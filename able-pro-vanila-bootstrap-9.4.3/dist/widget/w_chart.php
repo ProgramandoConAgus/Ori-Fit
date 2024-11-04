@@ -1,5 +1,5 @@
 <?php
-
+// hola
 
 ?>
 
@@ -405,9 +405,7 @@
                 <div class="d-flex align-items-center justify-content-between">
                   <h5 class="mb-0 d-inline-flex align-items-center"
                     ><svg class="pc-icon text-muted me-2">
-                      <use xlink:href="#custom-notification-outline"></use></svg
-                    >Notification</h5
-                  >
+                      <use xlink:href="#custom-notification-outline"></use></svg>Notification</h5>
                   <div class="form-check form-switch form-check-reverse m-0">
                     <input class="form-check-input f-18" type="checkbox" role="switch" />
                   </div>
