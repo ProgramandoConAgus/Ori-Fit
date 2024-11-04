@@ -2,7 +2,7 @@
 
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <!-- [Head] start -->
 
   <head>
@@ -602,7 +602,7 @@
                       <p class="text-white"
                         >Contesta un breve cuestionario y recibi un plan de alimentación personalizado para que puedas cumplir tus objetivos.</p
                       >
-                      <a href="../../dist/forms/form2_wizard.php" class="btn btn-outline-light">Hacer Test</a>
+                      <a href="../../dist/forms/form2_wizard.php" class="btn btn-outline-light">Rellenar Cuestionario</a>
                     </div>
                   </div>
                   <div class="col-sm-6 text-center">

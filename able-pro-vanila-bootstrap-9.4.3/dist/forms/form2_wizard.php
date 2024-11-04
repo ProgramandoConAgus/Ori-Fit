@@ -4,11 +4,11 @@
 ?>
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <!-- [Head] start -->
 
   <head>
-    <title>Test Nutricional</title>
+    <title>Cuestionario Nutricional</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
@@ -405,9 +405,8 @@
                 <div class="d-flex align-items-center justify-content-between">
                   <h5 class="mb-0 d-inline-flex align-items-center"
                     ><svg class="pc-icon text-muted me-2">
-                      <use xlink:href="#custom-notification-outline"></use></svg
-                    >Notification</h5
-                  >
+                      <use xlink:href="#custom-notification-outline"></use></svg>
+                      <h5>Notification</h5>
                   <div class="form-check form-switch form-check-reverse m-0">
                     <input class="form-check-input f-18" type="checkbox" role="switch" />
                   </div>
@@ -495,8 +494,7 @@
             <div class="d-grid mb-3">
               <button class="btn btn-primary">
                 <svg class="pc-icon me-2">
-                  <use xlink:href="#custom-logout-1-outline"></use></svg
-                >Logout
+                  <use xlink:href="#custom-logout-1-outline"></use></svg>Logout
               </button>
             </div>
             <div
@@ -634,7 +632,7 @@
                       <li class="nav-item" data-target-form="#educationDetailForm">
                         <a href="#educationDetail" data-bs-toggle="tab" data-toggle="tab" class="nav-link icon-btn">
                           <i class="ph-duotone ph-graduation-cap"></i>
-                          <span class="d-none d-sm-inline">Actividad</span>
+                          <span class="d-none d-sm-inline">Actividad Física</span>
                         </a>
                       </li>
                       <!-- end nav item -->
@@ -658,51 +656,72 @@
                       <!-- END: Define your progress bar here -->
                       <!-- START: Define your tab pans here -->
                       <div class="tab-pane show active" id="contactDetail">
-                        <form id="contactForm" method="get" action="/forms/form2_wizard.html">
-                          <div class="text-center">
-                            <h3 class="mb-2">Datos personales</h3>
-                            <small class="text-muted"
-                              >Información necesaria para el calculo del plan personalizado</small
-                            >
-                          </div>
-                          <div class="row mt-4">
-                            <div class="col-sm-auto text-center">
-                              <div class="position-relative me-3 d-inline-flex">
-                                <div class="position-absolute top-50 start-100 translate-middle">
-                                  <button class="btn btn-sm btn-primary btn-icon">
-                                    <i class="ti ti-pencil"></i>
-                                  </button>
+                      <form id="contactForm" method="post" action="guardar_datos.php">
+    <div class="text-center">
+        <h3 class="mb-2">Datos personales</h3>
+        <small class="text-muted">Información necesaria para el cálculo del plan personalizado</small>
+    </div>
+    <div class="row mt-4">
+        <div class="col-sm-auto text-center">
+            <div class="position-relative me-3 d-inline-flex">
+                <div class="position-absolute top-50 start-100 translate-middle">
+                    <button class="btn btn-sm btn-primary btn-icon">
+                        <i class="ti ti-pencil"></i>
+                    </button>
+                </div>
+                <img src="../assets/images/application/img-prod-3.jpg" alt="user-image" class="wid-150 rounded img-fluid ms-2" />
+            </div>
+        </div>
+        <div class="col">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre completo</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Introduzca su nombre completo" required />
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label">Edad</label>
+                        <input type="number" name="edad" class="form-control" placeholder="Introduzca su edad" required />
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label">Peso(kg)</label>
+                        <input type="number" name="peso" class="form-control" placeholder="Introduzca su peso en kilogramos" required />
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label">Altura(cm)</label>
+                        <input type="number" name="altura" class="form-control" placeholder="Introduzca su altura en centímetros" required />
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label">Género</label>
+                        <select name="genero" id="genero" class="form-control" required>
+                            <option value="default" disabled selected>Elige tu género</option>
+                            <option value="mujer">Mujer</option>
+                            <option value="hombre">Hombre</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label">Objetivo</label>
+                        <select name="objetivo" class="form-control" required>
+                            <option value="default" disabled selected>Elige tu objetivo</option>
+                            <option value="perderpeso">Perder peso</option>
+                            <option value="aumentomasa">Aumentar masa muscular</option>
+                            <option value="alimentacionsaludable">Alimentación saludable</option>
+                        </select>
                                 </div>
-                                <img
-                                  src="../assets/images/application/img-prod-3.jpg"
-                                  alt="user-image"
-                                  class="wid-150 rounded img-fluid ms-2"
-                                />
-                              </div>
-                            </div>
-                            <div class="col">
-                              <div class="row">
-                                <div class="col-sm-6">
-                                  <div class="mb-3">
-                                    <label class="form-label">Nombre Completo</label>
-                                    <input type="text" class="form-control" placeholder="Tu nombre completo" />
-                                  </div>
-                                </div>
-                                <div class="col-sm-6">
-                                  <div class="mb-3">
-                                    <label class="form-label">Edad</label>
-                                    <input type="text" class="form-control" placeholder="Tu Edad" />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12">
-                                  <div class="mb-3">
-                                    <label class="form-label">Objetivos</label>
-                                    <input type="email" class="form-control" placeholder="Ejemplo: Bajar de peso, masa muscular..." />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
                         </form>
                       </div>
                       <!-- end contact detail tab pane -->
@@ -718,31 +737,37 @@
                           <div class="row mt-4">
                             <div class="col-sm-6">
                               <div class="mb-3">
-                                <label class="form-label">Street Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Street Name" />
+                                <label class="form-label">¿Cuántas comidas al día quieres hacer?</label>
+                                <select class="form-control" required>
+                                    <option value="default" disabled selected>Elige cuantas comidas</option>
+                                      <option value="trescomidas"> Tres comidas</option>
+                                      <option value="cuatrocomidas">Cuatro comidas</option>
+                                      <option value="cincocomidas">Cinco comidas</option>
+                                      </select>
                               </div>
                             </div>
                             <div class="col-sm-6">
                               <div class="mb-3">
-                                <label class="form-label">Street No</label>
-                                <input type="text" class="form-control" placeholder="Enter Street No" />
+                                <label class="form-label"> ¿Hay algún alimento que no te guste o seas alérgico?</label>
+                                <input type="text" class="form-control" placeholder="Introduzca los alimentos que desea que se excluyan" required />
                               </div>
                             </div>
                             <div class="col-sm-6">
                               <div class="mb-3">
-                                <label class="form-label">City</label>
-                                <input type="text" class="form-control" placeholder="Enter City" />
+                                <label class="form-label"> Enfermedades o patologías alimenticias:</label>
+                                <input type="text" class="form-control" placeholder="" required />
                               </div>
                             </div>
                             <div class="col-sm-6">
                               <div class="mb-3">
-                                <label class="form-label">Country</label>
-                                <select class="form-select">
-                                  <option>Select Contry</option>
-                                  <option>India</option>
-                                  <option>Rusia</option>
-                                  <option>Dubai</option>
-                                </select>
+                                <label class="form-label">¿Cómo te sientes cuando comes?</label>
+                                <input type="text" class="form-control" placeholder="" required />
+                              </div>
+                            </div>
+                            <div class="col-sm-12">
+                              <div class="mb-3">
+                                <label class="form-label">Si tuvieses una situación de estrés/angustia. ¿Qué te ayuda a salir de eso?</label>
+                                <input type="text" class="form-control" placeholder="" required />
                               </div>
                             </div>
                           </div>
@@ -752,22 +777,47 @@
                       <div class="tab-pane" id="educationDetail">
                         <form id="educationForm" method="post" action="#">
                           <div class="text-center">
-                            <h3 class="mb-2">Tell us about your education</h3>
+                            <h3 class="mb-2">Actividad Física</h3>
                             <small class="text-muted"
-                              >Let us know your name and email address. Use an address you don't mind other users contacting you at</small
+                              >Necesitamos saber un poco sobre tu actividad física en lo cotidiano</small
                             >
                           </div>
                           <div class="row mt-4">
-                            <div class="col-md-12">
-                              <div class="mb-3">
-                                <label class="form-label" for="schoolName">School Name</label>
-                                <input type="text" class="form-control" id="schoolName" placeholder="enter your school name" />
+                             <div class="col-md-12">
+                               <div class="mb-3">
+                                 <label class="form-label" for="actividadtrabajo">¿Tu trabajo es sedentario o activo?</label>
+                                 <select class="form-control" required>
+                                   <option value="default" disabled selected>Elige si es sedentario o activo</option>
+                                   <option value="sedentario">Sedentario</option>
+                                   <option value="activo">Activo</option>
+                                 </select>
+                               </div>
+                             </div>
+
+                              <div class="col-md-12">
+                                <div class="mb-3">
+                                  <label class="form-label" for="ejercicio">¿Sueles hacer ejercicio físico?</label>
+                                  <select id="ejercicio" class="form-control" required>
+                                    <option value="default" disabled selected>Elige sí o no</option>
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                  </select>
+                                </div>
                               </div>
-                            </div>
-                            <div class="col-md-12">
-                              <div class="mb-3">
-                                <label class="form-label" for="schoolLocation">School Location</label>
-                                <input type="text" class="form-control" id="schoolLocation" placeholder="enter your school location" />
+
+                            <!-- Campos adicionales ocultos inicialmente -->
+                            <div id="extraFields" style="display: none; gap: 20px; margin-top: 10px;">
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label" for="diasEntrenamiento">Días de entrenamiento (1-7)</label>
+                                  <input type="number" id="diasEntrenamiento" class="form-control" min="1" max="7" placeholder="Días de entrenamiento" required />
+                                </div>
+                              </div>
+                              <div class="col-sm-6">
+                                <div class="mb-3">
+                                  <label class="form-label" for="intensidad">Intensidad (1-6)</label>
+                                  <input type="number" id="intensidad" class="form-control" min="1" max="6" placeholder="Intensidad" required />
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -795,18 +845,18 @@
                       <!-- START: Define your controller buttons here-->
                       <div class="d-flex wizard justify-content-between flex-wrap gap-2 mt-3">
                         <div class="first">
-                          <a href="javascript:void(0);" class="btn btn-secondary"> First </a>
+                          <a href="javascript:void(0);" class="btn btn-secondary"> Inicio </a>
                         </div>
                         <div class="d-flex">
                           <div class="previous me-2">
-                            <a href="javascript:void(0);" class="btn btn-secondary"> Back To Previous </a>
+                            <a href="javascript:void(0);" class="btn btn-secondary"> Atrás </a>
                           </div>
                           <div class="next">
-                            <a href="javascript:void(0);" class="btn btn-secondary"> Next Step </a>
+                            <a href="javascript:void(0);" id="nextButton" class="btn btn-secondary"> Siguiente </a>
                           </div>
                         </div>
                         <div class="last">
-                          <a href="javascript:void(0);" class="btn btn-secondary"> Finish </a>
+                          <a href="javascript:void(0);" class="btn btn-secondary"> Enviar </a>
                         </div>
                       </div>
                       <!-- END: Define your controller buttons here-->
@@ -842,7 +892,25 @@
 <script src="../assets/js/fonts/custom-font.js"></script>
 <script src="../assets/js/pcoded.js"></script>
 <script src="../assets/js/plugins/feather.min.js"></script>
+<script>
+  document.getElementById("ejercicio").addEventListener("change", function() {
+    const extraFields = document.getElementById("extraFields");
+    const diasEntrenamiento = document.getElementById("diasEntrenamiento");
+    const intensidad = document.getElementById("intensidad");
 
+    if (this.value === "si") {
+      extraFields.style.display = "flex"; 
+      diasEntrenamiento.required = true; // Establece los campos como obligatorios
+      intensidad.required = true;
+    } else {
+      extraFields.style.display = "none";
+      diasEntrenamiento.required = false; // Desactiva el requisito de campos obligatorios
+      intensidad.required = false;
+      diasEntrenamiento.value = ""; // Limpia el campo
+      intensidad.value = ""; // Limpia el campo
+    }
+  });
+</script>
 
 <script>
   layout_change('light');
@@ -1120,6 +1188,7 @@
         </div>
       </div>
     </div>
+    
 
   </body>
   <!-- [Body] end -->

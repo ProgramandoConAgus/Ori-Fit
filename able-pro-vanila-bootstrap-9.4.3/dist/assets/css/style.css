@@ -1170,7 +1170,7 @@ progress {
   }
   .col-sm-12 {
     flex: 0 0 auto;
-    width: 100%;
+    width: 50%;
   }
   .offset-sm-0 {
     margin-left: 0;
@@ -2782,7 +2782,7 @@ textarea.form-control-lg {
   z-index: -1;
   height: 1.5em;
   content: "";
-  background-color: #ffffff;
+  background-color:#ffffff;
   border-radius: 8px;
 }
 .form-floating > .form-control:-webkit-autofill ~ label, .form-floating > .datatable-input:-webkit-autofill ~ label, .form-floating > .custom-select:-webkit-autofill ~ label,
@@ -30412,6 +30412,11 @@ table.dataTable tbody > tr.selected th.select-checkbox:after {
 div.dataTables_wrapper div.dt-row {
   margin-top: 8px !important;
   margin-bottom: 8px !important;
+}
+
+.mbb-3 {
+  float: right;
+  color: #000;
 }
 
 /**  =====================
