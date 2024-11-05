@@ -598,8 +598,7 @@
 <!-- [ Header ] end -->
 
 
-
-    <!-- [ Main Content ] start -->
+<!-- [ Main Content ] start -->
     <div class="pc-container">
       <div class="pc-content">
 
@@ -607,7 +606,7 @@
         <!-- [ Main Content ] start -->
         <div class="row">
           <!-- [ sample-page ] start -->
-          <div class="col-sm-12">
+          <div class="col-12">
            
             <div id="basicwizard" class="form-wizard row justify-content-center">
               
