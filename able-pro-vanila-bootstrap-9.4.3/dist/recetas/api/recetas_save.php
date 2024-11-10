@@ -6,14 +6,14 @@
 }
 $uri .= $_SERVER['HTTP_HOST'];
 $uniqueName ="";
- 
+require_once '../../configuration.php';
+
 try {
    
 
     // Verifica si el archivo ha sido cargado
     if (isset($_FILES['foto_receta']) && $_FILES['foto_receta']['error'] === UPLOAD_ERR_OK) {
-        // Ruta de la carpeta donde quieres almacenar las fotos
-        $targetDir = "/Applications/XAMPP/htdocs/Ori-Fit/able-pro-vanila-bootstrap-9.4.3/dist/files/";
+      
 
         // Crea la carpeta si no existe
         if (!is_dir($targetDir)) {
@@ -40,30 +40,7 @@ try {
 
         // Mover el archivo a la carpeta de destino
         if (move_uploaded_file($_FILES['foto_receta']['tmp_name'], $targetFile)) {
-            //echo "Archivo subido exitosamente.";
-
-            // // Guardar la información de la receta en la base de datos
-            // require_once '../sql_files/database.php';
-            // $database = new Database();
-            // $conn = $database->getConnection();
-
-            // // Otros datos de la receta
-            // $titulo = $_POST['titulo'];
-            // $descripcion = $_POST['descripcion'];
-            // $dificultad = $_POST['dificultad'];
             
-            // // Consulta para guardar la receta con la ruta de la foto
-            // $stmt = $conn->prepare("INSERT INTO recetas (titulo, descripcion, dificultad, foto) VALUES (?, ?, ?, ?)");
-            // $stmt->bind_param("ssss", $titulo, $descripcion, $dificultad, $targetFile);
-
-            // if ($stmt->execute()) {
-            //     //echo "Receta guardada con éxito.";
-            // } else {
-            //     throw new Exception("Error al guardar la receta: " . $conn->error);
-            // }
-
-            // $stmt->close();
-            // $conn->close();
         } else {
             throw new Exception("Error al mover el archivo a la carpeta de destino.");
         }
@@ -78,6 +55,7 @@ try {
 try {
     // Conexión a la base de datos
     require_once '../../sql_files/database.php';
+   
 
     $database = new Database(); 
     $conn = $database->getConnection(); 
@@ -85,12 +63,18 @@ try {
     // Iniciar la transacción
     $conn->beginTransaction(); 
     // Insertar en la tabla recetas
-    $sqlReceta = "INSERT INTO recetas (titulo, descripcion, dificultad, foto) VALUES (:titulo, :descripcion, :dificultad, :foto)";
+    $sqlReceta = "INSERT INTO recetas (titulo, descripcion, dificultad, foto, tiempo_preparacion, porciones) VALUES (:titulo, :descripcion, :dificultad, :foto, :tiempo_preparacion, :porciones)";
     $stmtReceta = $conn->prepare($sqlReceta);
     $stmtReceta->bindParam(':titulo', $_POST['titulo']);
     $stmtReceta->bindParam(':descripcion', $_POST['descripcion']);
-    $stmtReceta->bindParam(':dificultad',$_POST['dificultad']);
+    $stmtReceta->bindParam(':dificultad',$_POST['dificultad']); 
+
+    $tiempo_preparacion = !empty($_POST['tiempo_preparacion']) ? $_POST['tiempo_preparacion'] : null;
+    $porciones = !empty($_POST['porciones']) ? $_POST['porciones'] : null;
  
+
+    $stmtReceta->bindParam(':tiempo_preparacion',$tiempo_preparacion);
+    $stmtReceta->bindParam(':porciones',$porciones);
     $stmtReceta->bindParam(':foto', $uniqueName);
    
     

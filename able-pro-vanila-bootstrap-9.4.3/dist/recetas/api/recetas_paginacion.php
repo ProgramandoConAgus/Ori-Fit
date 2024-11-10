@@ -18,7 +18,7 @@ $dificultad = $_GET['dificultad'] ?? '';
 $tiempo_preparacion = $_GET['tiempo_preparacion'] ?? '';
 $ingrediente = $_GET['ingrediente'] ?? '';  // Nuevo filtro para ingrediente
 $page = $_GET['page'] ?? 1;
-$limit = 6; // Número de recetas por página
+$limit = 8; // Número de recetas por página
 $offset = ($page - 1) * $limit;
 
 //echo 'coco 23'.$database->host;

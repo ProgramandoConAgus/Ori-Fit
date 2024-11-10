@@ -8,37 +8,49 @@
     <form id="formReceta" action="api/recetas_update.php" method="POST" enctype="multipart/form-data">
         <input type="hidden" value="<?php echo $_GET['id'] ?>" name="id" />
         <!-- Información de la Receta -->
-        <div class="mb-3">
-            <label for="titulo" class="form-label">Título</label>
-            <input type="text" class="form-control" id="titulo" name="titulo" required>
-        </div>
-        <div class="mb-3">
-            <label for="descripcion" class="form-label">Descripción</label>
-            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="dificultad" class="form-label">Dificultad</label>
-            <select class="form-select" id="dificultad" name="dificultad">
-                <option value="fácil">Fácil</option>
-                <option value="media">Media</option>
-                <option value="difícil">Difícil</option>
-            </select>
-        </div>
+        <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="titulo" class="form-label">Título</label>
+                    <input type="text" class="form-control" id="titulo" name="titulo" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="dificultad" class="form-label">Dificultad</label>
+                    <select class="form-select" id="dificultad" name="dificultad">
+                        <option value="fácil">Fácil</option>
+                        <option value="media">Media</option>
+                        <option value="difícil">Difícil</option>
+                    </select>
+                </div> 
+                <div class="col-md-12 mb-3">
+                    <label for="descripcion" class="form-label">Descripción</label>
+                    <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="tiempo_preparacion" class="form-label">Tiempo de preparación(Min)</label>
+                    <input type="number" class="form-control" id="tiempo_preparacion" name="tiempo_preparacion">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="porciones" class="form-label">Porciones</label>
+                    <input type="number" class="form-control" id="porciones" name="porciones">
+                </div> 
+                
+            </div>
 
         <div class="mb-3">
             <label for="descripcion" class="form-label">Foto</label>
             <input type="file" name="foto_receta">
         </div>
-
+        <button type="button" class="btn btn-primary mb-3" id="btnAddIngrediente">Agregar Ingrediente</button>
         <!-- Ingredientes -->
         <h5>Ingredientes</h5>
         <div id="ingredientesList">
            
-        </div>
-        <button type="button" class="btn btn-primary mb-3" id="btnAddIngrediente">Agregar Ingrediente</button>
+        </div> 
 
         <!-- Botón de Enviar -->
         <button type="submit" class="btn btn-success">Guardar Receta</button>
+        <a href="./" type="button" class="btn btn-secondary">Volver al listado</a>
     </form>
     <div class="row g-3 mb-2 ingrediente-item ingrediente-clonable">
         <div class="col-md-5">
@@ -152,6 +164,8 @@
             $("#titulo").val(receta.titulo);
             $("#descripcion").val(receta.descripcion);
             $("#dificultad").val(receta.dificultad);
+            $("#tiempo_preparacion").val(receta.tiempo_preparacion);
+            $("#porciones").val(receta.porciones);
 
             if(receta.ingredientes!=null && receta.ingredientes.length > 0 ){
                 for(var i =0; i< receta.ingredientes.length; i++){

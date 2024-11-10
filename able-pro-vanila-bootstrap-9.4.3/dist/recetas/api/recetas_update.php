@@ -8,7 +8,7 @@ $uri .= $_SERVER['HTTP_HOST'];
 $uniqueName ="";
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
+require_once '../../configuration.php';
   
 
 //buscamos el registro actual en la db
@@ -42,9 +42,7 @@ try{
 
 
     if (isset($_FILES['foto_receta']) && $_FILES['foto_receta']['error'] === UPLOAD_ERR_OK) {
-        // Ruta de la carpeta donde quieres almacenar las fotos
-        $targetDir = "/Applications/XAMPP/htdocs/Ori-Fit/able-pro-vanila-bootstrap-9.4.3/dist/files/";
-
+         
         
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0777, true);
@@ -86,11 +84,17 @@ try {
     // Iniciar la transacción
     $conn->beginTransaction(); 
     // Insertar en la tabla recetas
-    $sqlReceta = "update recetas set titulo=:titulo, descripcion=:descripcion, dificultad=:dificultad, foto=:foto where id=:id";
+    $fecha_actualizacion = date("Y-m-d H:i:s");
+    $sqlReceta = "update recetas set fecha_actualizacion = :fecha_actualizacion, titulo=:titulo, descripcion=:descripcion, dificultad=:dificultad, foto=:foto, tiempo_preparacion=:tiempo_preparacion, porciones=:porciones where id=:id";
     $stmtReceta = $conn->prepare($sqlReceta);
     $stmtReceta->bindParam(':titulo', $_POST['titulo']);
     $stmtReceta->bindParam(':descripcion', $_POST['descripcion']);
     $stmtReceta->bindParam(':dificultad',$_POST['dificultad']);
+    $tiempo_preparacion = !empty($_POST['tiempo_preparacion']) ? $_POST['tiempo_preparacion'] : null;
+    $porciones = !empty($_POST['porciones']) ? $_POST['porciones'] : null; 
+    $stmtReceta->bindParam(':tiempo_preparacion',$tiempo_preparacion);
+    $stmtReceta->bindParam(':porciones',$porciones);
+    $stmtReceta->bindParam(':fecha_actualizacion',$fecha_actualizacion);
     $stmtReceta->bindParam(':id',$_POST['id']);
  
     $stmtReceta->bindParam(':foto', $uniqueName); 
