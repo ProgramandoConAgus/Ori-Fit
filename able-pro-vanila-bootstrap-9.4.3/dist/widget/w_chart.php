@@ -139,6 +139,16 @@
             <span class="pc-mtext">Mi Progreso</span>
           </a>
         </li>
+        <li class="pc-item">
+  <a href="../../dist/widget/w_solis.php" class="pc-link">
+    <span class="pc-micon">
+      <svg class="pc-icon">
+        <use xlink:href="#custom-fatrows"></use>
+      </svg>
+    </span>
+    <span class="pc-mtext">Solicitudes</span>
+  </a>
+</li>
 
       </ul>
     </div>

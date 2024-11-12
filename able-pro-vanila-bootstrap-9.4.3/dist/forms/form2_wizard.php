@@ -1,5 +1,5 @@
 <?php
-//Hola pablo
+
 
 ?>
 
@@ -139,7 +139,16 @@
             <span class="pc-mtext">Mi Progreso</span>
           </a>
         </li>
-
+<li class="pc-item">
+  <a href="../../dist/widget/w_solis.php" class="pc-link">
+    <span class="pc-micon">
+      <svg class="pc-icon">
+        <use xlink:href="#custom-fatrows"></use>
+      </svg>
+    </span>
+    <span class="pc-mtext">Solicitudes</span>
+  </a>
+</li>
       </ul>
     </div>
   </div>
@@ -655,7 +664,7 @@
                       <!-- END: Define your progress bar here -->
                       <!-- START: Define your tab pans here -->
                       <div class="tab-pane show active" id="contactDetail">
-                      <form id="contactForm" method="post" action="guardar_datos.php">
+                      <form id="contactForm" action="../../dist/Forms/guardar_datos.php" method="POST">
     <div class="text-center">
         <h3 class="mb-2">Datos personales</h3>
         <small class="text-muted">Información necesaria para el cálculo del plan personalizado</small>
@@ -688,7 +697,7 @@
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label class="form-label">Peso(kg)</label>
-                        <input type="number" name="peso" class="form-control" placeholder="Introduzca su peso en kilogramos" required />
+                        <input type="number" name="peso" class="form-control" step="0.01" placeholder="Introduzca su peso en kilogramos" required />
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -721,11 +730,9 @@
                                    </div>
                                </div>
                            </div>
-                        </form>
                       </div>
                       <!-- end contact detail tab pane -->
                       <div class="tab-pane" id="jobDetail">
-                        <form id="jobForm" method="post" action="#">
                           <div class="text-center">
                             <h3 class="mb-2">Preguntas sobre tu alimentación</h3>
                             <small class="text-muted"
@@ -737,7 +744,7 @@
                             <div class="col-sm-6">
                               <div class="mb-3">
                                 <label class="form-label">¿Cuántas comidas al día quieres hacer?</label>
-                                <select class="form-control" required>
+                                <select name="comidas" class="form-control" required>
                                     <option value="default" disabled selected>Elige cuantas comidas</option>
                                       <option value="trescomidas"> Tres comidas</option>
                                       <option value="cuatrocomidas">Cuatro comidas</option>
@@ -748,44 +755,40 @@
                             <div class="col-sm-6">
                               <div class="mb-3">
                                 <label class="form-label"> ¿Hay algún alimento que no te guste o seas alérgico?</label>
-                                <input type="text" class="form-control" placeholder="Introduzca los alimentos que desea que se excluyan" required />
+                                <input type="text" name="alimentos_excluidos" class="form-control" placeholder="Introduzca los alimentos que desea que se excluyan" required />
                               </div>
                             </div>
                             <div class="col-sm-6">
                               <div class="mb-3">
                                 <label class="form-label"> Enfermedades o patologías alimenticias:</label>
-                                <input type="text" class="form-control" placeholder="" required />
+                                <input type="text" name="enfermedades" class="form-control" placeholder="" required />
                               </div>
                             </div>
                             <div class="col-sm-6">
                               <div class="mb-3">
                                 <label class="form-label">¿Cómo te sientes cuando comes?</label>
-                                <input type="text" class="form-control" placeholder="" required />
+                                <input type="text" name="sentimientos_alimentacion" class="form-control" placeholder="" required />
                               </div>
                             </div>
-                            <div class="col-sm-12">
+                            <div class="col-12">
                               <div class="mb-3">
                                 <label class="form-label">Si tuvieses una situación de estrés/angustia. ¿Qué te ayuda a salir de eso?</label>
-                                <input type="text" class="form-control" placeholder="" required />
+                                <input type="text" name="estrés_soluciones" class="form-control" placeholder="" required />
                               </div>
                             </div>
                           </div>
-                        </form>
                       </div>
                       <!-- end job detail tab pane -->
                       <div class="tab-pane" id="educationDetail">
-                        <form id="educationForm" method="post" action="#">
                           <div class="text-center">
                             <h3 class="mb-2">Actividad Física</h3>
-                            <small class="text-muted"
-                              >Necesitamos saber un poco sobre tu actividad física en lo cotidiano</small
-                            >
+                            <small class="text-muted">Necesitamos saber un poco sobre tu actividad física en lo cotidiano</small>
                           </div>
                           <div class="row mt-4">
                              <div class="col-md-12">
                                <div class="mb-3">
                                  <label class="form-label" for="actividadtrabajo">¿Tu trabajo es sedentario o activo?</label>
-                                 <select class="form-control" required>
+                                 <select name="trabajo" class="form-control" required>
                                    <option value="default" disabled selected>Elige si es sedentario o activo</option>
                                    <option value="sedentario">Sedentario</option>
                                    <option value="activo">Activo</option>
@@ -796,8 +799,8 @@
                               <div class="col-md-12">
                                 <div class="mb-3">
                                   <label class="form-label" for="ejercicio">¿Sueles hacer ejercicio físico?</label>
-                                  <select id="ejercicio" class="form-control" required>
-                                    <option value="default" disabled selected>Elige sí o no</option>
+                                  <select name="ejercicio" id="ejercicio" class="form-control" required>
+                                    <option value="default" disabled selected>Elige si o no</option>
                                     <option value="si">Si</option>
                                     <option value="no">No</option>
                                   </select>
@@ -809,13 +812,13 @@
                             <div class="col-sm-6">
                                 <div class="mb-3">
                                   <label class="form-label" for="diasEntrenamiento">Días de entrenamiento (1-7)</label>
-                                  <input type="number" id="diasEntrenamiento" class="form-control" min="1" max="7" placeholder="Días de entrenamiento" required />
+                                  <input name="dias_entrenamiento" type="number" id="diasEntrenamiento" class="form-control" min="1" max="7" placeholder="Días de entrenamiento" required />
                                 </div>
                               </div>
                               <div class="col-sm-6">
                                 <div class="mb-3">
                                   <label class="form-label" for="intensidad">Intensidad (1-6)</label>
-                                  <input type="number" id="intensidad" class="form-control" min="1" max="6" placeholder="Intensidad" required />
+                                  <input name="intensidad" type="number" id="intensidad" class="form-control" min="1" max="6" placeholder="Intensidad" required />
                                 </div>
                               </div>
                             </div>
@@ -855,7 +858,7 @@
                           </div>
                         </div>
                         <div class="last">
-                          <a href="javascript:void(0);" class="btn btn-secondary"> Enviar </a>
+                          <a href="javascript:void(0);" type="submit" class="btn btn-secondary"> Enviar </a>
                         </div>
                       </div>
                       <!-- END: Define your controller buttons here-->
@@ -1016,8 +1019,7 @@
                       data-value="true"
                       onclick="layout_theme_contrast_change('true');"
                       data-bs-toggle="tooltip"
-                      title="True"
-                    >
+                      title="True">
                       <svg class="pc-icon">
                         <use xlink:href="#custom-mask"></use>
                       </svg>
@@ -1031,8 +1033,7 @@
                       data-value="false"
                       onclick="layout_theme_contrast_change('false');"
                       data-bs-toggle="tooltip"
-                      title="False"
-                    >
+                      title="False">
                       <svg class="pc-icon">
                         <use xlink:href="#custom-mask-1-outline"></use>
                       </svg>
@@ -1089,8 +1090,7 @@
                       data-value="true"
                       onclick="layout_caption_change('true');"
                       data-bs-toggle="tooltip"
-                      title="Caption Show"
-                    >
+                      title="Caption Show">
                       <img src="../assets/images/customizer/caption-on.svg" alt="img" class="img-fluid" />
                     </button>
                   </div>
@@ -1102,8 +1102,7 @@
                       data-value="false"
                       onclick="layout_caption_change('false');"
                       data-bs-toggle="tooltip"
-                      title="Caption Hide"
-                    >
+                      title="Caption Hide">
                       <img src="../assets/images/customizer/caption-off.svg" alt="img" class="img-fluid" />
                     </button>
                   </div>
@@ -1122,8 +1121,7 @@
                         data-value="false"
                         onclick="layout_rtl_change('false');"
                         data-bs-toggle="tooltip"
-                        title="LTR"
-                      >
+                        title="LTR">
                         <img src="../assets/images/customizer/ltr.svg" alt="img" class="img-fluid" />
                       </button>
                     </div>
@@ -1135,8 +1133,7 @@
                         data-value="true"
                         onclick="layout_rtl_change('true');"
                         data-bs-toggle="tooltip"
-                        title="RTL"
-                      >
+                        title="RTL">
                         <img src="../assets/images/customizer/rtl.svg" alt="img" class="img-fluid" />
                       </button>
                     </div>
@@ -1156,8 +1153,7 @@
                         data-value="false"
                         onclick="change_box_container('false')"
                         data-bs-toggle="tooltip"
-                        title="Full Width"
-                      >
+                        title="Full Width">
                         <img src="../assets/images/customizer/full.svg" alt="img" class="img-fluid" />
                       </button>
                     </div>
@@ -1169,8 +1165,7 @@
                         data-value="true"
                         onclick="change_box_container('true')"
                         data-bs-toggle="tooltip"
-                        title="Fixed Width"
-                      >
+                        title="Fixed Width">
                         <img src="../assets/images/customizer/fixed.svg" alt="img" class="img-fluid" />
                       </button>
                     </div>
