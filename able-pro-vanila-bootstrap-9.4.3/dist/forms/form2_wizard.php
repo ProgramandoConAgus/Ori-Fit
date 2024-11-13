@@ -23,7 +23,7 @@
     />
     <meta name="author" content="Phoenixcoded" />
 
-    <!-- [Favicon] icon -->
+     <!-- [Favicon] icon -->
     <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
  <!-- [Font] Family -->
 <link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
@@ -661,9 +661,7 @@
                         <form id="contactForm" method="get" action="/forms/form2_wizard.html">
                           <div class="text-center">
                             <h3 class="mb-2">Datos personales</h3>
-                            <small class="text-muted"
-                              >Información necesaria para el calculo del plan personalizado</small
-                            >
+                            <small class="text-muted">Información necesaria para el calculo del plan personalizado</small>
                           </div>
                           <div class="row mt-4">
                             <div class="col-sm-auto text-center">
@@ -696,11 +694,21 @@
                                 </div>
                                 <div class="col-sm-12">
                                   <div class="mb-3">
-                                    <label class="form-label">Objetivos</label>
-                                    <input type="email" class="form-control" placeholder="Ejemplo: Bajar de peso, masa muscular..." />
+                                    <label class="form-label" for="objetivo">Objetivos</label>
+                                    <select id="objetivo" name="objetivo" class="form-control" required>
+                                        <option value="perder_peso">Perder peso</option>
+                                        <option value="mantener_peso">Mantener peso</option>
+                                        <option value="ganar_peso">Ganar peso</option>
+                                    </select>
                                   </div>
+                                    <label class="form-label" for="alergias">Alergias:</label>
+                                      <div id="alergias-multiselect">
+                                        <input type="text" id="alergias-input" name="alergias" class="form-control" placeholder="Escribe el nombre de un alimento..." autocomplete="off">
+                                          <div id="sugerencias" style="border: 1px solid #ccc; display: none;"></div>
+                                          <div id="seleccionados"></div>  
+                                      </div>  
                                 </div>
-                              </div>
+                              </div> 
                             </div>
                           </div>
                         </form>
@@ -711,37 +719,42 @@
                           <div class="text-center">
                             <h3 class="mb-2">Preguntas sobre tu alimentación</h3>
                             <small class="text-muted"
-                              >Esto servira para saber desde que punto partes</small
-                            >
+                              >Esto servira para saber desde que punto partes</small>
                           </div>
                           
                           <div class="row mt-4">
                             <div class="col-sm-6">
                               <div class="mb-3">
-                                <label class="form-label">Street Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Street Name" />
+                                <label class="form-label">Sexo</label>
+                                <select id="sexo" name="sexo" required class="form-control" placeholder="Seleccionar">
+                                  <option value="seleccionar">Seleccionar</option>  
+                                  <option value="hombre">Hombre</option>
+                                  <option value="mujer">Mujer</option>
+                                </select>
                               </div>
                             </div>
                             <div class="col-sm-6">
                               <div class="mb-3">
-                                <label class="form-label">Street No</label>
+                                <label class="form-label">Peso</label>
                                 <input type="text" class="form-control" placeholder="Enter Street No" />
                               </div>
                             </div>
                             <div class="col-sm-6">
                               <div class="mb-3">
-                                <label class="form-label">City</label>
+                                <label class="form-label">Altura</label>
                                 <input type="text" class="form-control" placeholder="Enter City" />
                               </div>
                             </div>
                             <div class="col-sm-6">
                               <div class="mb-3">
-                                <label class="form-label">Country</label>
-                                <select class="form-select">
-                                  <option>Select Contry</option>
-                                  <option>India</option>
-                                  <option>Rusia</option>
-                                  <option>Dubai</option>
+                                <label class="form-label" for="actividad">Nivel de Actividad:</label>
+                                <select class="form-select" id="actividad" name="actividad" required>
+                                      <option value="seleccionar">Seleccionar</option> 
+                                      <option value="sedentario">Sedentario (poco o ningún ejercicio)</option>
+                                      <option value="ligero">Ligero (ejercicio ligero)</option>
+                                      <option value="moderado">Moderado (ejercicio moderado)</option>
+                                      <option value="intenso">Intenso (ejercicio intenso)</option>
+                                      <option value="muy_intenso">Muy Intenso (ejercicio muy intenso)</option>
                                 </select>
                               </div>
                             </div>
@@ -842,6 +855,10 @@
 <script src="../assets/js/fonts/custom-font.js"></script>
 <script src="../assets/js/pcoded.js"></script>
 <script src="../assets/js/plugins/feather.min.js"></script>
+
+ <!-- [Autocompletado JS-  Alergias] -->
+ <script src="js/autocomplete.js"></script>
+
 
 
 <script>
