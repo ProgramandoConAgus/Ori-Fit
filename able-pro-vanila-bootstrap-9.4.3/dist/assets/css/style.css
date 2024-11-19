@@ -1170,7 +1170,7 @@ progress {
   }
   .col-sm-12 {
     flex: 0 0 auto;
-    width: 100%;
+    width: 50%;
   }
   .offset-sm-0 {
     margin-left: 0;
@@ -2782,7 +2782,7 @@ textarea.form-control-lg {
   z-index: -1;
   height: 1.5em;
   content: "";
-  background-color: #ffffff;
+  background-color:#ffffff;
   border-radius: 8px;
 }
 .form-floating > .form-control:-webkit-autofill ~ label, .form-floating > .datatable-input:-webkit-autofill ~ label, .form-floating > .custom-select:-webkit-autofill ~ label,
@@ -3254,6 +3254,8 @@ textarea.is-invalid.dataTable-input {
   --bs-btn-disabled-bg: #4680ff;
   --bs-btn-disabled-border-color: #4680ff;
 }
+
+
 
 .btn-secondary, .introjs-tooltip .introjs-button.introjs-prevbutton {
   --bs-btn-color: #ffffff;
@@ -8104,6 +8106,7 @@ textarea.is-invalid.dataTable-input {
 }
 [data-pc-direction=ltr] .mb-0 {
   margin-bottom: 0 !important;
+  
 }
 [data-pc-direction=ltr] .mb-1 {
   margin-bottom: 0.25rem !important;
@@ -13096,6 +13099,7 @@ textarea.is-invalid.dataTable-input {
 }
 [data-pc-direction=rtl] .mb-0 {
   margin-bottom: 0 !important;
+  textright: 70px;
 }
 [data-pc-direction=rtl] .mb-1 {
   margin-bottom: 0.25rem !important;
@@ -30412,6 +30416,11 @@ table.dataTable tbody > tr.selected th.select-checkbox:after {
 div.dataTables_wrapper div.dt-row {
   margin-top: 8px !important;
   margin-bottom: 8px !important;
+}
+
+.mbb-3 {
+  float: right;
+  color: #000;
 }
 
 /**  =====================
