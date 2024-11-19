@@ -20,6 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ejercicio = trim($_POST['ejercicio']);
     $dias_entrenamiento = isset($_POST['dias_entrenamiento']) ? filter_var(trim($_POST['dias_entrenamiento']), FILTER_VALIDATE_INT) : null;
     $intensidad = isset($_POST['intensidad']) ? filter_var(trim($_POST['intensidad']), FILTER_VALIDATE_INT) : null;
+    $estado = "pendiente"; // Estado por defecto
     $fechaHoraActual = date('Y-m-d H:i:s'); 
 
     // Validar campos requeridos
@@ -45,8 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         // Insertar datos en la base de datos
-        $sql = "INSERT INTO solicitudes (nombre, edad, genero, email, peso, altura, objetivo, suscripcion, comidas, alimentos_excluidos, enfermedades, sentimientos_alimentacion, estres_soluciones, trabajo, ejercicio, dias_entrenamiento, intensidad, fecha_envio) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO solicitudes (nombre, edad, genero, email, peso, altura, objetivo, suscripcion, comidas, alimentos_excluidos, enfermedades, sentimientos_alimentacion, estres_soluciones, trabajo, ejercicio, dias_entrenamiento, intensidad, estado, fecha_envio) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conexion->prepare($sql);
 
         // Verificar si la consulta se preparó correctamente
@@ -56,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Asociar los parámetros y ejecutar la consulta
         $stmt->bind_param(
-            "sissdisssssssssiis",
+            "sissdisssssssssiiss",
             $nombre,
             $edad,
             $genero, 
@@ -74,6 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $ejercicio,
             $dias_entrenamiento,
             $intensidad,
+            $estado,
             $fechaHoraActual
         );
 
