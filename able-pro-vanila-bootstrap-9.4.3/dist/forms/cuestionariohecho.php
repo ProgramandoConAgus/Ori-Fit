@@ -1,3 +1,12 @@
+
+
+
+
+
+
+
+
+
 <?php
 
 ?>
@@ -39,6 +48,7 @@
 <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
 <script src="../assets/js/tech-stack.js"></script>
 <link rel="stylesheet" href="../assets/css/style-preset.css" />
+
 
   </head>
   <!-- [Head] end -->
@@ -138,13 +148,13 @@
           </a>
         </li>
         <li class="pc-item">
-          <a href="../../dist/widget/w_solis.php" class="pc-link">
-            <span class="pc-micon">
-              <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
-            </span>
-            <span class="pc-mtext">Solicitudes</span>
-           </a>
-       </li>
+  <a href="../../dist/widget/w_solis.php" class="pc-link">
+    <span class="pc-micon">
+      <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
+    </span>
+    <span class="pc-mtext">Solicitudes</span>
+  </a>
+</li>
       </ul>
     </div>
   </div>
@@ -188,8 +198,7 @@
         href="#"
         role="button"
         aria-haspopup="false"
-        aria-expanded="false"
-      >
+        aria-expanded="false">
         <svg class="pc-icon">
           <use xlink:href="#custom-sun-1"></use>
         </svg>
@@ -222,8 +231,7 @@
         href="#"
         role="button"
         aria-haspopup="false"
-        aria-expanded="false"
-      >
+        aria-expanded="false">
         <svg class="pc-icon">
           <use xlink:href="#custom-setting-2"></use>
         </svg>
@@ -253,8 +261,7 @@
         href="#"
         role="button"
         aria-haspopup="false"
-        aria-expanded="false"
-      >
+        aria-expanded="false">
         <svg class="pc-icon">
           <use xlink:href="#custom-notification"></use>
         </svg>
@@ -280,7 +287,8 @@
                   <h5 class="text-body mb-2">UI/UX Design</h5>
                   <p class="mb-0"
                     >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
+                    type and scrambled it to make a type</p
+                  >
                 </div>
               </div>
             </div>
@@ -315,7 +323,8 @@
                   <h5 class="text-body mb-2">Forms</h5>
                   <p class="mb-0"
                     >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
+                    type and scrambled it to make a type</p
+                  >
                 </div>
               </div>
             </div>
@@ -351,7 +360,8 @@
                   <h5 class="text-body mb-2">Security</h5>
                   <p class="mb-0"
                     >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
+                    type and scrambled it to make a type</p
+                  >
                 </div>
               </div>
             </div>
@@ -392,7 +402,8 @@
             <div class="card">
               <div class="card-body py-3">
                 <div class="d-flex align-items-center justify-content-between">
-                  <h5 class="mb-0 d-inline-flex align-items-center"><svg class="pc-icon text-muted me-2">
+                  <h5 class="mb-0 d-inline-flex align-items-center"
+                    ><svg class="pc-icon text-muted me-2">
                       <use xlink:href="#custom-notification-outline"></use></svg>Notification</h5>
                   <div class="form-check form-switch form-check-reverse m-0">
                     <input class="form-check-input f-18" type="checkbox" role="switch" />
@@ -481,8 +492,7 @@
             <div class="d-grid mb-3">
               <button class="btn btn-primary">
                 <svg class="pc-icon me-2">
-                  <use xlink:href="#custom-logout-1-outline"></use></svg
-                >Logout
+                  <use xlink:href="#custom-logout-1-outline"></use></svg>Logout
               </button>
             </div>
             <div
@@ -582,10 +592,6 @@
     </div>
   </div>
 </div>
-<!-- [ Header ] end -->
-
-
-
     <!-- [ Main Content ] start -->
     <div class="pc-container">
       <div class="pc-content">
@@ -595,16 +601,26 @@
             <div class="card welcome-banner bg-blue-800">
               <div class="card-body">
                 <div class="row">
-                  <div class="col-sm-6">
-                    <div class="p-4">
-                      <h2 class="text-white">Comenza tu camino</h2>
-                      <p class="text-white">Contesta un breve cuestionario y recibe un plan de alimentación personalizado para que puedas cumplir tus objetivos.</p>
-                      <a href="../../dist/forms/form2_wizard.php" class="btn btn-outline-light">Rellenar Cuestionario</a>
-                    </div>
-                  </div>
+                <div class="tab-pane" id="finish">
+                        <div class="row d-flex justify-content-center">
+                          <div class="col-lg-6">
+                            <div class="text-center">
+                              <i class="ph-duotone ph-gift f-50 text-danger"></i>
+                              <h3 class="mt-4 mb-3">¡Muy bien! <br><br>
+                                Se ha enviado tu cuestionario correctamente</h3>
+                              <div class="mb-3">
+                                <div class="form-check d-inline-block">
+                                  <label class="form-check-label" for="customCheck1">Recibiras un email en las próximas 72 hs con tu plan personalizado.</label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- end col -->
+                        </div>
+                        <!-- end row -->
+                      </div>
                   <div class="col-sm-6 text-center">
                     <div class="img-welcome-banner">
-                      <img src="../assets/images/widget/welcome-banner.png" alt="img" class="img-fluid" />
                     </div>
                   </div>
                 </div>
@@ -612,7 +628,7 @@
             </div>
           </div>
           <div class="col-md-12">
-              <div class="card">
+            <div class="card">
               <div class="card-body border-bottom pb-0">
                 <div class="d-flex align-items-center justify-content-center">
                   <h5 class="mb-0">Tus planes</h5>
@@ -629,81 +645,28 @@
                       aria-controls="analytics-tab-1-pane"
                       aria-selected="true">Alimentación</button>
                   </li>
-                  
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
+                </ul>
               </div>
-            </div>
-          </div>
+              <div class="tab-content" id="myTabContent">
+                <div
+                  class="tab-pane fade show active"
+                  id="analytics-tab-1-pane"
+                  role="tabpanel"
+                  aria-labelledby="analytics-tab-1"
+                  tabindex="0">
 
-          <div class="col-xl-12 col-md-12">
-            <div class="card">
-              <div class="card-body pb-0">
-                <div class="d-flex align-items-center justify-content-between">
-                  <h5 class="mb-0">Usuarios</h5>
-                  <div class="dropdown">
-                    <a class="avtar avtar-s btn-link-secondary dropdown-toggle arrow-none" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="ti ti-dots-vertical f-18"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end" style="">
-                      <a class="dropdown-item" href="#">Today</a>
-                      <a class="dropdown-item" href="#">Weekly</a>
-                      <a class="dropdown-item" href="#">Monthly</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <ul class="list-group list-group-flush border-top-0">
-                <li class="list-group-item">
-                  <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                      <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
-                    </div>
-                    <div class="flex-grow-1 mx-2">
-                      <h6 class="mb-1">David Jones</h6>
-                      <p class="mb-0">Project Leader</p>
-                    </div>
-                    <div class="flex-shrink-0">
-                      <p class="text-muted mb-0">5 min ago</p>
-                    </div>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                      <img src="../assets/images/user/avatar-3.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
-                    </div>
-                    <div class="flex-grow-1 mx-2">
-                      <h6 class="mb-1">Robert Smith</h6>
-                      <p class="mb-0">HR Manager</p>
-                    </div>
-                    <div class="flex-shrink-0">
-                      <p class="text-muted mb-0">Yesterday</p>
-                    </div>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                      <img src="../assets/images/user/avatar-5.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
-                    </div>
-                    <div class="flex-grow-1 mx-2">
-                      <h6 class="mb-1">John larry</h6>
-                      <p class="mb-0">Developer</p>
-                    </div>
-                    <div class="flex-shrink-0">
-                      <p class="text-muted mb-0">1 hour ago</p>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                      <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                          <div class="avtar avtar-s border">🕘</div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                          <div class="row g-1">
+                            <div class="col-6">
+                              <h6 class="mb-0">Plan de Alimentación</h6>
+                              <p class="text-muted mb-0">Pendiente de revisión y confirmación.<small></small></p>
+                            </div>
         <!-- [ Main Content ] end -->
       </div>
     </div>
@@ -712,8 +675,7 @@
       <div class="footer-wrapper container-fluid">
         <div class="row">
           <div class="col my-1">
-            <p class="m-0"
-              >PCA - 2024</p>
+            <p class="m-0">PCA - 2024</p>
           </div>
          
         </div>
@@ -1001,3 +963,19 @@
 <?php
 
 ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

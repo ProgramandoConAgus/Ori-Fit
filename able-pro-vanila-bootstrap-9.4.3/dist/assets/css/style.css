@@ -3255,6 +3255,8 @@ textarea.is-invalid.dataTable-input {
   --bs-btn-disabled-border-color: #4680ff;
 }
 
+
+
 .btn-secondary, .introjs-tooltip .introjs-button.introjs-prevbutton {
   --bs-btn-color: #ffffff;
   --bs-btn-bg: #5b6b79;
@@ -8104,6 +8106,7 @@ textarea.is-invalid.dataTable-input {
 }
 [data-pc-direction=ltr] .mb-0 {
   margin-bottom: 0 !important;
+  
 }
 [data-pc-direction=ltr] .mb-1 {
   margin-bottom: 0.25rem !important;
@@ -13096,6 +13099,7 @@ textarea.is-invalid.dataTable-input {
 }
 [data-pc-direction=rtl] .mb-0 {
   margin-bottom: 0 !important;
+  textright: 70px;
 }
 [data-pc-direction=rtl] .mb-1 {
   margin-bottom: 0.25rem !important;
