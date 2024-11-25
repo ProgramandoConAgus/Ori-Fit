@@ -3,7 +3,7 @@
 $servidor="localhost";
 $usuario="root";
 $contraseña="";
-$baseDatos="ori";
+$baseDatos="orifit";
 
 //Crear conexion
 
