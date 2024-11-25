@@ -57,7 +57,7 @@
  <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
-      <a href="../dashboard/index.html" class="b-brand text-primary">
+      <a href="../forms/form2_wizard.php" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
         <img src="../assets/images/LOGO SIN FONDO-02.png" class="img-fluid" alt="logo" height="95px" width="95px"/>
         <span class="badge bg-light-success rounded-pill ms-2 theme-version">v1.0.0</span>
@@ -138,7 +138,15 @@
             <span class="pc-mtext">Mi Progreso</span>
           </a>
         </li>
-
+        <li class="pc-item">
+        <li class="pc-item">
+  <a href="../../dist/widget/w_solis.php" class="pc-link">
+    <span class="pc-micon">
+      <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
+    </span>
+    <span class="pc-mtext">Solicitudes</span>
+  </a>
+</li>
       </ul>
     </div>
   </div>
@@ -492,14 +500,12 @@
             <div class="d-grid mb-3">
               <button class="btn btn-primary">
                 <svg class="pc-icon me-2">
-                  <use xlink:href="#custom-logout-1-outline"></use></svg
-                >Logout
+                  <use xlink:href="#custom-logout-1-outline"></use></svg>Logout
               </button>
             </div>
             <div
               class="card border-0 shadow-none drp-upgrade-card mb-0"
-              style="background-image: url(../assets/images/layout/img-profile-card.jpg)"
-            >
+              style="background-image: url(../assets/images/layout/img-profile-card.jpg)">
               <div class="card-body">
                 <div class="user-group">
                   <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
