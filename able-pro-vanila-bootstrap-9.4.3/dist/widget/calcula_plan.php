@@ -10,7 +10,7 @@ session_start();
 $usuario_id = 1; // ID de usuario hardcodeado para pruebas
 
 // Consulta para obtener la última solicitud aprobada del usuario con rol "usuario"
-$sql = "SELECT peso, altura, edad, sexo, actividad, objetivo, fecha_solicitud, id 
+$sql = "SELECT peso, altura, edad, genero, actividad, objetivo, fecha_envio, id, trabajo, ejercicio, intensidad
         FROM solicitudes_nutricionales 
         WHERE usuario_id = ? AND estado_id = '1'
         ORDER BY fecha_solicitud DESC LIMIT 1"; // Solo la última solicitud aprobada
@@ -26,7 +26,7 @@ $stmt->execute();
 
 // Obtener el resultado de la consulta
 $resultado = $stmt->get_result();
-
+$actividad;
 // Verificar si se encontraron resultados
 if ($resultado->num_rows > 0) {
     // Asignar los datos obtenidos a variables
@@ -35,7 +35,24 @@ if ($resultado->num_rows > 0) {
     $altura = $fila['altura'];
     $edad = $fila['edad'];
     $sexo = $fila['sexo'];
-    $actividad = $fila['actividad'];
+    if($fila['trabajo']=="activo"){
+        if($fila['ejercicio']=="no"||$fila['intensidad']<3){
+            $actividad=2;
+        }
+        else if($fila['intensidad']<5){
+            $actividad=3;
+        }
+        else if($fila['intensidad']==5){
+            $actividad=4;
+        }
+        else{
+            $actividad=5;
+        }
+    }
+    else{
+        $actividad=1;
+    }
+   
     $objetivo = $fila['objetivo'];
     $fecha_solicitud = $fila['fecha_solicitud'];
     $solicitud_id = $fila['id'];
@@ -53,19 +70,19 @@ if ($sexo == 'hombre') {
 
 // Ajuste según nivel de actividad física
 switch ($actividad) {
-    case 'sedentario':
+    case 1:
         $factor_actividad = 1.2;
         break;
-    case 'ligero':
+    case 2:
         $factor_actividad = 1.375;
         break;
-    case 'moderado':
+    case 3:
         $factor_actividad = 1.55;
         break;
-    case 'intenso':
+    case 4:
         $factor_actividad = 1.725;
         break;
-    case 'muy_intenso':
+    case 5:
         $factor_actividad = 1.9;
         break;
 }
