@@ -1,4 +1,4 @@
-<?php
+<button?php
 
 
 ?>
@@ -24,7 +24,7 @@
     <meta name="author" content="Phoenixcoded" />
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="../assets/images/LOGO SIN FONDO-02.png" type="image/x-icon" />
  <!-- [Font] Family -->
 <link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
 <!-- [phosphor Icons] https://phosphoricons.com/ -->
@@ -142,9 +142,7 @@
 <li class="pc-item">
   <a href="../../dist/widget/w_solis.php" class="pc-link">
     <span class="pc-micon">
-      <svg class="pc-icon">
-        <use xlink:href="#custom-fatrows"></use>
-      </svg>
+      <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
     </span>
     <span class="pc-mtext">Solicitudes</span>
   </a>
@@ -508,8 +506,7 @@
             </div>
             <div
               class="card border-0 shadow-none drp-upgrade-card mb-0"
-              style="background-image: url(../assets/images/layout/img-profile-card.jpg)"
-            >
+              style="background-image: url(../assets/images/layout/img-profile-card.jpg)">
               <div class="card-body">
                 <div class="user-group">
                   <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
@@ -555,9 +552,8 @@
         <img src="../assets/images/layout/img-announcement-1.png" alt="img" class="img-fluid mb-3" />
         <div class="row">
           <div class="col-12">
-            <div class="d-grid"
-              ><a class="btn btn-outline-secondary" href="https://1.envato.market/zNkqj6" target="_blank">Check Now</a></div
-            >
+            <div class="d-grid"><a class="btn btn-outline-secondary" href="https://1.envato.market/zNkqj6" target="_blank">Check Now</a>
+            </div>
           </div>
         </div>
       </div>
@@ -619,37 +615,37 @@
            
             <div id="basicwizard" class="form-wizard row justify-content-center">
               
-              <div class="col-12">
-                <div class="card">
-                  <div class="card-body p-3">
-                    <ul class="nav nav-pills nav-justified">
-                      <li class="nav-item" data-target-form="#contactDetailForm">
-                        <a href="#contactDetail" data-bs-toggle="tab" data-toggle="tab" class="nav-link active">
-                          <i class="ph-duotone ph-user-circle"></i>
-                          <span class="d-none d-sm-inline">Datos Personales</span>
-                        </a>
-                      </li>
-                      <!-- end nav item -->
-                      <li class="nav-item" data-target-form="#jobDetailForm">
-                        <a href="#jobDetail" data-bs-toggle="tab" data-toggle="tab" class="nav-link icon-btn">
-                          <i class="ph-duotone ph-map-pin"></i>
-                          <span class="d-none d-sm-inline">Alimentación</span>
-                        </a>
-                      </li>
-                      <!-- end nav item -->
-                      <li class="nav-item" data-target-form="#educationDetailForm">
-                        <a href="#educationDetail" data-bs-toggle="tab" data-toggle="tab" class="nav-link icon-btn">
-                          <i class="ph-duotone ph-graduation-cap"></i>
-                          <span class="d-none d-sm-inline">Actividad Física</span>
-                        </a>
-                      </li>
-                      <!-- end nav item -->
-                      <li class="nav-item">
-                        <a href="#finish" data-bs-toggle="tab" data-toggle="tab" class="nav-link icon-btn">
-                          <i class="ph-duotone ph-check-circle"></i>
-                          <span class="d-none d-sm-inline">Listo!</span>
-                        </a>
-                      </li>
+            <div class="col-12">
+          <div class="card">
+         <div class="card-body p-3">
+        <ul class="nav nav-pills nav-justified">
+        <li class="nav-item" data-target-form="#contactDetailForm">
+          <a href="#contactDetail" class="nav-link active">
+          <img src="..//assets/images/icons-tab/icons8n.png" alt="Descripción de la imagen">
+            <span class="d-none d-sm-inline">Datos Personales</span>
+          </a>
+        </li>
+        <!-- end nav item -->
+        <li class="nav-item" data-target-form="#jobDetailForm">
+          <a href="#jobDetail" class="nav-link icon-btn">
+          <img src="..//assets/images/icons-tab/icons8c.png" alt="Descripción de la imagen">
+            <span class="d-none d-sm-inline">Alimentación</span>
+          </a>
+        </li>
+        <!-- end nav item -->
+          <li class="nav-item" data-target-form="#educationDetailForm">
+            <a href="#educationDetail" class="nav-link icon-btn">
+            <img src="..//assets/images/icons-tab/icon8b.png" alt="Descripción de la imagen">
+            <span class="d-none d-sm-inline">Actividad Física</span>
+          </a>
+        </li>
+        <!-- end nav item -->
+        <li class="nav-item">
+          <a href="#finish" class="nav-link icon-btn">
+          <img src="..//assets/images/icons-tab/icons8h.png" alt="Descripción de la imagen">
+            <span class="d-none d-sm-inline">¡Listo!</span>
+          </a>
+        </li>
                       <!-- end nav item -->
                     </ul>
                   </div>
@@ -658,16 +654,16 @@
                   <div class="card-body">
                     <div class="tab-content">
                       <!-- START: Define your progress bar here -->
-                      <div id="bar" class="progress mb-3" style="height: 7px">
-                        <div class="bar progress-bar progress-bar-striped progress-bar-animated bg-success"></div>
-                      </div>
+                      <div id="bar" class="progress mb-3" style="height: 7px;">
+  <div class="bar progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+</div>
                       <!-- END: Define your progress bar here -->
                       <!-- START: Define your tab pans here -->
                       <div class="tab-pane show active" id="contactDetail">
                       <form id="contactForm" action="../../dist/Forms/guardar_datos.php" method="POST">
     <div class="text-center">
         <h3 class="mb-2">Datos personales</h3>
-        <small class="text-muted">Información necesaria para el cálculo del plan personalizado</small>
+        <small class="text-muted">Tus datos personales nos ayudarán a generar un plan único y adecuado a tu situación.</small>
     </div>
     <div class="row mt-4">
         <div class="col-sm-auto text-center">
@@ -677,40 +673,45 @@
                         <i class="ti ti-pencil"></i>
                     </button>
                 </div>
-                <img src="../assets/images/application/img-prod-3.jpg" alt="user-image" class="wid-150 rounded img-fluid ms-2" />
+                <img src="../assets/images/icons-tab/orii.png" alt="user-image" class="wid-150 rounded img-fluid ms-2" />
             </div>
         </div>
         <div class="col">
             <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">
-                        <label class="form-label">Nombre completo</label>
-                        <input type="text" name="nombre" class="form-control" placeholder="Introduzca su nombre completo" required />
+                        <label class="form-label" for="nombre">Nombre completo</label>
+                        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Introduzca su nombre completo" required />
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="mb-3">
-                        <label class="form-label">Edad</label>
-                        <input type="number" name="edad" class="form-control" placeholder="Introduzca su edad" required />
+                        <label class="form-label" for="edad">Edad</label>
+                        <input type="number" id="edad" name="edad" class="form-control" placeholder="Introduzca su edad" required />
+                    </div>
+<<<<<<< HEAD
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="peso">Peso(kg)</label>
+                        <input type="number" id="peso" name="peso" class="form-control" step="0.01" placeholder="Introduzca su peso en kilogramos" required />
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="mb-3">
-                        <label class="form-label">Peso(kg)</label>
-                        <input type="number" name="peso" class="form-control" step="0.01" placeholder="Introduzca su peso en kilogramos" required />
+                        <label class="form-label" for="altura">Altura(cm)</label>
+                        <input type="number" id="altura" name="altura" class="form-control" placeholder="Introduzca su altura en centímetros" required />
                     </div>
                 </div>
                 <div class="col-sm-6">
-                    <div class="mb-3">
-                        <label class="form-label">Altura(cm)</label>
-                        <input type="number" name="altura" class="form-control" placeholder="Introduzca su altura en centímetros" required />
-                    </div>
-                </div>
-                <div class="col-sm-6">
+=======
+               </div>
+                    <div class="col-sm-6">
+>>>>>>> 8142f035ef586b5ed5d45ead9a1ad33ecbfd4aad
                     <div class="mb-3">
                         <label class="form-label">Género</label>
                         <select name="genero" id="genero" class="form-control" required>
-                            <option value="default" disabled selected>Elige tu género</option>
+                            <option value="default" disabled selected>Seleccionar</option>
                             <option value="mujer">Mujer</option>
                             <option value="hombre">Hombre</option>
                         </select>
@@ -718,49 +719,92 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="mb-3">
-                        <label class="form-label">Objetivo</label>
-                        <select name="objetivo" class="form-control" required>
+<<<<<<< HEAD
+                        <label class="form-label" for="objetivo">Objetivo</label>
+                        <select id="objetivo" name="objetivo" class="form-control" required>
                             <option value="default" disabled selected>Elige tu objetivo</option>
                             <option value="perderpeso">Perder peso</option>
                             <option value="aumentomasa">Aumentar masa muscular</option>
                             <option value="alimentacionsaludable">Alimentación saludable</option>
+=======
+                        <label class="form-label" for="email">Email</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Introduzca su email" required />
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="peso">Peso(kg)</label>
+                        <input type="number" id="peso" name="peso" class="form-control" step="0.01" placeholder="Introduzca su peso en kilogramos" required />
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label class="form-label" for="altura">Altura(cm)</label>
+                        <input type="number" id="altura" name="altura" class="form-control" placeholder="Introduzca su altura en centímetros" required />
+                    </div>
+                </div>
+                
+                <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label" for="objetivo">Objetivo</label>
+                        <select id="objetivo" name="objetivo" class="form-control" required>
+                            <option value="default" disabled selected>Seleccionar</option>
+                            <option value="Perdida de peso">Perder peso</option>
+                            <option value="Aumento de masa">Aumentar masa muscular</option>
+                            <option value="Una alimentación saludable">Alimentación saludable</option>
                         </select>
-                                </div>
-                                       </div>
-                                   </div>
-                               </div>
-                           </div>
+                     </div>
+                 </div>
+                    <div class="col-sm-12">
+                    <div class="mb-3">
+                        <label class="form-label" for="suscripcion">¿Qué tipo de suscripción quiere?</label>
+                        <select id="suscripcion" name="suscripcion" class="form-control" required>
+                            <option value="default" disabled selected>Seleccionar</option>
+                            <option value="Mensual">Suscripción Mensual</option>
+                            <option value="Anual">Suscripción Anual</option>
+>>>>>>> 8142f035ef586b5ed5d45ead9a1ad33ecbfd4aad
+                        </select>
                       </div>
+                  </div>
+               </div>
+             </div>
+                </div>
+                  </div>
                       <!-- end contact detail tab pane -->
                       <div class="tab-pane" id="jobDetail">
                           <div class="text-center">
+<<<<<<< HEAD
                             <h3 class="mb-2">Preguntas sobre tu alimentación</h3>
-                            <small class="text-muted"
-                              >Esto servira para saber desde que punto partes</small
-                            >
+                            <small class="text-muted">Esto servira para saber desde que punto partes</small>
+                          </div> 
+=======
+                            <h3 class="mb-2">Alimentación</h3>
+                            <small class="text-muted">Estas preguntas nos ayudarán a entender tus hábitos alimenticios y a personalizar tus planes según tus necesidades.</small>
                           </div>
                           
+>>>>>>> 8142f035ef586b5ed5d45ead9a1ad33ecbfd4aad
                           <div class="row mt-4">
                             <div class="col-sm-6">
                               <div class="mb-3">
                                 <label class="form-label">¿Cuántas comidas al día quieres hacer?</label>
                                 <select name="comidas" class="form-control" required>
-                                    <option value="default" disabled selected>Elige cuantas comidas</option>
-                                      <option value="trescomidas"> Tres comidas</option>
-                                      <option value="cuatrocomidas">Cuatro comidas</option>
-                                      <option value="cincocomidas">Cinco comidas</option>
+                                    <option value="default" disabled selected>Seleccionar</option>
+                                      <option value="Tres comidas"> Tres comidas</option>
+                                      <option value="Cuatro comidas">Cuatro comidas</option>
+                                      <option value="Cinco comidas">Cinco comidas</option>
                                       </select>
                               </div>
                             </div>
+                          </div>
                             <div class="col-sm-6">
                               <div class="mb-3">
                                 <label class="form-label"> ¿Hay algún alimento que no te guste o seas alérgico?</label>
-                                <input type="text" name="alimentos_excluidos" class="form-control" placeholder="Introduzca los alimentos que desea que se excluyan" required />
+                                <input type="text" id="alergias-input" name="alimentos_excluidos" class="form-control" placeholder="Introduzca los alimentos que desea que se excluyan" required />
                               </div>
                             </div>
                             <div class="col-sm-6">
                               <div class="mb-3">
-                                <label class="form-label"> Enfermedades o patologías alimenticias:</label>
+                                <label class="form-label"> ¿Tienes alguna enfermedad o patología alimenticia?</label>
                                 <input type="text" name="enfermedades" class="form-control" placeholder="" required />
                               </div>
                             </div>
@@ -773,7 +817,7 @@
                             <div class="col-12">
                               <div class="mb-3">
                                 <label class="form-label">Si tuvieses una situación de estrés/angustia. ¿Qué te ayuda a salir de eso?</label>
-                                <input type="text" name="estrés_soluciones" class="form-control" placeholder="" required />
+                                <input type="text" name="estres_soluciones" class="form-control" placeholder="" required />
                               </div>
                             </div>
                           </div>
@@ -782,25 +826,29 @@
                       <div class="tab-pane" id="educationDetail">
                           <div class="text-center">
                             <h3 class="mb-2">Actividad Física</h3>
-                            <small class="text-muted">Necesitamos saber un poco sobre tu actividad física en lo cotidiano</small>
+                            <small class="text-muted">La información sobre tu rutina de ejercicio es esencial para adaptar tu plan a tu actividad física habitual.</small>
                           </div>
                           <div class="row mt-4">
                              <div class="col-md-12">
                                <div class="mb-3">
                                  <label class="form-label" for="actividadtrabajo">¿Tu trabajo es sedentario o activo?</label>
                                  <select name="trabajo" class="form-control" required>
-                                   <option value="default" disabled selected>Elige si es sedentario o activo</option>
+                                   <option value="default" disabled selected>Seleccionar</option>
                                    <option value="sedentario">Sedentario</option>
                                    <option value="activo">Activo</option>
                                  </select>
                                </div>
                              </div>
+<<<<<<< HEAD
+                            </div>
 
+=======
+>>>>>>> 8142f035ef586b5ed5d45ead9a1ad33ecbfd4aad
                               <div class="col-md-12">
                                 <div class="mb-3">
                                   <label class="form-label" for="ejercicio">¿Sueles hacer ejercicio físico?</label>
                                   <select name="ejercicio" id="ejercicio" class="form-control" required>
-                                    <option value="default" disabled selected>Elige si o no</option>
+                                    <option value="default" disabled selected>Seleccionar</option>
                                     <option value="si">Si</option>
                                     <option value="no">No</option>
                                   </select>
@@ -823,7 +871,10 @@
                               </div>
                             </div>
                           </div>
-                        </form>
+<<<<<<< HEAD
+                        
+=======
+>>>>>>> 8142f035ef586b5ed5d45ead9a1ad33ecbfd4aad
                       </div>
                       <!-- end education detail tab pane -->
                       <div class="tab-pane" id="finish">
@@ -845,22 +896,32 @@
                       </div>
                       <!-- END: Define your tab pans here -->
                       <!-- START: Define your controller buttons here-->
+<<<<<<< HEAD
                       <div class="d-flex wizard justify-content-between flex-wrap gap-2 mt-3">
                         <div class="first">
-                          <a href="javascript:void(0);" class="btn btn-secondary"> Inicio </a>
+                          <button class="btn btn-secondary"> Inicio </button>
                         </div>
                         <div class="d-flex">
                           <div class="previous me-2">
-                            <a href="javascript:void(0);" class="btn btn-secondary"> Atrás </a>
+                            <button class="btn btn-secondary"> Atrás </button>
                           </div>
                           <div class="next">
-                            <a href="javascript:void(0);" id="nextButton" class="btn btn-secondary"> Siguiente </a>
+                            <button id="nextButton" class="btn btn-secondary"> Siguiente </button>
                           </div>
                         </div>
                         <div class="last">
-                          <a href="javascript:void(0);" type="submit" class="btn btn-secondary"> Enviar </a>
+                          <button type="submit" class="btn btn-secondary"> Enviar </button>
                         </div>
-                      </div>
+                      </div> 
+=======
+                     <!-- Controles de Navegación -->
+                          <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-secondary" id="btnAnterior" style="display: none;">Anterior</button>
+                            <button type="button" class="btn btn-primary" id="btnSiguiente">Siguiente</button>
+                            <button type="submit" class="btn btn-success" id="btnTerminar" style="display: none;">Terminar</button>
+                          </div>
+>>>>>>> 8142f035ef586b5ed5d45ead9a1ad33ecbfd4aad
+                    </form>
                       <!-- END: Define your controller buttons here-->
                     </div>
                   </div>
@@ -874,6 +935,7 @@
         <!-- [ Main Content ] end -->
       </div>
     </div>
+ 
     <!-- [ Main Content ] end -->
     <footer class="pc-footer">
       <div class="footer-wrapper container-fluid">
@@ -913,6 +975,117 @@
     }
   });
 </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const btnSiguiente = document.getElementById("btnSiguiente");
+    const btnAnterior = document.getElementById("btnAnterior");
+    const btnTerminar = document.getElementById("btnTerminar");
+    const barraProgreso = document.querySelector("#bar .bar");
+    const progreso = barraProgreso;
+
+    function validarCampos(seccion) {
+      const campos = seccion.querySelectorAll("input[required], select[required]");
+      for (let campo of campos) {
+        if (campo.value === "" || campo.value === "default") {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function actualizarProgreso() {
+      const secciones = document.querySelectorAll(".tab-pane");
+      const seccionActual = document.querySelector(".tab-pane.show");
+      const indexActual = Array.from(secciones).indexOf(seccionActual);
+      const porcentaje = ((indexActual + 1) / secciones.length) * 100;
+      progreso.style.width = porcentaje + "%";
+      progreso.setAttribute("aria-valuenow", porcentaje);
+    }
+
+    btnSiguiente.addEventListener("click", function () {
+      const seccionActual = document.querySelector(".tab-pane.show");
+      if (validarCampos(seccionActual)) {
+        const siguienteTab = seccionActual.nextElementSibling;
+        if (siguienteTab) {
+          const idSiguienteTab = siguienteTab.id;
+          const navLink = document.querySelector(`a[href="#${idSiguienteTab}"]`);
+          if (navLink) {
+            const bootstrapTab = new bootstrap.Tab(navLink);
+            bootstrapTab.show();
+          }
+        }
+        actualizarProgreso();
+        actualizarBotones();
+      } else {
+        alert("Por favor, rellene todos los campos antes de continuar.");
+      }
+    });
+
+    btnAnterior.addEventListener("click", function () {
+      const seccionActual = document.querySelector(".tab-pane.show");
+      const tabAnterior = seccionActual.previousElementSibling;
+      if (tabAnterior) {
+        const idTabAnterior = tabAnterior.id;
+        const navLink = document.querySelector(`a[href="#${idTabAnterior}"]`);
+        if (navLink) {
+          const bootstrapTab = new bootstrap.Tab(navLink);
+          bootstrapTab.show();
+        }
+      }
+      actualizarProgreso();
+      actualizarBotones();
+    });
+
+    function actualizarBotones() {
+      const seccionActual = document.querySelector(".tab-pane.show");
+
+      if (seccionActual.id === "finish") {
+        btnSiguiente.style.display = "none";
+        btnTerminar.style.display = "none";
+      } else {
+        btnSiguiente.style.display = "inline-block";
+        btnTerminar.style.display = "none";
+      }
+
+      if (seccionActual.id === "contactDetail") {
+        btnAnterior.style.display = "none";
+        btnSiguiente.style.marginLeft = "auto"; // Mueve el botón a la derecha
+        btnSiguiente.style.marginRight = "0";
+        btnSiguiente.style.display = "inline-block";
+      } else {
+        btnAnterior.style.display = "inline-block";
+        btnSiguiente.style.marginLeft = ""; // Restablece el margen para otras secciones
+        btnSiguiente.style.marginRight = "";
+      }
+
+      if (seccionActual.id === "educationDetail") {
+        btnSiguiente.style.display = "inline-block";
+        btnSiguiente.style.display = "none";
+        btnTerminar.style.display = "inline-block";
+      }
+    }
+
+    function terminarFormulario() {
+      const seccionActual = document.querySelector(".tab-pane.show");
+      const tabFinal = document.querySelector("#finish");
+      if (tabFinal) {
+        const navLink = document.querySelector(`a[href="#${tabFinal.id}"]`);
+        if (navLink) {
+          const bootstrapTab = new bootstrap.Tab(navLink);
+          bootstrapTab.show();
+        }
+      }
+      actualizarProgreso();
+      actualizarBotones();
+    }
+
+    actualizarProgreso();
+    actualizarBotones();
+  });
+</script>
+
+
 
 <script>
   layout_change('light');
