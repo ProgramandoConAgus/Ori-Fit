@@ -3,6 +3,7 @@ include 'db.php'; // Conexión a la base de datos
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Recibir y limpiar los datos
+    $usuario_id = 1;
     $nombre = trim($_POST['nombre']);
     $edad = isset($_POST['edad']) ? filter_var(trim($_POST['edad']), FILTER_VALIDATE_INT) : null;
     $genero = trim($_POST['genero']);  // Campo genero
@@ -46,8 +47,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         // Insertar datos en la base de datos
-        $sql = "INSERT INTO solicitudes (nombre, edad, genero, email, peso, altura, objetivo, suscripcion, comidas, alimentos_excluidos, enfermedades, sentimientos_alimentacion, estres_soluciones, trabajo, ejercicio, dias_entrenamiento, intensidad, estado, fecha_envio) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO solicitudes (usuario_id,nombre, edad, genero, email, peso, altura, objetivo, suscripcion, comidas, alimentos_excluidos, enfermedades, sentimientos_alimentacion, estres_soluciones, trabajo, ejercicio, dias_entrenamiento, intensidad, estado, fecha_envio) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conexion->prepare($sql);
 
         // Verificar si la consulta se preparó correctamente
@@ -57,7 +58,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Asociar los parámetros y ejecutar la consulta
         $stmt->bind_param(
-            "sissdisssssssssiiss",
+            "isissdisssssssssiiss",
+            $usuario_id,
             $nombre,
             $edad,
             $genero, 
@@ -97,6 +99,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo "Método no permitido.";
 }
 
-header("Location: cuestionariohecho.php");
+header("Location: ../widget/calcula_plan.php");
 exit();
 ?>

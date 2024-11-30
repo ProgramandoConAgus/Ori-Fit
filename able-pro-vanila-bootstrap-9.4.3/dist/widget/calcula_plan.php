@@ -10,10 +10,10 @@ session_start();
 $usuario_id = 1; // ID de usuario hardcodeado para pruebas
 
 // Consulta para obtener la última solicitud aprobada del usuario con rol "usuario"
-$sql = "SELECT peso, altura, edad, genero, actividad, objetivo, fecha_envio, id, trabajo, ejercicio, intensidad
-        FROM solicitudes_nutricionales 
-        WHERE usuario_id = ? AND estado_id = '1'
-        ORDER BY fecha_solicitud DESC LIMIT 1"; // Solo la última solicitud aprobada
+$sql = "SELECT peso, altura, edad, genero, objetivo, fecha_envio, id, trabajo, ejercicio, intensidad
+        FROM solicitudes
+        WHERE usuario_id = ? AND estado = 'pendiente'
+        ORDER BY fecha_envio DESC LIMIT 1"; // Solo la última solicitud aprobada
 
 // Preparar la consulta
 $stmt = $conexion->prepare($sql);
@@ -34,7 +34,7 @@ if ($resultado->num_rows > 0) {
     $peso = $fila['peso'];
     $altura = $fila['altura'];
     $edad = $fila['edad'];
-    $sexo = $fila['sexo'];
+    $sexo = $fila['genero'];
     if($fila['trabajo']=="activo"){
         if($fila['ejercicio']=="no"||$fila['intensidad']<3){
             $actividad=2;
@@ -54,7 +54,7 @@ if ($resultado->num_rows > 0) {
     }
    
     $objetivo = $fila['objetivo'];
-    $fecha_solicitud = $fila['fecha_solicitud'];
+    $fecha_solicitud = $fila['fecha_envio'];
     $solicitud_id = $fila['id'];
 } else {
     echo "No se encontraron solicitudes aprobadas para este usuario.";
@@ -89,7 +89,9 @@ switch ($actividad) {
 
 // Calcular calorías diarias
 $calorias_diarias = $tmb * $factor_actividad;
-
+$proteinas;
+$grasas;
+$carbohidratos;
 // Definir proporciones de macronutrientes según el objetivo
 if ($objetivo == 'perder_peso') {
     $proteinas = $sexo == 'hombre' ? 0.30 * $calorias_diarias : 0.25 * $calorias_diarias;
@@ -106,7 +108,7 @@ if ($objetivo == 'perder_peso') {
 }
 
 // Calcular gramos de macronutrientes
-$proteinas_g = round($proteinas / 4);
+    $proteinas_g = round($proteinas / 4);
 $grasas_g = round($grasas / 9);
 $carbohidratos_g = round($carbohidratos / 4);
 

@@ -660,7 +660,7 @@
                       <!-- END: Define your progress bar here -->
                       <!-- START: Define your tab pans here -->
                       <div class="tab-pane show active" id="contactDetail">
-                      <form id="contactForm" action="../../dist/Forms/guardar_datos.php" method="POST">
+                      <form id="contactForm" action="./guardar_datos.php" method="POST">
     <div class="text-center">
         <h3 class="mb-2">Datos personales</h3>
         <small class="text-muted">Tus datos personales nos ayudarán a generar un plan único y adecuado a tu situación.</small>
@@ -724,9 +724,9 @@
                         <label class="form-label" for="objetivo">Objetivo</label>
                         <select id="objetivo" name="objetivo" class="form-control" required>
                             <option value="default" disabled selected>Seleccionar</option>
-                            <option value="Perdida de peso">Perder peso</option>
-                            <option value="Aumento de masa">Aumentar masa muscular</option>
-                            <option value="Una alimentación saludable">Alimentación saludable</option>
+                            <option value="perder_peso">Perder peso</option>
+                            <option value="ganar_peso">Aumentar masa muscular</option>
+                            <option value="mantener_peso">Alimentación saludable</option>
                         </select>
                      </div>
                  </div>
