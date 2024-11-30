@@ -46,27 +46,26 @@
     <div class="loader-fill"></div>
   </div>
 </div>
-<!-- [ Pre-loader ] End -->
- <!-- [ Sidebar Menu ] start -->
+<!-- [ Pre-loader ] End --> <!-- [ Sidebar Menu ] start -->
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
-      <a href="../dashboard/index.html" class="b-brand text-primary">
+      <a href="../pages/panel.php" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
-        <img src="../assets/images/logo-dark.svg" class="img-fluid logo-lg" alt="logo" />
-        <span class="badge bg-light-success rounded-pill ms-2 theme-version">v9.4.3</span>
+        <img src="../assets/images/LOGO SIN FONDO-02.png" class="img-fluid" alt="logo" height="95px" width="95px"/>
+        <span class="badge bg-light-success rounded-pill ms-2 theme-version">v1.0.0</span>
       </a>
     </div>
     <div class="navbar-content">
       <div class="card pc-user-card">
-        <div class="card-body">
+         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class="flex-shrink-0">
-              <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar wid-45 rounded-circle" />
+              <img src="../assets/images/user/avatar-9.jpg" alt="user-image" class="user-avtar wid-45 rounded-circle" />
             </div>
             <div class="flex-grow-1 ms-3 me-2">
-              <h6 class="mb-0">Jonh Smith</h6>
-              <small>Administrator</small>
+              <h6 class="mb-0">Oriana Cristiano</h6>
+              <small>Administrador</small>
             </div>
             <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse" href="#pc_sidebar_userlink">
               <svg class="pc-icon">
@@ -76,21 +75,17 @@
           </div>
           <div class="collapse pc-user-links" id="pc_sidebar_userlink">
             <div class="pt-3">
-              <a href="#!">
-                <i class="ti ti-user"></i>
-                <span>My Account</span>
+              <a href="../../dist/widget/w_chart.php">
+                <i class="ph-duotone ph-cooking-pot f-28"></i>
+                <span>Plan de Alimentación</span>
               </a>
               <a href="#!">
-                <i class="ti ti-settings"></i>
-                <span>Settings</span>
-              </a>
-              <a href="#!">
-                <i class="ti ti-lock"></i>
-                <span>Lock Screen</span>
+                <i class="ph-duotone ph-sneaker-move f-28"></i>
+                <span>Plan de entrenamiento</span>
               </a>
               <a href="#!">
                 <i class="ti ti-power"></i>
-                <span>Logout</span>
+                <span>Cerrar Sesión</span>
               </a>
             </div>
           </div>
@@ -98,126 +93,60 @@
       </div>
 
       <ul class="pc-navbar">
-        <li class="pc-item pc-caption">
-          <label>Navigation</label>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="#!" class="pc-link">
-            <span class="pc-micon">
-              <svg class="pc-icon">
-                <use xlink:href="#custom-status-up"></use>
-              </svg>
-            </span>
-            <span class="pc-mtext">Dashboard</span>
-            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-            <span class="pc-badge">2</span>
-          </a>
-          <ul class="pc-submenu">
-            <li class="pc-item"><a class="pc-link" href="../dashboard/index.html">Default</a></li>
-            <li class="pc-item"><a class="pc-link" href="../dashboard/analytics.html">Analytics</a></li>
-            <li class="pc-item"><a class="pc-link" href="../dashboard/finance.html">Finance</a></li>
-          </ul>
-        </li>
-
-        <li class="pc-item pc-hasmenu">
-          <a href="#!" class="pc-link">
-            <span class="pc-micon">
-              <svg class="pc-icon">
-                <use xlink:href="#custom-document"></use>
-              </svg>
-            </span>
-            <span class="pc-mtext">Layouts</span>
-            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-          </a>
-          <ul class="pc-submenu">
-            <li class="pc-item"><a class="pc-link" href="../demo/layout-vertical.html">Vertical</a></li>
-            <li class="pc-item"><a class="pc-link" href="../demo/layout-horizontal.html">Horizontal</a></li>
-            <li class="pc-item"><a class="pc-link" href="../demo/layout-color-header.html">Layouts 2</a></li>
-            <li class="pc-item"><a class="pc-link" href="../demo/layout-compact.html">Compact</a></li>
-            <li class="pc-item"><a class="pc-link" href="../demo/layout-tab.html">Tab</a></li>
-          </ul>
-        </li>
+      
 
         <li class="pc-item pc-caption">
-          <label>Widget</label>
+          <label>Mi espacio</label>
           <svg class="pc-icon">
             <use xlink:href="#custom-presentation-chart"></use>
           </svg>
         </li>
         <li class="pc-item">
-          <a href="../widget/w_statistics.html" class="pc-link">
+          <a href="../../dist/widget/w_chart.php" class="pc-link">
             <span class="pc-micon">
               <svg class="pc-icon">
                 <use xlink:href="#custom-story"></use>
               </svg>
             </span>
-            <span class="pc-mtext">Statistics</span>
+            <span class="pc-mtext">Mi Alimentación</span>
           </a>
         </li>
-     
         <li class="pc-item">
-          <a href="../widget/w_chart.html" class="pc-link">
+          <a href="#" class="pc-link">
             <span class="pc-micon">
               <svg class="pc-icon">
-                <use xlink:href="#custom-presentation-chart"></use>
+                <use xlink:href="#custom-fatrows"></use>
               </svg>
             </span>
-            <span class="pc-mtext">Chart</span></a
-          >
+            <span class="pc-mtext">Mi Entrenamiento</span>
+          </a>
         </li>
-        <li class="pc-item pc-caption">
-          <label>Admin Panel</label>
-          <svg class="pc-icon">
-            <use xlink:href="#custom-layer"></use>
-          </svg>
-        </li>
-        
- 
-
-        <li class="pc-item pc-caption">
-          <label>table</label>
-          <svg class="pc-icon">
-            <use xlink:href="#custom-text-align-justify-center"></use>
-          </svg>
-        </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="#!" class="pc-link">
+         <li class="pc-item">
+          <a href="#" class="pc-link">
             <span class="pc-micon">
               <svg class="pc-icon">
-                <use xlink:href="#custom-text-align-justify-center"></use>
+                <use xlink:href="#custom-fatrows"></use>
               </svg>
             </span>
-            <span class="pc-mtext">Bootstrap Table</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
-          ></a>
-          <ul class="pc-submenu">
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_bootstrap.html">Basic table</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_sizing.html">Sizing table</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_border.html">Border table</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_styling.html">Styling table</a></li>
-          </ul>
+            <span class="pc-mtext">Mi Progreso</span>
+          </a>
         </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="#!" class="pc-link">
+        <li class="pc-item">
+          <a href="../../dist/widget/w_solis.php" class="pc-link">
             <span class="pc-micon">
-              <svg class="pc-icon">
-                <use xlink:href="#custom-keyboard"></use>
-              </svg>
+              <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
             </span>
-            <span class="pc-mtext">Vanilla Table</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span
-          ></a>
-          <ul class="pc-submenu">
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_dt-simple.html">Basic initialization</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_dt-dynamic-import.html">Dynamic Import</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_dt-render-column-cells.html">Render Column Cells</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_dt-column-manipulation.html">Column Manipulation</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_dt-datetime-sorting.html">Datetime Sorting</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_dt-methods.html">Methods</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_dt-add-rows.html">Add Rows</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_dt-fetch-api.html">Fetch API</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_dt-filters.html">Filters</a></li>
-            <li class="pc-item"><a class="pc-link" href="../table/tbl_dt-export.html">Export</a></li>
-          </ul>
-        </li>  
+            <span class="pc-mtext">Solicitudes</span>
+           </a>
+       </li>
+       <li class="pc-item">
+          <a href="../../dist/recetas/index.php" class="pc-link">
+            <span class="pc-micon">
+              <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
+            </span>
+            <span class="pc-mtext">Recetas</span>
+           </a>
+       </li>
       </ul>
     </div>
   </div>

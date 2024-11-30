@@ -56,7 +56,7 @@
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
-      <a href="../dashboard/index.html" class="b-brand text-primary">
+      <a href="../pages/panel.php" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
         <img src="../assets/images/LOGO SIN FONDO-02.png" class="img-fluid" alt="logo" height="95px" width="95px"/>
         <span class="badge bg-light-success rounded-pill ms-2 theme-version">v1.0.0</span>
@@ -143,6 +143,14 @@
               <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
             </span>
             <span class="pc-mtext">Solicitudes</span>
+           </a>
+       </li>
+       <li class="pc-item">
+          <a href="../../dist/recetas/index.php" class="pc-link">
+            <span class="pc-micon">
+              <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
+            </span>
+            <span class="pc-mtext">Recetas</span>
            </a>
        </li>
       </ul>
@@ -480,9 +488,8 @@
             <hr class="border-secondary border-opacity-50" />
             <div class="d-grid mb-3">
               <button class="btn btn-primary">
-                <svg class="pc-icon me-2">
-                  <use xlink:href="#custom-logout-1-outline"></use></svg
-                >Logout
+                <svg class="pc-icon me-2">  
+                  <use xlink:href="#custom-logout-1-outline"></use></svg>Logout
               </button>
             </div>
             <div
@@ -586,125 +593,124 @@
 
 
 
+   <!-- [ Main Content ] start -->
+<div class="pc-container">
+  <div class="pc-content">
     <!-- [ Main Content ] start -->
-    <div class="pc-container">
-      <div class="pc-content">
-        <!-- [ Main Content ] start -->
-        <div class="row">
-          <div class="col-12">
-            <div class="card welcome-banner bg-blue-800">
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-sm-6">
-                    <div class="p-4">
-                      <h2 class="text-white">Comenza tu camino</h2>
-                      <p class="text-white">Contesta un breve cuestionario y recibe un plan de alimentación personalizado para que puedas cumplir tus objetivos.</p>
-                      <a href="../../dist/forms/form2_wizard.php" class="btn btn-outline-light">Rellenar Cuestionario</a>
-                    </div>
-                  </div>
-                  <div class="col-sm-6 text-center">
-                    <div class="img-welcome-banner">
-                      <img src="../assets/images/widget/welcome-banner.png" alt="img" class="img-fluid" />
-                    </div>
-                  </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="card welcome-banner bg-blue-800">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="p-4">
+                  <h2 class="text-white">Comenza tu camino</h2>
+                  <p class="text-white">Contesta un breve cuestionario y recibe un plan de alimentación personalizado para que puedas cumplir tus objetivos.</p>
+                  <a href="../../dist/forms/form2_wizard.php" class="btn btn-outline-light">Rellenar Cuestionario</a>
                 </div>
               </div>
-            </div>
-          </div>
-          <div class="col-md-12">
-              <div class="card">
-              <div class="card-body border-bottom pb-0">
-                <div class="d-flex align-items-center justify-content-center">
-                  <h5 class="mb-0">Tus planes</h5>
-                </div>
-                <ul class="nav nav-tabs analytics-tab" id="myTab" role="tablist">
-                  <li class="nav-item" role="presentation">
-                    <button
-                      class="nav-link active"
-                      id="analytics-tab-1"
-                      data-bs-toggle="tab"
-                      data-bs-target="#analytics-tab-1-pane"
-                      type="button"
-                      role="tab"
-                      aria-controls="analytics-tab-1-pane"
-                      aria-selected="true">Alimentación</button>
-                  </li>
-                  
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
+              <div class="col-sm-6 text-center">
+                <div class="img-welcome-banner">
+                  <img src="../assets/images/widget/welcome-banner.png" alt="img" class="img-fluid" />
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div class="col-xl-12 col-md-12">
-            <div class="card">
-              <div class="card-body pb-0">
-                <div class="d-flex align-items-center justify-content-between">
-                  <h5 class="mb-0">Usuarios</h5>
-                  <div class="dropdown">
-                    <a class="avtar avtar-s btn-link-secondary dropdown-toggle arrow-none" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <i class="ti ti-dots-vertical f-18"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end" style="">
-                      <a class="dropdown-item" href="#">Today</a>
-                      <a class="dropdown-item" href="#">Weekly</a>
-                      <a class="dropdown-item" href="#">Monthly</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <ul class="list-group list-group-flush border-top-0">
-                <li class="list-group-item">
-                  <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                      <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
-                    </div>
-                    <div class="flex-grow-1 mx-2">
-                      <h6 class="mb-1">David Jones</h6>
-                      <p class="mb-0">Project Leader</p>
-                    </div>
-                    <div class="flex-shrink-0">
-                      <p class="text-muted mb-0">5 min ago</p>
-                    </div>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                      <img src="../assets/images/user/avatar-3.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
-                    </div>
-                    <div class="flex-grow-1 mx-2">
-                      <h6 class="mb-1">Robert Smith</h6>
-                      <p class="mb-0">HR Manager</p>
-                    </div>
-                    <div class="flex-shrink-0">
-                      <p class="text-muted mb-0">Yesterday</p>
-                    </div>
-                  </div>
-                </li>
-                <li class="list-group-item">
-                  <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0">
-                      <img src="../assets/images/user/avatar-5.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
-                    </div>
-                    <div class="flex-grow-1 mx-2">
-                      <h6 class="mb-1">John larry</h6>
-                      <p class="mb-0">Developer</p>
-                    </div>
-                    <div class="flex-shrink-0">
-                      <p class="text-muted mb-0">1 hour ago</p>
-                    </div>
-                  </div>
-                </li>
-              </ul>
             </div>
           </div>
         </div>
-        <!-- [ Main Content ] end -->
+      </div>
+
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body border-bottom pb-0">
+            <div class="d-flex align-items-center justify-content-center">
+              <h5 class="mb-0">Tus planes</h5>
+            </div>
+            <ul class="nav nav-tabs analytics-tab" id="myTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="analytics-tab-1" data-bs-toggle="tab" data-bs-target="#analytics-tab-1-pane" type="button" role="tab" aria-controls="analytics-tab-1-pane" aria-selected="true">
+                  Alimentación
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="analytics-tab-1-pane" role="tabpanel" aria-labelledby="analytics-tab-1">
+              <!-- Contenido del tab de alimentación -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-12 col-md-12">
+        <div class="card">
+          <div class="card-body pb-0">
+            <div class="d-flex align-items-center justify-content-between">
+              <h5 class="mb-0">Usuarios</h5>
+              <div class="dropdown">
+                <a class="avtar avtar-s btn-link-secondary dropdown-toggle arrow-none" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="ti ti-dots-vertical f-18"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end">
+                  <a class="dropdown-item" href="#">Today</a>
+                  <a class="dropdown-item" href="#">Weekly</a>
+                  <a class="dropdown-item" href="#">Monthly</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ul class="list-group list-group-flush border-top-0">
+            <li class="list-group-item">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
+                </div>
+                <div class="flex-grow-1 mx-2">
+                  <h6 class="mb-1">David Jones</h6>
+                  <p class="mb-0">Project Leader</p>
+                </div>
+                <div class="flex-shrink-0">
+                  <p class="text-muted mb-0">5 min ago</p>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-3.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
+                </div>
+                <div class="flex-grow-1 mx-2">
+                  <h6 class="mb-1">Robert Smith</h6>
+                  <p class="mb-0">HR Manager</p>
+                </div>
+                <div class="flex-shrink-0">
+                  <p class="text-muted mb-0">Yesterday</p>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <img src="../assets/images/user/avatar-5.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
+                </div>
+                <div class="flex-grow-1 mx-2">
+                  <h6 class="mb-1">John larry</h6>
+                  <p class="mb-0">Developer</p>
+                </div>
+                <div class="flex-shrink-0">
+                  <p class="text-muted mb-0">1 hour ago</p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- [ Main Content ] end -->
+  </div>
+</div>
+<!-- [ Main Content ] end -->
+
+
       </div>
     </div>
  <!-- [ Main Content ] end -->

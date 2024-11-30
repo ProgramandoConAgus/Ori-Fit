@@ -1,23 +1,19 @@
 <?php
-class Database {
-    public $host = 'localhost';
-    private $db_name = 'ejerciciosphp';
-    private $username = 'root';
-    private $password = '';
-    public $conn;
 
-    // Método para conectar a la base de datos
-    public function getConnection() {
-        $this->conn = null;
+$servidor="localhost";
+$usuario="root";
+$contraseña="";
+$baseDatos="orifit";
 
-        try {
-            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $exception) {
-            echo "Error en la conexión: " . $exception->getMessage();
-        }
+//Crear conexion
 
-        return $this->conn;
-    }
+$conexion = new mysqli($servidor, $usuario, $contraseña, $baseDatos);
+
+//Validacion de conexion
+if($conexion->connect_error){
+    die("Error de conexion" . $conexion->connect_error);
 }
+
+// echo"Conexion OK a la BBDD";
+
 ?>

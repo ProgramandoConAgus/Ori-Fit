@@ -57,7 +57,7 @@
  <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
-      <a href="../forms/form2_wizard.php" class="b-brand text-primary">
+      <a href="../pages/panel.php" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
         <img src="../assets/images/LOGO SIN FONDO-02.png" class="img-fluid" alt="logo" height="95px" width="95px"/>
         <span class="badge bg-light-success rounded-pill ms-2 theme-version">v1.0.0</span>
@@ -82,7 +82,7 @@
           </div>
           <div class="collapse pc-user-links" id="pc_sidebar_userlink">
             <div class="pt-3">
-              <a href="../../widget/w_chart.php">
+              <a href="../../dist/widget/w_chart.php">
                 <i class="ph-duotone ph-cooking-pot f-28"></i>
                 <span>Plan de Alimentación</span>
               </a>
@@ -102,14 +102,14 @@
       <ul class="pc-navbar">
       
 
-      <li class="pc-item pc-caption">
+        <li class="pc-item pc-caption">
           <label>Mi espacio</label>
           <svg class="pc-icon">
             <use xlink:href="#custom-presentation-chart"></use>
           </svg>
         </li>
         <li class="pc-item">
-          <a href="#" class="pc-link">
+          <a href="../../dist/widget/w_chart.php" class="pc-link">
             <span class="pc-micon">
               <svg class="pc-icon">
                 <use xlink:href="#custom-story"></use>
@@ -139,14 +139,21 @@
           </a>
         </li>
         <li class="pc-item">
-        <li class="pc-item">
-  <a href="../../dist/widget/w_solis.php" class="pc-link">
-    <span class="pc-micon">
-      <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
-    </span>
-    <span class="pc-mtext">Solicitudes</span>
-  </a>
-</li>
+          <a href="../../dist/widget/w_solis.php" class="pc-link">
+            <span class="pc-micon">
+              <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
+            </span>
+            <span class="pc-mtext">Solicitudes</span>
+           </a>
+       </li>
+       <li class="pc-item">
+          <a href="../../dist/recetas/index.php" class="pc-link">
+            <span class="pc-micon">
+              <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
+            </span>
+            <span class="pc-mtext">Recetas</span>
+           </a>
+       </li>
       </ul>
     </div>
   </div>
