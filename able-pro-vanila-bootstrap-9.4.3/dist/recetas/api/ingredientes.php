@@ -1,39 +1,32 @@
 <?php
 
+// Mostrar todos los errores
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-try{
+try {
+    require_once '../../sql_files/database.php';
 
-require_once '../../sql_files/database.php';
+    $database = new Database(); 
+    $conn = $database->getConnection();
 
-$database = new Database(); 
-$conn = $database->getConnection();
-// $conn->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+    $sql = "SELECT IdIngrediente, Nombre, Gramos_Proteina, Calorias, Gramos_Grasas FROM ingredientes";
 
- 
+    // Preparar y ejecutar la consulta
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
 
-$sql = "
-    SELECT i.* 
-    FROM ingredientes i
-    WHERE 1=1
-";
+    // Obtener los resultados de la consulta
+    $ingredientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Preparar y ejecutar la consulta
-$stmt = $conn->prepare($sql);
+    // Formatear los resultados en JSON
+    echo json_encode($ingredientes);
 
-$stmt->execute();
+    // Cerrar la conexión
+    $conn = null;
 
-// Obtener los resultados de la consulta
-$ingredientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
- 
-
-// Formatear los resultados en JSON
-echo json_encode( $ingredientes);
-
-$conn = null;
-
-}catch(e){
-    //echo "Ocurrió un error: " . $e->getMessage();
+} catch (Exception $e) {
+    // Mostrar mensaje de error
+    echo "Ocurrió un error: " . $e->getMessage();
 }
 ?>

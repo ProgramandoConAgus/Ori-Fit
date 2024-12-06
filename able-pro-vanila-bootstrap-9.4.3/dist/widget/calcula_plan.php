@@ -186,21 +186,21 @@ echo "Datos del plan nutricional guardados con éxito con estado 'pendiente'.";
 // Muestra datos generales para cotrol de LEAN
 
 echo "<h2>Datos de control</h2>";
-    echo "Peso: $peso g<br>";
-    echo "Altura: $altura g<br>";
-    echo "Edad: $edad g<br>";
+    echo "Peso: $peso <br>";
+    echo "Altura: $altura <br>";
+    echo "Edad: $edad <br>";
 
 
 echo "<h2>Datos de mi plan</h2>";
-    echo "Objetivo: $fecha_solicitud g<br>";
-    echo "Objetivo: $objetivo g<br>";
+    echo "Objetivo: $fecha_solicitud <br>";
+    echo "Objetivo: $objetivo <br>";
 
 
 echo "<h2>Consumo Diario recomendado</h2>";
     echo "Calorías diarias recomendadas: " . round($calorias_diarias) . " kcal<br>";
-    echo "Proteínas: $proteinas_g g<br>";
-    echo "Grasas: $grasas_g g<br>";
-    echo "Carbohidratos: $carbohidratos_g g<br>";
+    echo "Proteínas: $proteinas_g <br>";
+    echo "Grasas: $grasas_g <br>";
+    echo "Carbohidratos: $carbohidratos_g <br>";
 
 
 // Cerrar consulta de alimentos y conexión a la base de datos

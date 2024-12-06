@@ -1,19 +1,23 @@
 <?php
+class Database {
+    public $host = 'localhost';
+    private $db_name = 'orifit';
+    private $username = 'root';
+    private $password = '';
+    public $conn;
 
-$servidor="localhost";
-$usuario="root";
-$contraseña="";
-$baseDatos="orifit";
+    // Método para conectar a la base de datos
+    public function getConnection() {
+        $this->conn = null;
 
-//Crear conexion
+        try {
+            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $exception) {
+            echo "Error en la conexión: " . $exception->getMessage();
+        }
 
-$conexion = new mysqli($servidor, $usuario, $contraseña, $baseDatos);
-
-//Validacion de conexion
-if($conexion->connect_error){
-    die("Error de conexion" . $conexion->connect_error);
+        return $this->conn;
+    }
 }
-
-// echo"Conexion OK a la BBDD";
-
 ?>
