@@ -93,6 +93,23 @@ $proteinas_g = round($proteinas / 4);
 $grasas_g = round($grasas / 9);
 $carbohidratos_g = round($carbohidratos / 4);
 
+
+// Preparar la consulta para insertar en la tabla nueva " resumen_planes "  - Los datos Globales para luego mostarlos en el chart.
+$sql_resumen = "INSERT INTO resumen_planes 
+                (solicitud_id, calorias, proteinas, grasas, carbohidratos)
+                VALUES (?, ?, ?, ?, ?)";
+$stmt_resumen = $conexion->prepare($sql_resumen);
+$stmt_resumen->bind_param("iiiii", $solicitud_id, $calorias_diarias, $proteinas_g, $grasas_g, $carbohidratos_g);
+
+// Ejecutar la consulta
+if ($stmt_resumen->execute()) {
+    echo "Resumen del plan guardado con éxito.";
+} else {
+    echo "Error al guardar el resumen del plan: " . $stmt_resumen->error;
+}
+
+
+
 // Consulta para obtener los ingredientes que causan alergia
  $sql_alergias = "SELECT IdIngrediente FROM alergiasusuario WHERE IdUsuario = ?";
  $stmt_alergias = $conexion->prepare($sql_alergias);
