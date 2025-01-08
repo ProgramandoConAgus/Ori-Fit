@@ -1279,7 +1279,7 @@ echo '</div>';
                 echo '<div class="modal-row"><strong>¿Cómo te sientes cuándo comes?</strong><span>' . htmlspecialchars($row['sentimientos_alimentacion']) . '</span></div>';
                 echo '<div class="modal-row"><strong>¿Tú trabajo es sedentario o activo?</strong><span>' . htmlspecialchars($row['trabajo']) . '</span></div>';
                 echo '<div class="modal-row"><strong>¿Sueles hacer ejercicio físico?</strong><span>' . htmlspecialchars($row['ejercicio']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Cuántos días a la semana entrenas</strong><span>' . htmlspecialchars($row['dias_entrenamiento']) . '</span></div>';
+                echo '<div class="modal-row"><strong>¿Cuántos días a la semana entrenas? (1-7)</strong><span>' . htmlspecialchars($row['dias_entrenamiento']) . '</span></div>';
                 echo '<div class="modal-row"><strong>¿Qué nivel de intensidad quieres en tu rutina de ejercicio? (1-6)</strong><span>' . htmlspecialchars($row['intensidad']) . '</span></div>';
                 echo '<div>';
                 echo '<form method="POST" action="aprobar_o_denegar.php">';
