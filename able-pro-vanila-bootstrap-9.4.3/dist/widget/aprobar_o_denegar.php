@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("si", $estado, $id);
             if ($stmt->execute()) {
                 // Redirigir de vuelta a la página de solicitudes
-                header("Location: w_solis.php");
+                header("Location: w_paneladm.php#solicitudes");
                 exit();
             } else {
                 echo "Error al actualizar el estado de la solicitud.";
