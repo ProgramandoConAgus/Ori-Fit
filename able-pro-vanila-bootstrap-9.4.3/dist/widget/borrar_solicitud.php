@@ -16,8 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("i", $id); // "i" significa entero
             if ($stmt->execute()) {
                 // Redirigir de vuelta a la página principal después de eliminar
-                header("Location: w_solis.php?mensaje=eliminado");
-                exit(); 
+                header("Location: w_paneladm.php#solicitudes");
+                exit();
+
             } else {
                 echo "Error al eliminar la solicitud.";
             }

@@ -141,11 +141,11 @@
         </li>
         <li class="pc-item">
         <li class="pc-item">
-  <a href="../../dist/widget/w_solis.php" class="pc-link">
+        <a href="../../dist/widget/w_paneladm.php" class="pc-link">
     <span class="pc-micon">
-      <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
+      <img src="..//assets/images/icons-tab/icons9.png" alt="Descripción de la imagen">  
     </span>
-    <span class="pc-mtext">Solicitudes</span>
+    <span class="pc-mtext">Panel de Administración</span><br><br>
   </a>
 </li>
       </ul>

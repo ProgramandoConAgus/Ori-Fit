@@ -140,12 +140,11 @@
           </a>
         </li>
 <li class="pc-item">
-  <a href="../../dist/widget/w_solis.php" class="pc-link">
+<a href="../../dist/widget/w_paneladm.php" class="pc-link">
     <span class="pc-micon">
-      <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
-      <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
+      <img src="..//assets/images/icons-tab/icons9.png" alt="Descripción de la imagen">  
     </span>
-    <span class="pc-mtext">Solicitudes</span>
+    <span class="pc-mtext">Panel de Administración</span><br><br>
   </a>
 </li>
       </ul>
@@ -508,7 +507,6 @@
             <div
               class="card border-0 shadow-none drp-upgrade-card mb-0"
               style="background-image: url(../assets/images/layout/img-profile-card.jpg)">
-              style="background-image: url(../assets/images/layout/img-profile-card.jpg)">
               <div class="card-body">
                 <div class="user-group">
                   <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
@@ -554,8 +552,6 @@
         <img src="../assets/images/layout/img-announcement-1.png" alt="img" class="img-fluid mb-3" />
         <div class="row">
           <div class="col-12">
-            <div class="d-grid"><a class="btn btn-outline-secondary" href="https://1.envato.market/zNkqj6" target="_blank">Check Now</a>
-            </div>
             <div class="d-grid"><a class="btn btn-outline-secondary" href="https://1.envato.market/zNkqj6" target="_blank">Check Now</a>
             </div>
           </div>
