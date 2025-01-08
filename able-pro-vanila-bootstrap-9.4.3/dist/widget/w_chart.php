@@ -1,5 +1,79 @@
 <?php
 
+// Conectar a la base de datos
+include 'db.php';
+
+// Iniciar la sesión para obtener datos de usuario
+session_start();
+
+// $usuario_id = $_SESSION['usuario_id']; // Captura el id de la sesión del usuario (para pruebas está hardcodeado)
+//$usuario_id = 1;  ID de usuario hardcodeado para pruebas
+$usuario_id = 1; // ID de usuario hardcodeado para pruebas
+
+// Obtener el ID de la solicitud
+//$solicitud_id = $_GET['solicitud_id'] ?? null;
+$solicitud_id = 8; // Reemplaza '1' con el ID que deseas probar
+
+if ($solicitud_id) {
+    // Recuperar el resumen del plan
+    $sql_resumen = "SELECT calorias, proteinas, grasas, carbohidratos 
+                    FROM resumen_planes 
+                    WHERE solicitud_id = ?";
+    $stmt = $conexion->prepare($sql_resumen);
+    $stmt->bind_param("i", $solicitud_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $resumen = $result->fetch_assoc();
+        $calorias = $resumen['calorias'];
+        $proteinas = $resumen['proteinas'];
+        $grasas = $resumen['grasas'];
+        $carbohidratos = $resumen['carbohidratos'];
+    } else {
+        echo "No se encontraron datos para esta solicitud.";
+        $calorias = $proteinas = $grasas = $carbohidratos = 0;
+    }
+
+    // Recuperar los alimentos del plan
+    // Recuperar los alimentos del plan con todos los campos necesarios
+// Consulta mejorada para recuperar los alimentos del plan con nombre, categoría y detalles
+      $sql_alimentos = "
+          SELECT 
+              pn.idIngrediente,
+              i.Nombre AS NombreIngrediente,
+              c.Nombre AS Categoria,
+              pn.porcion,
+              pn.calorias
+          FROM 
+              planes_nutricionales pn
+          INNER JOIN 
+              ingredientes i ON pn.idIngrediente = i.idIngrediente
+          INNER JOIN 
+              categorias c ON i.idCategoria = c.idCategoria
+          WHERE 
+              pn.solicitud_id = ?";
+      $stmt_alimentos = $conexion->prepare($sql_alimentos);
+      $stmt_alimentos->bind_param("i", $solicitud_id);
+      $stmt_alimentos->execute();
+      $result_alimentos = $stmt_alimentos->get_result();
+
+      $alimentos = [];
+      if ($result_alimentos->num_rows > 0) {
+          while ($row = $result_alimentos->fetch_assoc()) {
+              $alimentos[] = $row;
+          }
+      } else {
+          echo "No se encontraron alimentos para esta solicitud.";
+      }
+} else {
+    echo "Solicitud ID no proporcionado.";
+    $calorias = $proteinas = $grasas = $carbohidratos = 0;
+    $alimentos = [];
+}
+
+
+
 ?>
 
 <!doctype html>
@@ -623,7 +697,7 @@
         <!-- [ breadcrumb ] end -->
 
         <div class="row">
-          <div class="col-md-12 col-xxl-3">
+          <div class="col-md-12 col-xxl-12">
             <div class="card">
               <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -642,7 +716,7 @@
                       <div id="all-earnings-graph"></div>
                     </div>
                     <div class="col-5">
-                      <h5 class="mb-1">$30200</h5>
+                      <h5 class="mb-1"><?= ($calorias) ?></h5> <!-- varible calorias -->
                       <p class="text-primary mb-0"><i class="ti ti-arrow-up-right"></i> 30.6%</p>
                     </div>
                   </div>
@@ -657,7 +731,7 @@
                 <div class="d-flex align-items-center">
                   <div class="flex-grow-1 me-3">
                     <p class="mb-1 fw-medium text-muted">Proteinas</p>
-                    <h4 class="mb-1">1,563</h4>
+                    <h4 class="mb-1"><?= ($proteinas) ?></h4> <!-- varible prote -->
                     <p class="mb-0 text-sm">En Calorias</p>
                   </div>
                   <div class="flex-shrink-0">
@@ -675,7 +749,7 @@
                 <div class="d-flex align-items-center">
                   <div class="flex-grow-1 me-3">
                     <p class="mb-1 fw-medium text-muted">Grasas</p>
-                    <h4 class="mb-1">1,563</h4>
+                    <h4 class="mb-1"><?= ($grasas) ?></h4> <!-- varible grasas -->
                     <p class="mb-0 text-sm">En Calorias</p>
                   </div>
                   <div class="flex-shrink-0">
@@ -693,7 +767,7 @@
                 <div class="d-flex align-items-center">
                   <div class="flex-grow-1 me-3">
                     <p class="mb-1 fw-medium text-muted">Carbohidratos</p>
-                    <h4 class="mb-1">1,563</h4>
+                    <h4 class="mb-1"><?= ($carbohidratos) ?></h4> <!-- varible carbo -->
                     <p class="mb-0 text-sm">En Calorias</p>
                   </div>
                   <div class="flex-shrink-0">
@@ -712,6 +786,8 @@
                 <h5>Lista de Ingredientes</h5>
                 <span class="d-block m-t-5">Debajo encontraras los ingredientes que tendras que incluir en tu dieta para una mayor efectividad del plan según tus objetivos.</span>
               </div>
+
+        <?php if (!empty($alimentos)): ?>
               <div class="card-body table-border-style">
                 <div class="table-responsive">
                   <table class="table">
@@ -725,29 +801,39 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="table-success"> <!--"Succes es para grasas"-->
-                        <td>1</td>
-                        <td>Nueces</td>
-                        <td>Grasas</td>
-                        <td>100g</td>
-                        <td>1000</td>
+                    <?php 
+          $contador = 1; // Inicializar contador para Nro
+          foreach ($alimentos as $alimento): 
+          ?>
+                        <tr class="table-success"> <!--"Succes es para grasas"-->
+                        <td><?php echo $contador++; ?></td>
+                        <td><?php echo $alimento['NombreIngrediente']; ?></td>
+                        <td><?php echo $alimento['Categoria']; ?></td>
+                        <td><?php echo $alimento['porcion']; ?> g</td>
+                        <td><?php echo $alimento['calorias']; ?> kcal</td>
                       </tr>
-                      <tr class="table-info"> <!--"Succes es para carbohidratos"-->
+          <?php endforeach; ?>
+
+                      <!-- <tr class="table-info"> 
                         <td>2</td>
                         <td>Fideo</td>
                         <td>Carbohidratos</td>
                         <td>300g</td>
                         <td>1000</td>
                       </tr>
-                      <tr class="table-warning"> <!--"Succes es para proteinas"-->
+                      <tr class="table-warning"> 
                         <td>3</td>
                         <td>Pechuga de pollo</td>
                         <td>Proteina</td>
                         <td>200g</td>
                         <td>1000</td>
-                      </tr>
+                      </tr> -->
                     </tbody>
                   </table>
+          <?php else: ?>
+          <p>No se encontraron alimentos asociados a este plan.</p>
+          <?php endif; ?>
+
                 </div>
               </div>
             </div>
@@ -1065,6 +1151,5 @@
 
 
 <?php
-
 
 ?>
