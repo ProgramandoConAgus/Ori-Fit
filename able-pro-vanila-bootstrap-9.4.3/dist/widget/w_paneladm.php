@@ -178,12 +178,11 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
           </a>
         </li>
         <li class="pc-item">
-        <li class="pc-item">
   <a href="../../dist/widget/w_paneladm.php" class="pc-link">
     <span class="pc-micon">
       <img src="..//assets/images/icons-tab/icons9.png" alt="Descripción de la imagen">  
     </span>
-    <span class="pc-mtext">Panel de Administración</span><br><br>
+    <span class="pc-mtext" >Panel de Administración</span><br><br>
   </a>
 </li>
       </ul>
@@ -668,7 +667,7 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
 
             <!-- Botón Agregar Usuario -->
             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal" style="background-color: white; color: black; border: 1px solid #ced4da;">
-            <img src="../assets/images/icons-tab/añadir.png" alt="añadir" style="margin-right: 5px;">
+            <img src="../assets/images/icons-tab/añadir.png" alt="añadir" style="margin-right: 0px; height: 20px; width: 20px;">
              Agregar usuario
             </button>
         </div>
@@ -1273,14 +1272,15 @@ echo '</div>';
                 echo '<div class="modal-row"><strong>Altura (cm)</strong><span>' . htmlspecialchars($row['altura']) . ' cm</span></div>';
                 echo '<div class="modal-row"><strong>Objetivo</strong><span>' . htmlspecialchars($row['objetivo']) . '</span></div>';
                 echo '<div class="modal-row"><strong>¿Qué tipo de suscripción quiere?</strong><span>' . htmlspecialchars($row['suscripcion']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Qué tipo de comidas tiene?</strong><span>' . htmlspecialchars($row['comidas']) . '</span></div>';
+                echo '<div class="modal-row"><strong>¿Cuántas comidas al día quieres hacer?</strong><span>' . htmlspecialchars($row['comidas']) . '</span></div>';
                 echo '<div class="modal-row"><strong>¿Qué soluciones busca?</strong><span>' . htmlspecialchars($row['estres_soluciones']) . '</span></div>';
-                echo '<div class="modal-row"><strong>Alimentos excluidos</strong><span>' . htmlspecialchars($row['alimentos_excluidos']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Tiene alguna enfermedad?</strong><span>' . htmlspecialchars($row['enfermedades']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Cómo se siente con la alimentación?</strong><span>' . htmlspecialchars($row['sentimientos_alimentacion']) . '</span></div>';
-                echo '<div class="modal-row"><strong>Tipo de trabajo</strong><span>' . htmlspecialchars($row['trabajo']) . '</span></div>';
-                echo '<div class="modal-row"><strong>Días de entrenamiento</strong><span>' . htmlspecialchars($row['dias_entrenamiento']) . '</span></div>';
-                echo '<div class="modal-row"><strong>Intensidad de entrenamiento</strong><span>' . htmlspecialchars($row['intensidad']) . '</span></div>';
+                echo '<div class="modal-row"><strong>¿Hay algún alimento que no te guste o seas alérgico?</strong><span>' . htmlspecialchars($row['alimentos_excluidos']) . '</span></div>';
+                echo '<div class="modal-row"><strong>¿Tiene alguna enfermedad o condición médica?</strong><span>' . htmlspecialchars($row['enfermedades']) . '</span></div>';
+                echo '<div class="modal-row"><strong>¿Cómo te sientes cuándo comes?</strong><span>' . htmlspecialchars($row['sentimientos_alimentacion']) . '</span></div>';
+                echo '<div class="modal-row"><strong>¿Tú trabajo es sedentario o activo?</strong><span>' . htmlspecialchars($row['trabajo']) . '</span></div>';
+                echo '<div class="modal-row"><strong>¿Sueles hacer ejercicio físico?</strong><span>' . htmlspecialchars($row['ejercicio']) . '</span></div>';
+                echo '<div class="modal-row"><strong>¿Cuántos días a la semana entrenas</strong><span>' . htmlspecialchars($row['dias_entrenamiento']) . '</span></div>';
+                echo '<div class="modal-row"><strong>¿Qué nivel de intensidad quieres en tu rutina de ejercicio? (1-6)</strong><span>' . htmlspecialchars($row['intensidad']) . '</span></div>';
                 echo '<div>';
                 echo '<form method="POST" action="aprobar_o_denegar.php">';
                 echo '<input type="hidden" name="id" value="' . $row['id'] . '">';
