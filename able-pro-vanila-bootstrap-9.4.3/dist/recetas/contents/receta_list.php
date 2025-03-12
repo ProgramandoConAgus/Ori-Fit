@@ -109,29 +109,57 @@
     }
 
     function renderRecetas(recetas) {
-        const recetasListado = $('#recetasListado');
-        recetasListado.empty();
-        if (recetas.length === 0) {
-            recetasListado.append('<p class="text-center">No se encontraron recetas.</p>');
-        } else {
-            recetas.forEach(receta => {
-                recetasListado.append(`
-                    <div class="col-md-3 mb-3">
-                        <div class="card">
-                            <img height="120" src="http://localhost/ori-fit/able-pro-vanila-bootstrap-9.4.3/dist/files/${receta.foto}" class="card-img-top" alt="${receta.titulo}">
-                            <div class="card-body">
-                                <h5 class="card-title">${receta.titulo}</h5>
-                                <p class="card-text">${receta.descripcion}</p>
-                                <p><strong>Tiempo:</strong> ${receta.tiempo_preparacion} mins</p>
-                                <p><strong>Dificultad:</strong> ${receta.dificultad}</p>
-                                <a href="./editar-receta.php?id=${receta.id}" class="btn btn-primary">Editar</a>
-                            </div>
+    const recetasListado = $('#recetasListado');
+    recetasListado.empty();
+    if (recetas.length === 0) {
+        recetasListado.append('<p class="text-center">No se encontraron recetas.</p>');
+    } else {
+        recetas.forEach(receta => {
+            const descripcion = receta.descripcion || '';
+            const maxCaracteres = 150;
+            const descripcionCorta = descripcion.length > maxCaracteres ? 
+                descripcion.substring(0, maxCaracteres) + '...' : 
+                descripcion;
+
+            recetasListado.append(`
+                <div class="col-md-3 mb-3">
+                    <div class="card h-100">
+                        <img height="120" src="http://localhost/ori-fit/able-pro-vanila-bootstrap-9.4.3/dist/files/${receta.foto}" class="card-img-top" alt="${receta.titulo}">
+                        <div class="card-body">
+                            <h5 class="card-title">${receta.titulo}</h5>
+                            <p class="card-text descripcion-corta">${descripcionCorta}</p>
+                            ${descripcion.length > maxCaracteres ? 
+                                `<p class="card-text descripcion-completa" style="display: none;">${descripcion}</p>
+                                <a href="#" class="link-ver-mas">Ver más</a>` : ''}
+                            <p><strong>Tiempo:</strong> ${receta.tiempo_preparacion} mins</p>
+                            <p><strong>Dificultad:</strong> ${receta.dificultad}</p>
+                            <a href="./editar-receta.php?id=${receta.id}" class="btn btn-primary">Editar</a>
                         </div>
                     </div>
-                `);
-            });
-        }
+                </div>
+            `);
+        });
     }
+}
+
+// Manejar clic en "Ver más/menos"
+$(document).on('click', '.link-ver-mas', function(e) {
+    e.preventDefault();
+    const $this = $(this);
+    const $cardBody = $this.closest('.card-body');
+    const $descCorta = $cardBody.find('.descripcion-corta');
+    const $descCompleta = $cardBody.find('.descripcion-completa');
+
+    if ($descCompleta.is(':visible')) {
+        $descCompleta.hide();
+        $descCorta.show();
+        $this.text('Ver más');
+    } else {
+        $descCorta.hide();
+        $descCompleta.show();
+        $this.text('Ver menos');
+    }
+});
 
     function renderPagination(totalPages, currentPage) {
         const pagination = $('#pagination');

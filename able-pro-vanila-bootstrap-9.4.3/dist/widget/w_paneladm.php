@@ -1,9 +1,11 @@
-<?php
+  <?php
 include('db.php'); // Incluye la conexión a la base de datos
-
+session_start();
 
 // Realizamos la consulta a la base de datos
-$query = "SELECT u.id, u.nombre, u.apellido, u.edad, u.telefono, u.correo, u.acceso, s.peso, s.altura, s.objetivo, s.suscripcion, s.comidas, s.enfermedades, s.estres_soluciones, s.alimentos_excluidos, s.sentimientos_alimentacion, s.trabajo, s.ejercicio, s.dias_entrenamiento, s.intensidad, s.estado, s.fecha_envio
+$query = "SELECT u.id, u.nombre, u.apellido, u.telefono, u.correo, u.acceso, u.idTipoPlan as plan, u.idRol as rol ,
+s.peso, s.altura, s.objetivo, s.suscripcion, s.comidas, s.enfermedades, s.estres_soluciones, 
+s.sentimientos_alimentacion, s.trabajo, s.ejercicio, s.dias_entrenamiento, s.intensidad, s.estado, s.fecha_envio
           FROM usuarios u
           LEFT JOIN solicitudes s ON u.id = s.id";
 $result = $conexion->query($query);
@@ -18,6 +20,20 @@ if ($result && $result->num_rows > 0) {
 
 // Verificamos si existe el parámetro 'mensaje' en la URL
 $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
+include('../forms/UsuarioClass.php');
+
+$usuario = new Usuario($conexion);
+$datosUsuario = $usuario->obtenerPorId($_SESSION['IdUsuario']);
+
+
+$sql = "SELECT n.Titulo, n.descripcion, pu.pregunta
+        FROM notificaciones n
+        JOIN preguntasusuarios pu ON n.idpregunta = pu.idpregunta
+        WHERE n.IdUsuario = ?";
+$stmt = $conexion->prepare($sql);
+$stmt->bind_param("i", $_SESSION['IdUsuario']);
+$stmt->execute();
+$resultadoNotificaciones = $stmt->get_result();
 ?>
 
 <!doctype html>
@@ -28,7 +44,7 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
     <title>Panel de Administración - Team Ori</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
       name="description"
@@ -58,6 +74,10 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
 <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
 <script src="../assets/js/tech-stack.js"></script>
 <link rel="stylesheet" href="../assets/css/style-preset.css" />
+
+
+<!-- Colocar esto en el head -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <style>
         /* Estilos personalizados */
         body {
@@ -86,20 +106,15 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
 
   <body data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr" data-pc-theme_contrast="" data-pc-theme="light">
     <!-- [ Pre-loader ] start -->
-<div class="loader-bg">
-  <div class="loader-track">
-    <div class="loader-fill"></div>
-  </div>
-</div>
+
 <!-- [ Pre-loader ] End -->
- <!-- [ Sidebar Menu ] start -->
+  <!-- [ Sidebar Menu ] start -->
  <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
-      <a href="../dashboard/index.html" class="b-brand text-primary">
+      <a href="../pages/panel.php" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
         <img src="../assets/images/LOGO SIN FONDO-02.png" class="img-fluid" alt="logo" height="95px" width="95px"/>
-        <span class="badge bg-light-success rounded-pill ms-2 theme-version">v1.0.0</span>
       </a>
     </div>
     <div class="navbar-content">
@@ -110,8 +125,8 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
               <img src="../assets/images/user/avatar-9.jpg" alt="user-image" class="user-avtar wid-45 rounded-circle" />
             </div>
             <div class="flex-grow-1 ms-3 me-2">
-              <h6 class="mb-0">Oriana Cristiano</h6>
-              <small>Administrador</small>
+            <h6 class="mb-0"><?= ucwords($datosUsuario['nombre']) ?> <?= ucwords($datosUsuario['apellido']) ?></h6>
+            <small>Administrador</small>
             </div>
             <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse" href="#pc_sidebar_userlink">
               <svg class="pc-icon">
@@ -121,7 +136,7 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
           </div>
           <div class="collapse pc-user-links" id="pc_sidebar_userlink">
             <div class="pt-3">
-              <a href="../../widget/w_chart.php">
+              <a href="../../dist/widget/w_chart.php">
                 <i class="ph-duotone ph-cooking-pot f-28"></i>
                 <span>Plan de Alimentación</span>
               </a>
@@ -141,14 +156,14 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
       <ul class="pc-navbar">
       
 
-      <li class="pc-item pc-caption">
+        <li class="pc-item pc-caption">
           <label>Mi espacio</label>
           <svg class="pc-icon">
             <use xlink:href="#custom-presentation-chart"></use>
           </svg>
         </li>
         <li class="pc-item">
-        <a href="../../dist/widget/w_chart.php" class="pc-link">
+          <a href="../../dist/widget/w_chart.php" class="pc-link">
             <span class="pc-micon">
               <svg class="pc-icon">
                 <use xlink:href="#custom-story"></use>
@@ -178,13 +193,29 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
           </a>
         </li>
         <li class="pc-item">
-  <a href="../../dist/widget/w_paneladm.php" class="pc-link">
-    <span class="pc-micon">
-      <img src="..//assets/images/icons-tab/icons9.png" alt="Descripción de la imagen">  
-    </span>
-    <span class="pc-mtext" >Panel de Administración</span><br><br>
-  </a>
-</li>
+          <a href="../../dist/widget/w_paneladm.php" class="pc-link">
+            <span class="pc-micon">
+              <img src="../assets/images/icons-tab/icons9.png" alt="Recetas">  
+            </span>
+            <span class="pc-mtext">Panel de Administración</span>
+          </a>
+       </li>
+       <li class="pc-item">
+          <a href="../../dist/recetas/index.php" class="pc-link">
+            <span class="pc-micon">
+              <img src="../assets/images/icons-tab/icons8c.png" alt="Recetas">  
+            </span>
+            <span class="pc-mtext">Recetas</span>
+           </a>
+       </li>
+       <li class="pc-item">
+          <a href="../pages/recomendations.php" class="pc-link">
+              <span class="pc-micon">
+                  <i class="ph-duotone ph-book-open-text"></i>
+              </span>
+              <span class="pc-mtext">Recomendaciones</span>
+          </a>
+      </li>
       </ul>
     </div>
   </div>
@@ -206,8 +237,7 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
         <i class="ti ti-menu-2"></i>
       </a>
     </li>
-    <li class="pc-h-item d-none d-md-inline-flex">
-    </li>
+    
   </ul>
 </div>
 <!-- [Mobile Media Block end] -->
@@ -220,7 +250,8 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
         href="#"
         role="button"
         aria-haspopup="false"
-        aria-expanded="false">
+        aria-expanded="false"
+      >
         <svg class="pc-icon">
           <use xlink:href="#custom-sun-1"></use>
         </svg>
@@ -253,7 +284,8 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
         href="#"
         role="button"
         aria-haspopup="false"
-        aria-expanded="false">
+        aria-expanded="false"
+      >
         <svg class="pc-icon">
           <use xlink:href="#custom-setting-2"></use>
         </svg>
@@ -261,33 +293,15 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
       <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
         <a href="#!" class="dropdown-item">
           <i class="ti ti-user"></i>
-          <span>My Account</span>
-        </a>
-        <a href="#!" class="dropdown-item">
-          <i class="ti ti-settings"></i>
-          <span>Settings</span>
-        </a>
-        <a href="#!" class="dropdown-item">
-          <i class="ti ti-headset"></i>
-          <span>Support</span>
-        </a>
-        <a href="#!" class="dropdown-item">
-          <i class="ti ti-lock"></i>
-          <span>Lock Screen</span>
+          <span>Mis Planes</span>
         </a>
         <a href="#!" class="dropdown-item">
           <i class="ti ti-power"></i>
-          <span>Logout</span>
+          <span>Cerrar Sesión</span>
         </a>
       </div>
     </li>
-    <li class="pc-h-item">
-      <a href="#" class="pc-head-link me-0" data-bs-toggle="offcanvas" data-bs-target="#announcement" aria-controls="announcement">
-        <svg class="pc-icon">
-          <use xlink:href="#custom-flash"></use>
-        </svg>
-      </a>
-    </li>
+    
     <li class="dropdown pc-h-item">
       <a
         class="pc-head-link dropdown-toggle arrow-none me-0"
@@ -295,113 +309,49 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
         href="#"
         role="button"
         aria-haspopup="false"
-        aria-expanded="false">
+        aria-expanded="false"
+      >
         <svg class="pc-icon">
           <use xlink:href="#custom-notification"></use>
         </svg>
         <span class="badge bg-success pc-h-badge">3</span>
       </a>
       <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
-        <div class="dropdown-header d-flex align-items-center justify-content-between">
-          <h5 class="m-0">Notifications</h5>
-          <a href="#!" class="btn btn-link btn-sm">Mark all read</a>
-        </div>
-        <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
-          <p class="text-span">Today</p>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-layer"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">2 min ago</span>
-                  <h5 class="text-body mb-2">UI/UX Design</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
-                </div>
+      <div class="dropdown-header d-flex align-items-center justify-content-between">
+    <h5 class="m-0">Notificaciones</h5>
+    <a href="#!" class="btn btn-link btn-sm">Marcar como leidas</a>
+  </div>
+  <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
+    <?php if($resultadoNotificaciones->num_rows > 0): ?>
+      <?php while($notificacion = $resultadoNotificaciones->fetch_assoc()): ?>
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="d-flex">
+              <div class="flex-shrink-0">
+                <svg class="pc-icon text-primary">
+                  <use xlink:href="#custom-layer"></use>
+                </svg>
               </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-sms"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">1 hour ago</span>
-                  <h5 class="text-body mb-2">Message</h5>
-                  <p class="mb-0">Lorem Ipsum has been the industry's standard dummy text ever since the 1500.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p class="text-span">Yesterday</p>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-document-text"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">2 hour ago</span>
-                  <h5 class="text-body mb-2">Forms</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-user-bold"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">12 hour ago</span>
-                  <h5 class="text-body mb-2">Challenge invitation</h5>
-                  <p class="mb-2"><span class="text-dark">Jonny aber</span> invites to join the challenge</p>
-                  <button class="btn btn-sm btn-outline-secondary me-2">Decline</button>
-                  <button class="btn btn-sm btn-primary">Accept</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-security-safe"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">5 hour ago</span>
-                  <h5 class="text-body mb-2">Security</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
-                </div>
+              <div class="flex-grow-1 ms-3">
+                <span class="float-end text-sm text-muted">
+                </span>
+                <h4 class="text-body mb-2"><?= htmlspecialchars($notificacion['Titulo']); ?></h4>
+                <p>Pregunta:<?=$notificacion['pregunta']?></p>
+                <h5 class="mb-0"><?= htmlspecialchars($notificacion['descripcion']); ?></h5>
               </div>
             </div>
           </div>
         </div>
-        <div class="text-center py-2">
-          <a href="#!" class="link-danger">Clear all Notifications</a>
-        </div>
-      </div>
+      <?php endwhile; ?>
+    <?php else: ?>
+      <p class="text-center">No hay notificaciones</p>
+    <?php endif; ?>
+  </div>
+  <div class="text-center py-2">
+    <a href="#!" class="link-danger">Borrar todas las Notificaciones</a>
+  </div>
+</div>
+
     </li>
     <li class="dropdown pc-h-item header-user-profile">
       <a
@@ -411,8 +361,7 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
         role="button"
         aria-haspopup="false"
         data-bs-auto-close="outside"
-        aria-expanded="false"
-      >
+        aria-expanded="false">
         <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar" />
       </a>
       <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
@@ -426,30 +375,29 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
                 <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35" />
               </div>
               <div class="flex-grow-1 ms-3">
-                <h6 class="mb-1">Carson Darrin 🖖</h6>
-                <span>carson.darrin@company.io</span>
+                <h6 class="mb-1"><?= ucwords($datosUsuario['nombre']) ?> <?= ucwords($datosUsuario['apellido']) ?></h6>
+                <span><?=$datosUsuario['correo']?></span>
               </div>
             </div>
             <hr class="border-secondary border-opacity-50" />
             <div class="card">
               <div class="card-body py-3">
                 <div class="d-flex align-items-center justify-content-between">
-                  <h5 class="mb-0 d-inline-flex align-items-center"
-                    ><svg class="pc-icon text-muted me-2">
-                      <use xlink:href="#custom-notification-outline"></use></svg>Notification</h5>
+                  <h5 class="mb-0 d-inline-flex align-items-center"><svg class="pc-icon text-muted me-2">
+                      <use xlink:href="#custom-notification-outline"></use></svg>Notificaciones</h5>
                   <div class="form-check form-switch form-check-reverse m-0">
                     <input class="form-check-input f-18" type="checkbox" role="switch" />
                   </div>
                 </div>
               </div>
             </div>
-            <p class="text-span">Manage</p>
+            <p class="text-span">Administrar</p>
             <a href="#" class="dropdown-item">
               <span>
                 <svg class="pc-icon text-muted me-2">
                   <use xlink:href="#custom-setting-outline"></use>
                 </svg>
-                <span>Settings</span>
+                <span>Configuraciones</span>
               </span>
             </a>
             <a href="#" class="dropdown-item">
@@ -457,7 +405,7 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
                 <svg class="pc-icon text-muted me-2">
                   <use xlink:href="#custom-share-bold"></use>
                 </svg>
-                <span>Share</span>
+                <span>Compartir</span>
               </span>
             </a>
             <a href="#" class="dropdown-item">
@@ -465,89 +413,17 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
                 <svg class="pc-icon text-muted me-2">
                   <use xlink:href="#custom-lock-outline"></use>
                 </svg>
-                <span>Change Password</span>
+                <span>Cambiar Contraseña</span>
               </span>
-            </a>
-            <hr class="border-secondary border-opacity-50" />
-            <p class="text-span">Team</p>
-            <a href="#" class="dropdown-item">
-              <span>
-                <svg class="pc-icon text-muted me-2">
-                  <use xlink:href="#custom-profile-2user-outline"></use>
-                </svg>
-                <span>UI Design team</span>
-              </span>
-              <div class="user-group">
-                <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                <span class="avtar bg-danger text-white">K</span>
-                <span class="avtar bg-success text-white">
-                  <svg class="pc-icon m-0">
-                    <use xlink:href="#custom-user"></use>
-                  </svg>
-                </span>
-                <span class="avtar bg-light-primary text-primary">+2</span>
-              </div>
-            </a>
-            <a href="#" class="dropdown-item">
-              <span>
-                <svg class="pc-icon text-muted me-2">
-                  <use xlink:href="#custom-profile-2user-outline"></use>
-                </svg>
-                <span>Friends Groups</span>
-              </span>
-              <div class="user-group">
-                <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                <span class="avtar bg-danger text-white">K</span>
-                <span class="avtar bg-success text-white">
-                  <svg class="pc-icon m-0">
-                    <use xlink:href="#custom-user"></use>
-                  </svg>
-                </span>
-              </div>
-            </a>
-            <a href="#" class="dropdown-item">
-              <span>
-                <svg class="pc-icon text-muted me-2">
-                  <use xlink:href="#custom-add-outline"></use>
-                </svg>
-                <span>Add new</span>
-              </span>
-              <div class="user-group">
-                <span class="avtar bg-primary text-white">
-                  <svg class="pc-icon m-0">
-                    <use xlink:href="#custom-add-outline"></use>
-                  </svg>
-                </span>
-              </div>
             </a>
             <hr class="border-secondary border-opacity-50" />
             <div class="d-grid mb-3">
               <button class="btn btn-primary">
-                <svg class="pc-icon me-2">
+                <svg class="pc-icon me-2">  
                   <use xlink:href="#custom-logout-1-outline"></use></svg>Logout
               </button>
             </div>
-            <div
-              class="card border-0 shadow-none drp-upgrade-card mb-0"
-              style="background-image: url(../assets/images/layout/img-profile-card.jpg)">
-              <div class="card-body">
-                <div class="user-group">
-                  <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                  <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="avtar" />
-                  <img src="../assets/images/user/avatar-3.jpg" alt="user-image" class="avtar" />
-                  <img src="../assets/images/user/avatar-4.jpg" alt="user-image" class="avtar" />
-                  <img src="../assets/images/user/avatar-5.jpg" alt="user-image" class="avtar" />
-                  <span class="avtar bg-light-primary text-primary">+20</span>
-                </div>
-                <h3 class="my-3 text-dark">245.3k <small class="text-muted">Followers</small></h3>
-                <a href="#" class="btn btn btn-warning buynowlinks">
-                  <svg class="pc-icon me-2">
-                    <use xlink:href="#custom-logout-1-outline"></use>
-                  </svg>
-                  Upgrade to Business
-                </a>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -556,74 +432,7 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
 </div>
  </div>
 </header>
-<div class="offcanvas pc-announcement-offcanvas offcanvas-end" tabindex="-1" id="announcement" aria-labelledby="announcementLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="announcementLabel">What's new announcement?</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <p class="text-span">Today</p>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-success f-12">Big News</div>
-          <p class="mb-0 text-muted">2 min ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Able Pro is Redesigned</h5>
-        <p class="text-muted">Able Pro is completely renowed with high aesthetics User Interface.</p>
-        <img src="../assets/images/layout/img-announcement-1.png" alt="img" class="img-fluid mb-3" />
-        <div class="row">
-          <div class="col-12">
-            <div class="d-grid"
-              ><a class="btn btn-outline-secondary" href="https://1.envato.market/zNkqj6" target="_blank">Check Now</a></div
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-warning f-12">Offer</div>
-          <p class="mb-0 text-muted">2 hour ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Able Pro is in best offer price</h5>
-        <p class="text-muted">Download Able Pro exclusive on themeforest with best price. </p>
-        <a href="https://1.envato.market/zNkqj6" target="_blank"
-          ><img src="../assets/images/layout/img-announcement-2.png" alt="img" class="img-fluid"
-        /></a>
-      </div>
-    </div>
 
-    <p class="text-span mt-4">Yesterday</p>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-primary f-12">Blog</div>
-          <p class="mb-0 text-muted">12 hour ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Featured Dashboard Template</h5>
-        <p class="text-muted">Do you know Able Pro is one of the featured dashboard template selected by Themeforest team.?</p>
-        <img src="../assets/images/layout/img-announcement-3.png" alt="img" class="img-fluid" />
-      </div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-primary f-12">Announcement</div>
-          <p class="mb-0 text-muted">12 hour ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Buy Once - Get Free Updated lifetime</h5>
-        <p class="text-muted">Get the lifetime free updates once you purchase the Able Pro.</p>
-        <img src="../assets/images/layout/img-announcement-4.png" alt="img" class="img-fluid" />
-      </div>
-    </div>
-  </div>
-</div>
 <!-- [ Header ] end -->
 <!-- [ Main Content ] start -->
 <div class="pc-container">
@@ -636,134 +445,272 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
 
         <!-- Barra de Navegación -->
         <div class="nav-wrapper mb-4">
-            <ul class="nav nav-pills justify-content-center">
-                <li class="nav-item">
-                    <a class="nav-link active" id="usuarios-tab" data-bs-toggle="pill" href="#usuarios" role="tab">Gestión de Usuarios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="solicitudes-tab" data-bs-toggle="pill" href="#solicitudes" role="tab">Gestión de Solicitudes</a>
-                </li>
-            </ul>
+    <ul class="nav nav-pills justify-content-center">
+        <li class="nav-item">
+            <a class="nav-link active" id="usuarios-tab" data-bs-toggle="pill" href="#usuarios" role="tab">Gestión de Usuarios</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="solicitudes-tab" data-bs-toggle="pill" href="#solicitudes" role="tab">Gestión de Solicitudes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="modal" href="#videosEntrenamientoModal" role="button">Videos Entrenamiento</a>
+        </li>
+    </ul>
+</div>
+
+<!-- Modal para Videos de Entrenamiento -->
+<div class="modal fade" id="videosEntrenamientoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-content rounded">
+            <div class="modal-header pb-0 border-0 justify-content-end">
+                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                    <i class="ki-duotone ki-cross fs-1">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                </div>
+            </div>
+            <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                <form method="POST" class="form" action="./Admins/guardarVideoEntrenamiento.php">
+                    <div class="mb-13 text-center">
+                        <h1 class="mb-3">Agregar Video de Entrenamiento</h1>
+                    </div>
+<br>
+                    <!-- Nombre -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Nombre del Video</span>
+                        </label>
+                        <input type="text" class="form-control form-control-solid" name="nombre" required>
+                    </div>
+<br>
+                    <!-- Descripción -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Descripción</span>
+                        </label>
+                        <textarea class="form-control form-control-solid" rows="3" name="descripcion" required></textarea>
+                    </div>
+<br>
+                    <!-- URL del Video -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Enlace del Video</span>
+                        </label>
+                        <input type="url" class="form-control form-control-solid" name="url" required>
+                    </div>
+<br>
+                    <!-- Tipo de Entrenamiento -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Tipo de Entrenamiento</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="tipo_entrenamiento" required>
+                            <option value="">Seleccione un tipo...</option>
+                            <option value="fuerza">Entrenamiento de Fuerza</option>
+                            <option value="cardio">Cardio</option>
+                            <option value="flexibilidad">Flexibilidad</option>
+                            <option value="hiit">HIIT</option>
+                        </select>
+                    </div>
+<br>
+                    <!-- Lugar de Entrenamiento -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Lugar</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="lugar" required>
+                            <option value="">Seleccione un lugar...</option>
+                            <option value="gimnasio">Gimnasio</option>
+                            <option value="casa">Casa</option>
+                            <option value="exterior">Exterior</option>
+                        </select>
+                    </div>
+<br>
+                    <!-- Sexo -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Sexo</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="sexo" required>
+                            <option value="">Seleccione el sexo...</option>
+                            <option value="gimnasio">Hombre</option>
+                            <option value="casa">Mujer</option>
+                            <option value="exterior">Ambos</option>
+                        </select>
+                    </div>
+<br>
+                    <!-- Dificultad -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Dificultad</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="lugar" required>
+                            <option value="">Seleccione una dificultad...</option>
+                            <option value="gimnasio">Facil</option>
+                            <option value="casa">Medio</option>
+                            <option value="exterior">Dificil</option>
+                        </select>
+                    </div>
+<br>
+                    <!-- Grupo Muscular -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Grupo Muscular</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="grupo_muscular" required>
+                            <option value="">Seleccione un grupo...</option>
+                            <option value="piernas">Piernas</option>
+                            <option value="brazos">Brazos</option>
+                            <option value="espalda">Espalda</option>
+                            <option value="pecho">Pecho</option>
+                            <option value="core">Core</option>
+                            <option value="fullbody">Full Body</option>
+                        </select>
+                    </div>
+<br>    
+                        <!-- Grupo Ejercicio -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Grupo Ejercicio</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="grupo_muscular" required>
+                            <option value="">Seleccione un grupo...</option>
+                            <option value="1">Grupo 1</option>
+                            <option value="2">Grupo 2</option>
+                            <option value="3">Grupo 3</option>
+                            <option value="4">Grupo 4</option>
+                            <option value="5">Grupo 5</option>
+                            <option value="6">Grupo 6</option>
+                        </select>
+                    </div>
+<br>  
+                    <!-- Botones -->
+                    <div class="text-center">
+                        <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="indicator-label">Guardar Video</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
+    </div>
+</div>
     <hr>
      <!-- Contenido de la página -->
-<div class="container mt-4">
+     <div class="container mt-4">
     <!-- Pestañas -->
     <div class="tab-content">
         <div class="tab-pane fade show active" id="usuarios" role="tabpanel">
-            <table class="table table-bordered text-center">
-            <thead>
-            <tr>
-    <th colspan="8" style="background-color: #f8f9fa; font-size: 1.5rem; border: none;">
-        <div class="d-flex justify-content-between align-items-center">
-            <!-- Buscador -->
-            <div class="d-flex flex-column">
-                <label for="userSearch" class="form-label" style="margin-bottom: 5px; font-size: 1rem;">Buscador</label>
-                <input type="text" class="form-control form-control-sm" id="userSearch" placeholder="Buscar por nombre, correo..." style="width: 200px;">
-            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th colspan="9" style="background-color: #f8f9fa; font-size: 1.5rem; border: none;">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                                    <!-- Buscador -->
+                                    <div class="mb-2 mb-md-0">
+                                        <label for="userSearch" class="form-label" style="font-size: 1rem;">Buscador</label>
+                                        <input type="text" class="form-control form-control-sm" id="userSearch" placeholder="Buscar por nombre, correo..." style="width: 200px;">
+                                    </div>
 
-            <!-- Título -->
-            <div style="font-size: 1.5rem;">Gestión de Usuarios</div>
+                                    <!-- Título -->
+                                    <div class="text-center mb-2 mb-md-0">Gestión de Usuarios</div>
 
-            <!-- Botón Agregar Usuario -->
-            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal" style="background-color: white; color: black; border: 1px solid #ced4da;">
-            <img src="../assets/images/icons-tab/añadir.png" alt="añadir" style="margin-right: 0px; height: 20px; width: 20px;">
-             Agregar usuario
-            </button>
-        </div>
-     </th>
-          </tr>
-                     <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Apellidos</th>
-                        <th>Edad</th>
-                        <th>Teléfono</th>
-                        <th>Correo</th>
-                        <th>Acceso</th>
-                        <th>Acciones</th>
-                    </tr>
-          </thead>
-                        <tbody>
-                            <?php foreach ($usuarios as $usuario): ?>
-                                <tr>
-                                    <td><?php echo $usuario['id']; ?></td>
-                                    <td><?php echo $usuario['nombre']; ?></td>
-                                    <td><?php echo $usuario['apellido']; ?></td>
-                                    <td><?php echo $usuario['edad']; ?></td>
-                                    <td><?php echo $usuario['telefono']; ?></td>
-                                    <td><?php echo $usuario['correo']; ?></td>
-                                    <td><?php echo $usuario['acceso']; ?></td>
-                                    <td>
-                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"
-                                            data-id="<?php echo $usuario['id']; ?>"
-                                            data-nombre="<?php echo $usuario['nombre']; ?>"
-                                            data-apellido="<?php echo $usuario['apellido']; ?>"
-                                            data-edad="<?php echo $usuario['edad']; ?>"
-                                            data-telefono="<?php echo $usuario['telefono']; ?>"
-                                            data-correo="<?php echo $usuario['correo']; ?>"
-                                            data-acceso="<?php echo ($usuario['acceso'] == 'Habilitado' ? 'Habilitado' : 'Deshabilitado'); ?>"
-                                            data-peso="<?php echo $usuario['peso']; ?>"
-                                            data-altura="<?php echo $usuario['altura']; ?>"
-                                            data-objetivo="<?php echo $usuario['objetivo']; ?>"
-                                            data-suscripcion="<?php echo $usuario['suscripcion']; ?>"
-                                            data-comidas="<?php echo $usuario['comidas']; ?>"
-                                            data-enfermedades="<?php echo $usuario['enfermedades']; ?>"
-                                            data-estres_soluciones="<?php echo $usuario['estres_soluciones']; ?>"
-                                            data-alimentos_excluidos="<?php echo $usuario['alimentos_excluidos']; ?>"
-                                            data-sentimientos_alimentacion="<?php echo $usuario['sentimientos_alimentacion']; ?>"
-                                            data-trabajo="<?php echo $usuario['trabajo']; ?>"
-                                            data-ejercicio="<?php echo $usuario['ejercicio']; ?>"
-                                            data-dias_entrenamiento="<?php echo $usuario['dias_entrenamiento']; ?>"
-                                            data-intensidad="<?php echo $usuario['intensidad']; ?>"
-                                            data-estado="<?php echo $usuario['estado']; ?>"
-                                            data-fecha_envio="<?php echo $usuario['fecha_envio']; ?>"
-                                            title="Editar Usuario">
-                                            <img src="..//assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px; margin-center; 5px; text-align: center;"></button>
-                                            <form method="POST" action="borrar_usuario.php" style="display: inline;">
+                                    <!-- Botón Agregar Usuario -->
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                                        <img src="../assets/images/icons-tab/añadir.png" alt="añadir" style="height: 20px; width: 20px; margin-right: 5px;">
+                                        Agregar usuario
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th class="d-none d-md-table-cell">Apellidos</th>
+                            <th>Teléfono</th>
+                            <th class="d-none d-md-table-cell">Correo</th>
+                            <th>Acceso</th>
+                            <th class="d-none d-lg-table-cell">Plan</th>
+                            <th class="d-none d-lg-table-cell">Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($usuarios as $usuario): ?>
+                            <tr>
+                                <td><?php echo $usuario['id']; ?></td>
+                                <td><?php echo $usuario['nombre']; ?></td>
+                                <td class="d-none d-md-table-cell"><?php echo $usuario['apellido']; ?></td>
+                                <td><?php echo $usuario['telefono']; ?></td>
+                                <td class="d-none d-md-table-cell"><?php echo $usuario['correo']; ?></td>
+                                <td><?php echo ($usuario['acceso'] == 1 ? 'Habilitado' : 'Deshabilitado'); ?></td>
+                                <td class="d-none d-lg-table-cell"><?php echo ($usuario['plan'] == 1 ? 'Solo Nutricional' : ($usuario['plan'] == 2 ? 'Solo Entrenamiento' : 'Nutricional y Entrenamiento')); ?></td>
+                                <td class="d-none d-lg-table-cell"><?php echo ($usuario['rol'] == 1 ? 'Usuario' : ($usuario['rol'] == 2 ? 'Administrador' : ($usuario['rol'] == 3 ? 'Especialista en Entrenamiento' : ($usuario['rol'] == 4 ? 'Especialista en Nutrición' : 'Rol Desconocido')))); ?></td>
+                                <td>
+                                    <div class="d-flex flex-column flex-md-row justify-content-center gap-1">
+                                    <button class="btn btn-sm btn-warning" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editModal"
+                                        data-id="<?= $usuario['id'] ?>"
+                                        data-nombre="<?= $usuario['nombre'] ?>"
+                                        data-apellido="<?= $usuario['apellido'] ?>"
+                                        data-telefono="<?= $usuario['telefono'] ?>"
+                                        data-correo="<?= $usuario['correo'] ?>"
+                                        data-acceso="<?= $usuario['acceso'] ?>"
+                                        data-plan="<?= $usuario['plan'] ?>"
+                                        data-rol="<?= $usuario['rol'] ?>">
+                                          <img src="../assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px;">
+                                      </button>
+
+                                        <form method="POST" action="borrar_usuario.php" style="display: inline;">
                                             <input type="hidden" name="id" value="<?php echo $usuario['id']; ?>">
-                                            <button type="submit" class="btn btn-danger btn-sm" title="Eliminar Usuario">
-                                                <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar" style="width: 16px; height: 16px; text-align: center;">
+                                            <button type="submit" class="btn btn-danger btn-sm w-100 w-md-auto" title="Eliminar Usuario">
+                                                <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar" style="width: 16px; height: 16px;">
                                             </button>
                                         </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-          </div>
-        <!-- Modal para agregar usuario -->
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div><!-- Modal para agregar usuario -->
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" style="margin-left: 130px; margin-top: 100px;">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addUserModalLabel">Agregar Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form action="add_user.php" method="POST">
-                    <h4 style="text-align: center;">Datos de Contacto</h4>
+                  
+                    <h4 class="text-center">Datos de Contacto</h4>
+
                     <div class="mb-3">
                         <label for="addNombre" class="form-label">Nombre</label>
                         <input type="text" class="form-control" id="addNombre" name="nombre" required>
                     </div>
+
                     <div class="mb-3">
                         <label for="addApellido" class="form-label">Apellidos</label>
                         <input type="text" class="form-control" id="addApellido" name="apellido" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="addEdad" class="form-label">Edad</label>
-                        <input type="number" class="form-control" id="addEdad" name="edad" required>
-                    </div>
+
                     <div class="mb-3">
                         <label for="addTelefono" class="form-label">Teléfono</label>
                         <input type="text" class="form-control" id="addTelefono" name="telefono" required>
                     </div>
+
                     <div class="mb-3">
                         <label for="addCorreo" class="form-label">Correo</label>
                         <input type="email" class="form-control" id="addCorreo" name="correo" required>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Acceso</label>
                         <div class="form-check form-switch">
@@ -771,6 +718,28 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
                             <label class="form-check-label" for="addAcceso">Habilitado</label>
                         </div>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="addPlan" class="form-label">Plan</label>
+                        <select class="form-select" id="addPlan" name="plan" required>
+                            <option value="" disabled selected>Selecciona un plan</option>
+                            <option value="1">Solo nutricional</option>
+                            <option value="2">Solo entrenamiento</option>
+                            <option value="3">Nutricional y mixto</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="addRol" class="form-label">Rol</label>
+                        <select class="form-select" id="addRol" name="rol" required>
+                            <option value="" disabled selected>Selecciona un rol</option>
+                            <option value="1">Usuario</option>
+                            <option value="2">Administrador</option>
+                            <option value="3">Especialista en entrenamiento</option>
+                            <option value="4">Especialista en nutrición</option>
+                        </select>
+                    </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         <button type="submit" class="btn btn-primary">Añadir Usuario</button>
@@ -783,8 +752,8 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
 
         <!-- Modal de Edición -->
         <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content" style="margin-left: 130px; margin-top: 60px;">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editModalLabel">Editar ficha</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -795,15 +764,6 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">Datos</button>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="form-tab" data-bs-toggle="tab" data-bs-target="#form" type="button" role="tab">Formulario</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="nutrition-tab" data-bs-toggle="tab" data-bs-target="#nutrition" type="button" role="tab">P. Alimentación</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="exercise-tab" data-bs-toggle="tab" data-bs-target="#exercise" type="button" role="tab">P. Ejercicio</button>
-                            </li>
                         </ul>
 
                         <!-- Contenido de las pestañas -->
@@ -811,149 +771,62 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
                             <div class="tab-pane fade show active" id="contact" role="tabpanel">
                                 <!-- Formulario de Edición -->
                                 <form action="update_user.php" method="POST">
-                                    <input type="hidden" id="editId" name="id"><br>
-                                    <h4 style= "text-align: center;">Datos de Contacto</h4>
-                                    <div class="mb-3">
-                                        <label for="editNombre" class="form-label">Nombre</label>
-                                        <input type="text" class="form-control" id="editNombre" name="nombre">
+                                <input type="hidden" id="editId" name="id"><br>
+                                <h4 style="text-align: center;">Datos de Contacto</h4>
+
+                                <div class="mb-3">
+                                    <label for="editNombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="editNombre" name="nombre">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editApellido" class="form-label">Apellidos</label>
+                                    <input type="text" class="form-control" id="editApellido" name="apellido">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editTelefono" class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control" id="editTelefono" name="telefono">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editCorreo" class="form-label">Correo</label>
+                                    <input type="email" class="form-control" id="editCorreo" name="correo">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Acceso</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="editAcceso" name="acceso" value="permitido">
+                                        <label class="form-check-label" for="editAcceso">Habilitado</label>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="editApellido" class="form-label">Apellidos</label>
-                                        <input type="text" class="form-control" id="editApellido" name="apellido">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editEdad" class="form-label">Edad</label>
-                                        <input type="number" class="form-control" id="editEdad" name="edad">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editTelefono" class="form-label">Teléfono</label>
-                                        <input type="text" class="form-control" id="editTelefono" name="telefono">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editCorreo" class="form-label">Correo</label>
-                                        <input type="email" class="form-control" id="editCorreo" name="correo">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Acceso</label>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="editAcceso" name="acceso" value="permitido">
-                                            <label class="form-check-label" for="editAcceso">Habilitado</label>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                                    </div>
-                                </form>
-                            </div>
-                            <!-- Formulario de Edición de Datos del Formulario -->
-                            <div class="tab-pane fade" id="form" role="tabpanel">
-                                <form action="update_formulario.php" method="POST">
-                                <input type="hidden" name="id" id="editFormId"><br>
-                                <h4 style= "text-align: center;">Respuestas del Formulario</h4>
-                                    <div class="mb-3">
-                                        <label for="editPeso" class="form-label">Peso (Kg)</label>
-                                        <input type="number" class="form-control" id="editPeso" name="peso">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editAltura" class="form-label">Altura (Cm)</label>
-                                        <input type="number" class="form-control" id="editAltura" name="altura">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editObjetivo" class="form-label">Objetivo</label>
-                                        <input type="text" class="form-control" id="editObjetivo" name="objetivo">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editSuscripcion" class="form-label">¿Qué tipo de suscripción quiere?</label>
-                                        <input type="text" class="form-control" id="editSuscripcion" name="suscripcion">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editComidas" class="form-label">¿Cuántas comidas al día quieres hacer?</label>
-                                        <input type="text" class="form-control" id="editComidas" name="comidas">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editEnfermedades" class="form-label">¿Tienes alguna enfermedad o condición médica?</label>
-                                        <input type="text" class="form-control" id="editEnfermedades" name="enfermedades">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editEstres_soluciones" class="form-label">Si tuvieses una situación de estrés/angustia. ¿Qué te ayuda a salir de eso?</label>
-                                        <input type="text" class="form-control" id="editEstres_soluciones" name="estres_soluciones">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editAlimentos_excluidos" class="form-label">¿Hay algún alimento que no te guste o seas alérgico?</label>
-                                        <input type="text" class="form-control" id="editAlimentos_excluidos" name="alimentos_excluidos">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editSentimientos_alimentacion" class="form-label">¿Cómo te sientes cuando comes?</label>
-                                        <input type="text" class="form-control" id="editSentimientos_alimentacion" name="sentimientos_alimentacion">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editTrabajo" class="form-label">¿Tu trabajo es sedentario o activo?</label>
-                                        <input type="text" class="form-control" id="editTrabajo" name="trabajo">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editEjercicio" class="form-label">¿Sueles hacer ejercicio físico?</label>
-                                        <input type="text" class="form-control" id="editEjercicio" name="ejercicio">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editDias_entrenamiento" class="form-label">¿Cuántos días a la semana entrenas? (1-7)</label>
-                                        <input type="text" class="form-control" id="editDias_entrenamiento" name="dias_entrenamiento">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editIntensidad" class="form-label">¿Qué nivel de intensidad quieres en tu rutina de ejercicio? (1-6)</label>
-                                        <input type="number" class="form-control" id="editIntensidad" name="intensidad">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editEstado" class="form-label">Estado de la solicitud</label>
-                                        <input type="text" class="form-control" id="editEstado" name="estado">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editFecha_envio" class="form-label">Fecha de envío</label>
-                                        <input type="text" class="form-control" id="editFecha_envio" name="fecha_envio">
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="tab-pane fade" id="nutrition" role="tabpanel">
-                                <form action="" method="POST">
-                                <input type="hidden" name="id" id="editPlanId"><br>
-                                    <h4 style= "text-align: center;">Plan actual de Alimentación</h4>
-                                    <div class="mb-3">
-                                        <label for="editPorciones" class="form-label">Porciones</label>
-                                        <input type="number" class="form-control" id="editPorciones" name="porciones">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editCalorias" class="form-label">Calorías</label>
-                                        <input type="text" class="form-control" id="editCalorias" name="calorias">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editProteinas" class="form-label">Proteinas</label>
-                                        <input type="text" class="form-control" id="editProteinas" name="proteinas">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editGrasas" class="form-label">Grasas</label>
-                                        <input type="text" class="form-control" id="editGrasas" name="grasas">
-                                    </div>   
-                                    <div class="mb-3">
-                                        <label for="editCarbohidratos" class="form-label">Carbohidratos</label>
-                                        <input type="text" class="form-control" id="editCarbohidratos" name="carbohidratos">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editIngredientes" class="form-label">Ingredientes</label>
-                                        <input type="text" class="form-control" id="editIngredientes" name="ingredientes">
-                                    </div> 
-                                    <div class="mb-3">
-                                        <label for="editAlimentos_excluidos" class="form-label">Alimentos excluidos por el cliente</label>
-                                        <input type="text" class="form-control" id="editAlimentos_excluidoss" name="alimentos_excluidos">
-                                    </div> 
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                                    </div>     
-                                </form>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editPlan" class="form-label">Plan</label>
+                                    <select class="form-select" id="editPlan" name="plan">
+                                        <option value="1">Solo Nutricional</option>
+                                        <option value="2">Solo Entrenamiento</option>
+                                        <option value="3">Nutricional y Mixto</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="editRol" class="form-label">Rol</label>
+                                    <select class="form-select" id="editRol" name="rol">
+                                        <option value="1">Usuario</option>
+                                        <option value="2">Administrador</option>
+                                        <option value="3">Especialista en Entrenamiento</option>
+                                        <option value="4">Especialista en Nutrición</option>
+                                    </select>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                </div>
+                            </form>
+
                             </div>
                         </div>
                     </div>
@@ -963,11 +836,7 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
 <!-- Pestañas -->
 <div class="tab-content">
     <div class="tab-pane fade" id="solicitudes" role="tabpanel"><br>
-
-    <?php
-    include 'db.php'; 
-
-    echo '<style>
+    <style>
     .solicitud-card {
         background-color: rgba(255, 255, 255, 0.9);
         border-radius: 15px;
@@ -1181,37 +1050,296 @@ $mensaje = isset($_GET['mensaje']) ? $_GET['mensaje'] : '';
         margin-left: 80px;
     }
 
-      .labelb{
-        font-size: 1rem;
-        margin-right: -194px;
+    .labelb{
+      font-size: 1rem;
+      margin-right: -194px;
     }
-        
-       
-   
-   
-}
-
-.botonessolis:hover {
-    
-    transform: scale(1.1);  /* Aumentar ligeramente el tamaño al pasar el ratón */
-}
-</style>';
-
-    try {
-      echo '<h2 style="text-align: center;">Gestión de Solicitudes</h2>';
-echo '<br>';
-echo '<div class="contenedor-filtrado">';
-echo '<label for="buscador-solis" class="labelb">Buscador</label>';
-echo '<input type="text" class="form-control form-control-sm" id="buscador-solis" onkeyup="buscarSolicitudes()" placeholder="Buscar por nombre, email..." style="width: 200px; margin-bottom: 0;">';
-echo '<div class="botones-filtrado">';
-echo '<button id="btn-pendientes">Solicitudes Pendientes</button>';
-echo '<button id="btn-aprobadas">Solicitudes Aprobadas</button>';
-echo '<button id="btn-denegadas">Solicitudes Denegadas</button>';
-echo '<button id="btn-todas">Todas</button>';
-echo '</div>';
-echo '</div>';
       
-        $sql = "SELECT id, nombre, peso, altura, genero, ejercicio, edad, email, objetivo, suscripcion, comidas, estres_soluciones, alimentos_excluidos, enfermedades, sentimientos_alimentacion, trabajo, dias_entrenamiento, intensidad, estado, fecha_envio FROM solicitudes";
+      
+    .botonessolis:hover {  
+      transform: scale(1.1);  /* Aumentar ligeramente el tamaño al pasar el ratón */
+    }
+</style>
+<style>
+/* Media Queries para Responsive */
+@media (max-width: 768px) {
+    .solicitud-card {
+        width: 90% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        height: auto;
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    .avatar {
+        margin: 0 auto 10px;
+    }
+
+    .solicitud-info {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .solicitud-info p {
+        margin: 5px 0;
+    }
+
+    .modal-solicitudes-content {
+        width: 90% !important;
+        margin: 20px auto !important;
+        padding: 15px;
+    }
+
+    .contenedor-filtrado {
+        flex-direction: column;
+        margin-left: 15px !important;
+        margin-top: 15px;
+    }
+
+    #buscador-solis {
+        width: 90% !important;
+        margin-left: 0 !important;
+    }
+
+    .botones-filtrado {
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-left: 0 !important;
+    }
+
+    .botones-filtrado button {
+        width: 45%;
+        margin: 5px;
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    .modal-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .modal-row strong,
+    .modal-row span {
+        width: 100% !important;
+        text-align: left !important;
+    }
+
+    .botonessolis {
+        width: 100%;
+        margin: 5px 0 !important;
+        padding: 12px !important;
+    }
+}
+
+/* Modificaciones adicionales para mejor responsive */
+.solicitud-card {
+    max-width: 907px;
+    width: 100%;
+}
+
+.modal-solicitudes-content {
+    max-width: 400px;
+    margin: 2% auto;
+}
+
+.contenedor-filtrado {
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+#buscador-solis {
+    max-width: 350px;
+    width: 100%;
+}
+
+.botones-filtrado button {
+    flex: 1 1 150px;
+}
+
+/* Añadir esto para mejor visualización en móviles */
+@media (max-width: 480px) {
+    .solicitud-card.pendiente,
+    .solicitud-card.aprobada,
+    .solicitud-card.denegada {
+        width: 95% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .modal-solicitudes-content {
+        margin-top: 50px !important;
+    }
+
+    .botones-filtrado button {
+        width: 100%;
+    }
+    
+    .solicitud-info p {
+        font-size: 12px;
+    }
+    
+    .avatar {
+        width: 50px;
+        height: 50px;
+    }
+}
+.modal-solicitudes {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    z-index: 9999;
+}
+
+.modal-solicitudes-content {
+    background-color: #fff;
+    margin: 2% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 700px;
+    border-radius: 10px;
+    position: relative;
+}
+
+/* Añadir viewport meta tag en el head de tu HTML (si no lo tienes) */
+</style>
+
+<style>
+.nutrition-input {
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+    -moz-appearance: textfield;
+}
+
+.nutrition-input::-webkit-outer-spin-button,
+.nutrition-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.plan-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.plan-table th {
+    background: #ffffff;
+    padding: 12px;
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.plan-table td {
+    padding: 5px;
+}
+
+/* Responsive para móviles */
+@media (max-width: 767px) {
+    .table-responsive {
+        margin: 0 -15px;
+        width: calc(100% + 30px);
+    }
+    
+    .nutrition-input {
+        padding: 8px;
+        font-size: 0.8rem;
+    }
+    
+    .plan-table th {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+    
+    .plan-table td {
+        min-width: 80px;
+    }
+}
+
+/* En el CSS existente agrega */
+.modal-tabs {
+    display: flex;
+    justify-content: center !important;
+    margin: 20px 0;
+}
+
+.nav-pills .nav-link {
+    padding: 8px 25px;
+    margin: 0 5px;
+    border-radius: 25px;
+    transition: all 0.3s;
+}
+
+/* Modifica el contenedor de la pestaña del plan */
+.tab-pane {
+    padding: 15px 0;
+}
+
+</style>
+<style>
+/* [1] Corrección de posición de botones */
+.botones-plan {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-editar-plan, .btn-guardar-plan {
+    padding: 10px 25px;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-editar-plan {
+    display: block;
+    background: #4680FF;
+    color: white;
+}
+
+.btn-guardar-plan {
+    display: none;
+    background: #4CAF50;
+    color: white;
+}
+</style>
+<h2 style="text-align: center;">Gestión de Solicitudes</h2>
+    <br>
+    
+    <div class="contenedor-filtrado">
+        <label for="buscador-solis" class="labelb">Buscador</label>
+        <input type="text" class="form-control form-control-sm" id="buscador-solis" 
+               onkeyup="buscarSolicitudes()" placeholder="Buscar por nombre, email..." 
+               style="width: 200px; margin-bottom: 0;">
+        
+        <div class="botones-filtrado">
+            <button id="btn-pendientes">Solicitudes Pendientes</button>
+            <button id="btn-aprobadas">Solicitudes Aprobadas</button>
+            <button id="btn-denegadas">Solicitudes Denegadas</button>
+            <button id="btn-todas">Todas</button>
+        </div>
+    </div>
+
+    <?php
+    include 'db.php';
+    
+    try {
+        $sql = "SELECT id, nombre, peso, altura, genero, ejercicio, edad, email, objetivo, 
+                suscripcion, comidas, estres_soluciones, enfermedades, sentimientos_alimentacion, 
+                trabajo, dias_entrenamiento, intensidad, estado, fecha_envio 
+                FROM solicitudes";
         $result = $conexion->query($sql);
 
         if ($result->num_rows > 0) {
@@ -1219,94 +1347,557 @@ echo '</div>';
             echo '<div style="display: flex; flex-direction: column; gap: 15px;">';
 
             while ($row = $result->fetch_assoc()) {
-              
-              $estadoClass = 'pendiente'; 
-              if ($row['estado'] == 'aprobada') {
-                  $estadoClass = 'aprobada';
-              } elseif ($row['estado'] == 'denegada') {
-                  $estadoClass = 'denegada';
-              }
+                $estadoClass = match($row['estado']) {
+                    'aprobada' => 'aprobada',
+                    'denegada' => 'denegada',
+                    default => 'pendiente'
+                };
 
-                $avatarImg = '';
-                if (strtolower($row['genero']) == 'hombre') {
-                    $avatarImg = '../assets/images/user/avatar-1.jpg';
-                } elseif (strtolower($row['genero']) == 'mujer') {
-                    $avatarImg = '../assets/images/user/avatar-10.jpg';
-                } else {
-                    $nombreParts = explode(' ', $row['nombre']);
-                    $initials = strtoupper($nombreParts[0][0] . (isset($nombreParts[1]) ? $nombreParts[1][0] : ''));
-                    $avatarImg = 'data:image/svg+xml;base64,' . base64_encode(
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">
-                            <circle cx="60" cy="60" r="55" fill="#4CAF50" />
-                            <text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="40" fill="white">' . $initials . '</text>
-                        </svg>'
-                    );
-                }
+                // Determinar avatar
+                $avatarImg = match(strtolower($row['genero'])) {
+                  'hombre' => '../assets/images/user/avatar-1.jpg',
+                  'mujer'  => '../assets/images/user/avatar-10.jpg',
+                  default   => (function() use ($row) {
+                      $nombreParts = explode(' ', $row['nombre']);
+                      $initials = strtoupper(($nombreParts[0][0] ?? '') . ($nombreParts[1][0] ?? ''));
+                      return 'data:image/svg+xml;base64,' . base64_encode(
+                          '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+                              <circle cx="60" cy="60" r="55" fill="#4CAF50"/>
+                              <text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" 
+                                    font-size="40" fill="white">'.$initials.'</text>
+                          </svg>'
+                      );
+                  })(),
+              };
 
-                echo '<div class="solicitud-card ' . $estadoClass . '" onclick="abrirModal(' . $row['id'] . ')">';
-                echo '<div class="avatar" style="background-image: url(\'' . $avatarImg . '\');"></div>';
-                echo '<div class="solicitud-info">';
-                echo '<p class="soli"><strong>Solicitud para plan personalizado</strong>';
-                if (!empty($row['fecha_envio'])) {
-                    $fecha = new DateTime($row['fecha_envio']);
-                    echo '<p class="fecha"><strong>Fecha:</strong> ' . $fecha->format('d/m/Y h:i A') . '</p>';
-                } else {
-                    echo '<p class="fecha"><strong>Fecha de Envío:</strong> No disponible</p>';
-                }
-                echo '<p><strong>Nombre</strong> ' . htmlspecialchars($row['nombre']) . '</p>';
-                echo '<p><strong>Email</strong> ' . htmlspecialchars($row['email']) . '</p><br><br>';
-                echo '<p><strong>Género</strong> ' . htmlspecialchars($row['genero']) . '</p>';
-                echo '<p><strong>Solicitud</strong> ' . htmlspecialchars($row['estado']) . '</p>';
-                echo '<hr>';
-                echo '<p class="soli2">Ver detalles</p>';
-                echo '</div>';
-                echo '</div>';
-                echo '<div class="modal-solicitudes" id="modal-solicitudes-' . $row['id'] . '">';
-                echo '<div class="modal-solicitudes-content" style="margin-left: 610px; margin-top: 100px;">';
-                echo '<span class="close" onclick="cerrarModal(' . $row['id'] . ')">&times;</span>';
-                echo '<h2 style="text-align: center;">Solicitud completa</h2>';
-                echo '<div class="modal-row"><strong>Nombre completo</strong><span>' . htmlspecialchars($row['nombre']) . '</span></div>';
-                echo '<div class="modal-row"><strong>Edad</strong><span>' . htmlspecialchars($row['edad']) . '</span></div>';
-                echo '<div class="modal-row"><strong>Correo Electrónico</strong><span>' . htmlspecialchars($row['email']) . '</span></div>';
-                echo '<div class="modal-row"><strong>Peso (kg)</strong><span>' . htmlspecialchars($row['peso']) . ' kg</span></div>';
-                echo '<div class="modal-row"><strong>Altura (cm)</strong><span>' . htmlspecialchars($row['altura']) . ' cm</span></div>';
-                echo '<div class="modal-row"><strong>Objetivo</strong><span>' . htmlspecialchars($row['objetivo']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Qué tipo de suscripción quiere?</strong><span>' . htmlspecialchars($row['suscripcion']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Cuántas comidas al día quieres hacer?</strong><span>' . htmlspecialchars($row['comidas']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Qué soluciones busca?</strong><span>' . htmlspecialchars($row['estres_soluciones']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Hay algún alimento que no te guste o seas alérgico?</strong><span>' . htmlspecialchars($row['alimentos_excluidos']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Tiene alguna enfermedad o condición médica?</strong><span>' . htmlspecialchars($row['enfermedades']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Cómo te sientes cuándo comes?</strong><span>' . htmlspecialchars($row['sentimientos_alimentacion']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Tú trabajo es sedentario o activo?</strong><span>' . htmlspecialchars($row['trabajo']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Sueles hacer ejercicio físico?</strong><span>' . htmlspecialchars($row['ejercicio']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Cuántos días a la semana entrenas? (1-7)</strong><span>' . htmlspecialchars($row['dias_entrenamiento']) . '</span></div>';
-                echo '<div class="modal-row"><strong>¿Qué nivel de intensidad quieres en tu rutina de ejercicio? (1-6)</strong><span>' . htmlspecialchars($row['intensidad']) . '</span></div>';
-                echo '<div>';
-                echo '<form method="POST" action="aprobar_o_denegar.php">';
-                echo '<input type="hidden" name="id" value="' . $row['id'] . '">';
-                echo '<button class="botonessolis" type="submit" name="accion" value="aprobar" style="margin-left: 100px;">
-                      <img src="../assets/images/icons-tab/aprobar.png" alt="aprobar"> Aprobar</button>';
-                echo '<button class="botonessolis" type="submit" name="accion" value="denegar" style="margin-left: 150px;"><img src="..//assets/images/icons-tab/rechazado.png" alt="denegar"> Denegar</button><br>';
-                echo '</form>';
-                echo '<form method="POST" action="borrar_solicitud.php">';
-                echo '<input type="hidden" name="id" value="' . $row['id'] . '">';
-                echo '<button class="botonessolis" type="submit" style="margin-left: 240px; margin-top: 0px;"><img src="..//assets/images/icons-tab/papeleraa.png" alt="borrar"> Borrar</button>';
-                echo '</div>';
-                echo '</form>';
-                echo '</div>';
-                echo '</div>';
-            }
-               echo '</div>';
-               echo '</div>';
-        }
-    } catch (Exception $e) {
-        echo "Error al mostrar las solicitudes: " . $e->getMessage();
+                ?>
+<script>
+// Funciones para controlar modales
+// Agrega este código en el script principal de la página
+function abrirModal(id) {
+    document.getElementById(`modal-${id}`).style.display = 'block';
+}
+
+function cerrarModal(id) {
+    document.getElementById(`modal-${id}`).style.display = 'none';
+}
+
+// Cerrar al hacer clic fuera del modal
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal-solicitudes')) {
+        event.target.style.display = 'none';
     }
-    ?>
+};
+</script>
+
+                <!-- Tarjeta de solicitud -->
+                <div class="solicitud-card <?= $estadoClass ?>" onclick="abrirModal(<?= $row['id'] ?>)">
+                    <div class="avatar" style="background-image: url('<?= $avatarImg ?>')"></div>
+                    <div class="solicitud-info">
+                        <p class="soli"><strong>Solicitud para plan personalizado</strong>
+                        <?php if (!empty($row['fecha_envio'])) : 
+                            $fecha = new DateTime($row['fecha_envio']); ?>
+                            <p class="fecha"><strong>Fecha:</strong> <?= $fecha->format('d/m/Y h:i A') ?></p>
+                        <?php else : ?>
+                            <p class="fecha"><strong>Fecha de Envío:</strong> No disponible</p>
+                        <?php endif; ?>
+                        <p><strong>Nombre</strong> <?= htmlspecialchars($row['nombre']) ?></p>
+                        <p><strong>Email</strong> <?= htmlspecialchars($row['email']) ?></p>
+                        <p><strong>Género</strong> <?= htmlspecialchars($row['genero']) ?></p>
+                        <p><strong>Solicitud</strong> <?= htmlspecialchars($row['estado']) ?></p>
+                        <hr>
+                        <p class="soli2">Ver detalles</p>
+                    </div>
+                </div>
+
+                <!-- Modal -->
+                <!-- *************** MODAL PARA CADA SOLICITUD *************** -->
+<div class="modal-solicitudes" id="modal-<?= $row['id'] ?>">
+    <div class="modal-solicitudes-content">
+        
+        <!-- BOTÓN CERRAR -->
+        <span class="close" onclick="cerrarModal(<?= $row['id'] ?>)">&times;</span>
+        
+        <!-- ******** PESTAÑAS CON BOOTSTRAP ******** -->
+          <ul class="nav nav-pills modal-tabs">
+              <li class="nav-item">
+                  <a class="nav-link active" 
+                    id="detalles-tab-<?= $row['id'] ?>" 
+                    data-bs-toggle="pill" 
+                    href="#detalles-<?= $row['id'] ?>" 
+                    role="tab">
+                      Detalles
+                  </a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" 
+                    id="plan-tab-<?= $row['id'] ?>" 
+                    data-bs-toggle="pill" 
+                    href="#plan-<?= $row['id'] ?>" 
+                    role="tab">
+                      Plan Nutricional
+                  </a>
+              </li>
+          </ul>
+        <!-- ******** CONTENIDO PESTAÑAS ******** -->
+        <div class="tab-content">
+            
+            <!-- PESTAÑA 1: DETALLES DE LA SOLICITUD -->
+            <div class="tab-pane fade show active" id="detalles-<?= $row['id'] ?>" role="tabpanel" aria-labelledby="detalles-tab-<?= $row['id'] ?>">
+              <h2 class="modal-title">Solicitud Completa</h2>
+                
+                <?php 
+                // Campos de datos estáticos
+                $modalFields = [
+                    'Nombre completo'    => $row['nombre'],
+                    'Edad'               => $row['edad'],
+                    'Correo Electrónico' => $row['email'],
+                    'Peso (kg)'          => $row['peso'] . ' kg',
+                    'Altura (cm)'        => $row['altura'] . ' cm',
+                    'Objetivo'           => $row['objetivo'],
+                    'Suscripción'        => $row['suscripcion'],
+                    'Comidas diarias'    => $row['comidas'],
+                    'Soluciones buscadas'=> $row['estres_soluciones'],
+                    'Enfermedades'       => $row['enfermedades'],
+                    'Sentimientos alimentación' => $row['sentimientos_alimentacion'],
+                    'Tipo de trabajo'    => $row['trabajo'],
+                    'Ejercicio físico'   => $row['ejercicio'],
+                    'Días de entrenamiento' => $row['dias_entrenamiento'],
+                    'Intensidad'        => $row['intensidad']
+                ];
+                
+                foreach ($modalFields as $label => $value) : ?>
+                <div class="modal-row">
+                    <strong><?= $label ?></strong>
+                    <span><?= htmlspecialchars($value) ?></span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <!-- PESTAÑA 2: PLAN NUTRICIONAL -->
+            <div class="tab-pane fade" id="plan-<?= $row['id'] ?>" role="tabpanel" aria-labelledby="plan-tab-<?= $row['id'] ?>">
+            <form method="POST" action="guardar_plan.php" id="form-plan-<?= htmlspecialchars($row['id']) ?>">
+    <!-- Campos ocultos para datos principales -->
+    <input type="hidden" name="solicitud_id" value="<?= $row['id'] ?>">
+    <input type="hidden" name="calorias" id="hiddenCalorias" value="<?= $plan['calorias'] ?? '' ?>">
+    <input type="hidden" name="proteinas" id="hiddenProteinas" value="<?= $plan['proteinas'] ?? '' ?>">
+    <input type="hidden" name="grasas" id="hiddenGrasas" value="<?= $plan['grasas'] ?? '' ?>">
+    <input type="hidden" name="carbohidratos" id="hiddenCarbohidratos" value="<?= $plan['carbohidratos'] ?? '' ?>">
+
+    <!-- Sección de macros -->
+    <div class="table-responsive">
+        <table class="plan-table">
+            <thead>
+                <tr>
+                    <th>Calorías</th>
+                    <th>Proteínas (g)</th>
+                    <th>Grasas (g)</th>
+                    <th>Carbohidratos (g)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                $planQuery = "SELECT * FROM resumen_planes 
+                            WHERE solicitud_id = ".$row['id']."
+                            ORDER BY fecha_calculo DESC 
+                            LIMIT 1";
+                $planResult = $conexion->query($planQuery);
+                
+                if($planResult && $planResult->num_rows > 0): 
+                    $plan = $planResult->fetch_assoc();
+                ?>
+                <tr>
+                    <td><input type="number" name="calorias" value="<?= $plan['calorias'] ?>" class="nutrition-input" readonly></td>
+                    <td><input type="number" name="proteinas" value="<?= $plan['proteinas'] ?>" class="nutrition-input" readonly></td>
+                    <td><input type="number" name="grasas" value="<?= $plan['grasas'] ?>" class="nutrition-input" readonly></td>
+                    <td><input type="number" name="carbohidratos" value="<?= $plan['carbohidratos'] ?>" class="nutrition-input" readonly></td>
+                </tr>
+                <?php else: ?>
+                <tr>
+                    <td colspan="4" class="text-muted">No hay datos de plan nutricional</td>
+                </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </div>
+
+    <!-- Sección de ingredientes -->
+    <div class="ingredientes-container mb-4">
+        <h4>Ingredientes del Plan</h4>
+        <div class="ingredientes-list">
+            <?php
+            $index = 0;
+            $ingredientesQuery = "SELECT pn.idIngrediente, i.Nombre, pn.porcion, pn.tiempo_comida 
+                                FROM planes_nutricionales pn
+                                JOIN ingredientes i ON pn.idIngrediente = i.IdIngrediente
+                                WHERE pn.solicitud_id = ".$row['id'];
+            $ingredientesResult = $conexion->query($ingredientesQuery);
+            
+            if($ingredientesResult && $ingredientesResult->num_rows > 0):
+                while($ing = $ingredientesResult->fetch_assoc()): 
+            ?>
+            <div class="ingrediente-item mb-3">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-4">
+                        <input type="hidden" name="ingredientes[<?= $index ?>][id]" value="<?= $ing['idIngrediente'] ?>">
+                        <select class="form-select" disabled>
+                            <option value="<?= $ing['idIngrediente'] ?>" selected>
+                                <?= htmlspecialchars($ing['Nombre']) ?>
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <input type="number" 
+                            name="ingredientes[<?= $index ?>][porcion]" 
+                            value="<?= $ing['porcion'] ?>" 
+                            class="form-control" 
+                            min="1" 
+                            step="1"
+                            placeholder="Gramos"
+                            disabled>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <select name="ingredientes[<?= $index ?>][tiempo_comida]" class="form-select" disabled>
+                            <option value="desayuno" <?= $ing['tiempo_comida'] == 'desayuno' ? 'selected' : '' ?>>Desayuno</option>
+                            <option value="almuerzo" <?= $ing['tiempo_comida'] == 'almuerzo' ? 'selected' : '' ?>>Almuerzo</option>
+                            <option value="cena" <?= $ing['tiempo_comida'] == 'cena' ? 'selected' : '' ?>>Cena</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2">
+                    <button type="button" 
+                        class="btn btn-danger btn-sm btn-eliminar-ingrediente" 
+                        onclick="this.closest('.ingrediente-item').remove()"
+                        disabled>
+                            <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar">
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <?php 
+                $index++;
+                endwhile;
+            else:
+            ?>
+            <div class="alert alert-info">No hay ingredientes registrados</div>
+            <?php endif; ?>
+        </div>
+        
+        <!-- Nuevo ingrediente -->
+        <div class="nuevo-ingrediente mt-3">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <select class="form-select" id="select-ingrediente-<?= $row['id'] ?>">
+                        <option value="">Seleccionar ingrediente...</option>
+                        <?php
+                        $allIngredients = $conexion->query("SELECT * FROM ingredientes");
+                        while($ing = $allIngredients->fetch_assoc()): 
+                        ?>
+                        <option value="<?= $ing['IdIngrediente'] ?>">
+                            <?= htmlspecialchars($ing['Nombre']) ?>
+                        </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <select class="form-select" id="nuevo-tiempo-comida-<?= $row['id'] ?>">
+                        <option value="desayuno">Desayuno</option>
+                        <option value="almuerzo">Almuerzo</option>
+                        <option value="cena">Cena</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success btn-sm" 
+                        onclick="agregarIngrediente(<?= $row['id'] ?>)">
+                        <img src="../assets/images/icons-tab/añadir.png" alt="Agregar">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="botones-plan">
+        <button type="button" 
+                onclick="habilitarEdicion(<?= $row['id'] ?>)" 
+                class="btn-editar-plan"
+                id="btn-editar-<?= $row['id'] ?>">
+            ✏️ Editar Plan
+        </button>            
+        <button type="submit" 
+                class="btn-guardar-plan"
+                id="btn-guardar-<?= $row['id'] ?>"
+                style="display: none;">
+            💾 Guardar Cambios
+        </button>
+    </div>
+</form>
+
 </div>
 
+        <!-- ******** ACCIONES FINALES ******** -->
+        <div class="modal-footer">
+          <div class="acciones-container w-100">
+              <div class="row g-2">
+                  <!-- Aprobar y Denegar -->
+                  <div class="col-12 col-md-6">
+                      <form method="POST" action="aprobar_o_denegar.php" class="h-100">
+                          <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                          <button class="boton-accion aprobar w-100 h-100" type="submit" name="accion" value="aprobar">
+                              <img src="../assets/images/icons-tab/aprobar.png" alt="aprobar">
+                              Aprobar
+                          </button>
+                      </form>
+                  </div>
+                  <div class="col-12 col-md-6">
+                      <form method="POST" action="aprobar_o_denegar.php" class="h-100">
+                          <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                          <button class="boton-accion denegar w-100 h-100" type="submit" name="accion" value="denegar">
+                              <img src="../assets/images/icons-tab/rechazado.png" alt="denegar">
+                              Denegar
+                          </button>
+                      </form>
+                  </div>
+                  
+                  <!-- Borrar (siempre full width) -->
+                  <div class="col-12 mt-2">
+                      <form method="POST" action="borrar_solicitud.php" class="h-100">
+                          <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                          <button class="boton-accion borrar w-100 h-100" type="submit">
+                              <img src="../assets/images/icons-tab/papeleraa.png" alt="borrar">
+                              Borrar
+                          </button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+</div>
+                <?php
+            }
+            echo '</div></div>';
+        }
+    } catch (Exception $e) {
+        echo "<p>Error al mostrar las solicitudes: " . $e->getMessage() . "</p>";
+    }
+    ?>
+</div>
+    </div>
+</div>
+<script>
+// Función para manejar el cambio de pestañas
+function cambiarPestana(evt, tabName) {
+    const tabContents = document.querySelectorAll('.tab-content');
+    const tabLinks = document.querySelectorAll('.modal-tab');
+    
+    tabContents.forEach(content => content.classList.remove('active'));
+    tabLinks.forEach(link => link.classList.remove('active'));
+    
+    evt.currentTarget.classList.add('active');
+    document.getElementById(tabName).classList.add('active');
+}
 
+function habilitarEdicion(solicitudId) {
+    const formId = `form-plan-${solicitudId}`;
+    const form = document.getElementById(formId);
+
+    if (!form) {
+        console.error(`Formulario ${formId} no encontrado. Verificar:`);
+        console.log('IDs de formularios existentes:', 
+            [...document.querySelectorAll('form')].map(f => f.id)
+        );
+        return;
+    }
+
+    // Habilitar todos los campos editables
+    const elementosEditables = form.querySelectorAll(`
+        input[readonly], 
+        select[disabled], 
+        .btn-eliminar-ingrediente
+    `);
+
+    elementosEditables.forEach(elemento => {
+        if (elemento.hasAttribute('readonly')) elemento.removeAttribute('readonly');
+        if (elemento.disabled) elemento.disabled = false;
+        elemento.style.backgroundColor = '#fff';
+    });
+
+    // Actualizar visibilidad de botones
+    document.getElementById(`btn-editar-${solicitudId}`).style.display = 'none';
+    document.getElementById(`btn-guardar-${solicitudId}`).style.display = 'block';
+}
+function agregarIngrediente(solicitudId) {
+    const select = document.querySelector(`#select-ingrediente-${solicitudId}`);
+    const tiempo = document.querySelector(`#nuevo-tiempo-comida-${solicitudId}`);
+    const ingredientesList = document.querySelector(`.ingredientes-list`);
+    
+    if(select.value) {
+        const nuevoIndex = document.querySelectorAll('.ingrediente-item').length;
+        const nombreIngrediente = select.options[select.selectedIndex].text;
+        
+        const nuevoIngrediente = `
+        <div class="ingrediente-item mb-3">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <input type="hidden" name="ingredientes[${nuevoIndex}][id]" value="${select.value}">
+                    <select class="form-select" disabled>
+                        <option value="${select.value}" selected>${nombreIngrediente}</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2">
+                    <input type="number" 
+                        name="ingredientes[${nuevoIndex}][porcion]" 
+                        value="100" 
+                        class="form-control" 
+                        min="1" 
+                        step="1"
+                        placeholder="Gramos">
+                </div>
+                
+                <div class="col-md-3">
+                    <select name="ingredientes[${nuevoIndex}][tiempo_comida]" class="form-select">
+                        ${tiempo.innerHTML}
+                    </select>
+                </div>
+                
+                <div class="col-md-2">
+                <button type="button" 
+                        class="btn btn-danger btn-sm btn-eliminar-ingrediente" 
+                        onclick="this.closest('.ingrediente-item').remove()">
+                        <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar">
+                    </button>
+                </div>
+            </div>
+        </div>`;
+        
+        ingredientesList.insertAdjacentHTML('beforeend', nuevoIngrediente);
+        select.value = '';
+    }
+}
+
+// Habilitar todos los campos antes de enviar
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function() {
+        this.querySelectorAll('input, select, button').forEach(element => {
+            element.disabled = false;
+        });
+    });
+});
+</script>
+<!-- Botón flotante de ayuda -->
+<button type="button" 
+        class="btn btn-primary rounded-circle shadow-lg p-0"
+        style="
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            z-index: 1000;
+            width: 58px;
+            height: 58px;
+        " 
+        data-bs-toggle="modal" 
+        data-bs-target="#helpModal">
+    <i class="ph-duotone ph-question" style="font-size: 2rem"></i>  <!-- Ícono agrandado -->
+</button>
+<!-- Modal de ayuda -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">¿Necesitas ayuda?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="helpForm">
+                    <div class="mb-3">
+                        <label class="form-label">¡Envíanos tu consulta!</label>
+                        <textarea 
+                            name="mensaje" 
+                            class="form-control" 
+                            rows="4" 
+                            placeholder="Describe tu problema o duda..."
+                            required
+                            maxlength="500"
+                        ></textarea>
+                        <small class="text-muted">Máximo 500 caracteres</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        Enviar consulta
+                    </button>
+                </form>
+          </div>
+        </div>
+    </div>
+</div>
+<script>
+document.getElementById('helpForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const alertContainer = document.querySelector('#helpModal .modal-body');
+    
+    // Resetear alertas anteriores
+    alertContainer.querySelectorAll('.alert').forEach(alert => alert.remove());
+
+    // Estado de carga
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+        <span class="spinner-border spinner-border-sm" role="status"></span>
+        Enviando...
+    `;
+
+    fetch('../foro/envioPreguntasForo.php', {
+        method: 'POST',
+        body: new FormData(form)
+    })
+    .then(async response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new TypeError('Respuesta no es JSON');
+        }
+        
+        return response.json();
+    })
+    .then(data => {
+        const alertType = data.success ? 'success' : 'danger';
+        const message = data.message || (data.success 
+            ? '¡Consulta enviada! Te responderemos a la brevedad.'
+            : 'Error al enviar la consulta');
+
+        const alertHTML = `
+            <div class="alert alert-${alertType} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        alertContainer.insertAdjacentHTML('afterbegin', alertHTML);
+        if (data.success) form.reset();
+    })
+    .catch(error => {
+        console.error('Fetch Error:', error);
+        const alertHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                Error de conexión: ${error.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        alertContainer.insertAdjacentHTML('afterbegin', alertHTML);
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Enviar consulta';
+    });
+});
+</script>
 
 
  <!-- Required Js -->
@@ -1370,62 +1961,42 @@ echo '</div>';
     });
 </script>
 <script>
-function abrirModal(id) {
-    const modal = document.getElementById('modal-solicitudes-' + id);
-    if (modal) {
-        modal.style.display = 'block';
-    }
-}
 
-function cerrarModal(id) {
-    const modal = document.getElementById('modal-solicitudes-' + id);
-    if (modal) {
-        modal.style.display = 'none';
-    }
+// Función para cambiar pestañas dentro de cada modal
+function cambiarPestana(evt, tabName, modalId) {
+    const modal = document.getElementById(`modal-${modalId}`);
+    const tabContents = modal.querySelectorAll('.tab-content');
+    const tabLinks = modal.querySelectorAll('.modal-tab');
+    
+    tabContents.forEach(content => content.classList.remove('active'));
+    tabLinks.forEach(link => link.classList.remove('active'));
+    
+    evt.currentTarget.classList.add('active');
+    modal.querySelector(`#${tabName}`).classList.add('active');
 }
-
-// Cierra el modal si se hace clic fuera de él
-window.onclick = function(event) {
-    document.querySelectorAll('.modal-solicitudes').forEach(modal => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-};
 </script>
  <script>
     // Este script se ejecutará cuando el modal se abra
     const editModal = document.getElementById('editModal');
-    editModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget; // El botón que activó el modal
-        const modal = editModal;
+    editModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+        
+        // Obtener datos del botón
+        const acceso = parseInt(button.dataset.acceso) === 1;
+        const plan = button.dataset.plan;
+        const rol = button.dataset.rol;
 
-        // Rellenar los campos del formulario con los datos del botón
-        modal.querySelector('#editId').value = button.getAttribute('data-id');
-        modal.querySelector('#editFormId').value = button.getAttribute('data-id');
-        modal.querySelector('#editFormId').value = button.getAttribute('data-id');
-        modal.querySelector('#editNombre').value = button.getAttribute('data-nombre');
-        modal.querySelector('#editApellido').value = button.getAttribute('data-apellido');
-        modal.querySelector('#editEdad').value = button.getAttribute('data-edad');
-        modal.querySelector('#editTelefono').value = button.getAttribute('data-telefono');
-        modal.querySelector('#editCorreo').value = button.getAttribute('data-correo');
-        modal.querySelector('#editAcceso').checked = button.getAttribute('data-acceso') === 'Habilitado';
-        modal.querySelector('#editPeso').value = button.getAttribute('data-peso');
-        modal.querySelector('#editAltura').value = button.getAttribute('data-altura');
-        modal.querySelector('#editObjetivo').value = button.getAttribute('data-objetivo');
-        modal.querySelector('#editSuscripcion').value = button.getAttribute('data-suscripcion');
-        modal.querySelector('#editComidas').value = button.getAttribute('data-comidas');
-        modal.querySelector('#editEnfermedades').value = button.getAttribute('data-enfermedades');
-        modal.querySelector('#editEstres_soluciones').value = button.getAttribute('data-estres_soluciones');
-        modal.querySelector('#editAlimentos_excluidos').value = button.getAttribute('data-alimentos_excluidos');
-        modal.querySelector('#editAlimentos_excluidoss').value = button.getAttribute('data-alimentos_excluidos');
-        modal.querySelector('#editSentimientos_alimentacion').value = button.getAttribute('data-sentimientos_alimentacion');
-        modal.querySelector('#editTrabajo').value = button.getAttribute('data-trabajo');
-        modal.querySelector('#editEjercicio').value = button.getAttribute('data-ejercicio');
-        modal.querySelector('#editDias_entrenamiento').value = button.getAttribute('data-dias_entrenamiento');
-        modal.querySelector('#editIntensidad').value = button.getAttribute('data-intensidad');
-        modal.querySelector('#editEstado').value = button.getAttribute('data-estado');
-        modal.querySelector('#editFecha_envio').value = button.getAttribute('data-fecha_envio');
+        // Asignar valores a los campos del formulario
+        editModal.querySelector('#editId').value = button.dataset.id;
+        editModal.querySelector('#editNombre').value = button.dataset.nombre;
+        editModal.querySelector('#editApellido').value = button.dataset.apellido;
+        editModal.querySelector('#editTelefono').value = button.dataset.telefono;
+        editModal.querySelector('#editCorreo').value = button.dataset.correo;
+        editModal.querySelector('#editAcceso').checked = acceso;
+        
+        // Seleccionar opciones en los combos
+        editModal.querySelector('#editPlan').value = plan;
+        editModal.querySelector('#editRol').value = rol;
     });
 </script>
 
@@ -1467,8 +2038,6 @@ window.onload = function () {
     }
 };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
 <script src="../assets/js/plugins/popper.min.js"></script>
 <script src="../assets/js/plugins/simplebar.min.js"></script>
 <script src="../assets/js/plugins/bootstrap.min.js"></script>
@@ -1502,248 +2071,44 @@ window.onload = function () {
   main_layout_change('vertical');
 </script>
 
+<script>
+  const edicionPlan=document.getElementById("edicionPlanNutricional");
+
+  edicionPlan.addEventListener('submit',function(){
+    
+  })
+
+  async function guardarPlan(data) {
+    try {
+        const response = await fetch('guardar_plan.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const resultado = await response.json();
+        
+        if (resultado.success) {
+            console.log('Éxito:', resultado.message);
+            // Actualizar la UI aquí
+        } else {
+            console.error('Error:', resultado.message);
+        }
+    } catch (error) {
+        console.error('Error de red:', error);
+    }
+}
+</script>
+
 
     <!-- [Page Specific JS] start -->
     <!-- Apex Chart -->
     <script src="../assets/js/plugins/apexcharts.min.js"></script>
     <script src="../assets/js/pages/w-chart.js"></script>
     <!-- [Page Specific JS] end -->
-    <div class="pct-c-btn">
-      <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_pc_layout">
-        <i class="ph-duotone ph-gear-six"></i>
-      </a>
-    </div>
-    <div class="offcanvas border-0 pct-offcanvas offcanvas-end" tabindex="-1" id="offcanvas_pc_layout">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title">Settings</h5>
-        <button type="button" class="btn btn-icon btn-link-danger ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"
-          ><i class="ti ti-x"></i
-        ></button>
-      </div>
-      <div class="pct-body customizer-body">
-        <div class="offcanvas-body py-0">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <div class="pc-dark">
-                <h6 class="mb-1">Theme Mode</h6>
-                <p class="text-muted text-sm">Choose light or dark mode or Auto</p>
-                <div class="row theme-color theme-layout">
-                  <div class="col-4">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn active"
-                        data-value="true"
-                        onclick="layout_change('light');"
-                        data-bs-toggle="tooltip"
-                        title="Light">
-                        <svg class="pc-icon text-warning">
-                          <use xlink:href="#custom-sun-1"></use>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="d-grid">
-                      <button class="preset-btn btn" data-value="false" onclick="layout_change('dark');" data-bs-toggle="tooltip" title="Dark">
-                        <svg class="pc-icon">
-                          <use xlink:href="#custom-moon"></use>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn"
-                        data-value="default"
-                        onclick="layout_change_default();"
-                        data-bs-toggle="tooltip"
-                        title="Automatically sets the theme based on user's operating system's color scheme.">
-                        <span class="pc-lay-icon d-flex align-items-center justify-content-center">
-                          <i class="ph-duotone ph-cpu"></i>
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <h6 class="mb-1">Theme Contrast</h6>
-              <p class="text-muted text-sm">Choose theme contrast</p>
-              <div class="row theme-contrast">
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button
-                      class="preset-btn btn"
-                      data-value="true"
-                      onclick="layout_theme_contrast_change('true');"
-                      data-bs-toggle="tooltip"
-                      title="True">
-                      <svg class="pc-icon">
-                        <use xlink:href="#custom-mask"></use>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button
-                      class="preset-btn btn active"
-                      data-value="false"
-                      onclick="layout_theme_contrast_change('false');"
-                      data-bs-toggle="tooltip"
-                      title="False">
-                      <svg class="pc-icon">
-                        <use xlink:href="#custom-mask-1-outline"></use>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <h6 class="mb-1">Custom Theme</h6>
-              <p class="text-muted text-sm">Choose your primary theme color</p>
-              <div class="theme-color preset-color">
-                <a href="#!" data-bs-toggle="tooltip" title="Blue" class="active" data-value="preset-1"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Indigo" data-value="preset-2"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Purple" data-value="preset-3"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Pink" data-value="preset-4"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Red" data-value="preset-5"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Orange" data-value="preset-6"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Yellow" data-value="preset-7"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Green" data-value="preset-8"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Teal" data-value="preset-9"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Cyan" data-value="preset-10"><i class="ti ti-checks"></i></a>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <h6 class="mb-1">Theme layout</h6>
-              <p class="text-muted text-sm">Choose your layout</p>
-              <div class="theme-main-layout d-flex align-center gap-1 w-100">
-                <a href="#!" data-bs-toggle="tooltip" title="Vertical" class="active" data-value="vertical">
-                  <img src="../assets/images/customizer/caption-on.svg" alt="img" class="img-fluid" />
-                </a>
-                <a href="#!" data-bs-toggle="tooltip" title="Horizontal" data-value="horizontal">
-                  <img src="../assets/images/customizer/horizontal.svg" alt="img" class="img-fluid" />
-                </a>
-                <a href="#!" data-bs-toggle="tooltip" title="Color Header" data-value="color-header">
-                  <img src="../assets/images/customizer/color-header.svg" alt="img" class="img-fluid" />
-                </a>
-                <a href="#!" data-bs-toggle="tooltip" title="Compact" data-value="compact">
-                  <img src="../assets/images/customizer/compact.svg" alt="img" class="img-fluid" />
-                </a>
-                <a href="#!" data-bs-toggle="tooltip" title="Tab" data-value="tab">
-                  <img src="../assets/images/customizer/tab.svg" alt="img" class="img-fluid" />
-                </a>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <h6 class="mb-1">Sidebar Caption</h6>
-              <p class="text-muted text-sm">Sidebar Caption Hide/Show</p>
-              <div class="row theme-color theme-nav-caption">
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button
-                      class="preset-btn btn-img btn active"
-                      data-value="true"
-                      onclick="layout_caption_change('true');"
-                      data-bs-toggle="tooltip"
-                      title="Caption Show">
-                      <img src="../assets/images/customizer/caption-on.svg" alt="img" class="img-fluid" />
-                    </button>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button
-                      class="preset-btn btn-img btn"
-                      data-value="false"
-                      onclick="layout_caption_change('false');"
-                      data-bs-toggle="tooltip"
-                      title="Caption Hide">
-                      <img src="../assets/images/customizer/caption-off.svg" alt="img" class="img-fluid" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="pc-rtl">
-                <h6 class="mb-1">Theme Layout</h6>
-                <p class="text-muted text-sm">LTR/RTL</p>
-                <div class="row theme-color theme-direction">
-                  <div class="col-6">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn-img btn active"
-                        data-value="false"
-                        onclick="layout_rtl_change('false');"
-                        data-bs-toggle="tooltip"
-                        title="LTR"
-                      >
-                        <img src="../assets/images/customizer/ltr.svg" alt="img" class="img-fluid" />
-                      </button>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn-img btn"
-                        data-value="true"
-                        onclick="layout_rtl_change('true');"
-                        data-bs-toggle="tooltip"
-                        title="RTL"
-                      >
-                        <img src="../assets/images/customizer/rtl.svg" alt="img" class="img-fluid" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item pc-box-width">
-              <div class="pc-container-width">
-                <h6 class="mb-1">Layout Width</h6>
-                <p class="text-muted text-sm">Choose Full or Container Layout</p>
-                <div class="row theme-color theme-container">
-                  <div class="col-6">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn-img btn active"
-                        data-value="false"
-                        onclick="change_box_container('false')"
-                        data-bs-toggle="tooltip"
-                        title="Full Width">
-                        <img src="../assets/images/customizer/full.svg" alt="img" class="img-fluid" />
-                      </button>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn-img btn"
-                        data-value="true"
-                        onclick="change_box_container('true')"
-                        data-bs-toggle="tooltip"
-                        title="Fixed Width">
-                        <img src="../assets/images/customizer/fixed.svg" alt="img" class="img-fluid" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="d-grid">
-                <button class="btn btn-light-danger" id="layoutreset">Reset Layout</button>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+     
 
   </body>
   <!-- [Body] end -->
@@ -1754,3 +2119,6 @@ window.onload = function () {
 
 
 ?>
+
+
+                  

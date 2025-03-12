@@ -1,3 +1,4 @@
+/*
 const seleccionadosDiv = document.getElementById("seleccionados");
 const alergiasInput = document.getElementById("alergias-input");
 const sugerenciasDiv = document.getElementById("sugerencias");
@@ -83,3 +84,4 @@ function agregarChip(nombre) {
     chip.appendChild(close);
     seleccionadosDiv.appendChild(chip);
 }
+*/

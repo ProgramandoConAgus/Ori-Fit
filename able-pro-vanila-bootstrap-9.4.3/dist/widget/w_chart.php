@@ -8,12 +8,22 @@ session_start();
 
 // $usuario_id = $_SESSION['usuario_id']; // Captura el id de la sesión del usuario (para pruebas está hardcodeado)
 //$usuario_id = 1;  ID de usuario hardcodeado para pruebas
-$usuario_id = 1; // ID de usuario hardcodeado para pruebas
+$usuario_id = $_SESSION['IdUsuario']; // ID de usuario hardcodeado para pruebas
 
 // Obtener el ID de la solicitud
 //$solicitud_id = $_GET['solicitud_id'] ?? null;
-$solicitud_id = 8; // Reemplaza '1' con el ID que deseas probar
+$sql = "SELECT solicitud_id FROM resumen_planes WHERE idUsuario = ?";
+$stmt = $conexion->prepare($sql);
+$stmt->bind_param("i", $usuario_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
+if ($result && $result->num_rows > 0) {
+    $row = $result->fetch_assoc(); // Obtiene la fila como un array asociativo
+    $solicitud_id = $row["solicitud_id"]; // Accede al valor de solicitud_id
+} else {
+    $solicitud_id = null; // Asignar null si no hay resultados
+}
 if ($solicitud_id) {
     // Recuperar el resumen del plan
     $sql_resumen = "SELECT calorias, proteinas, grasas, carbohidratos 
@@ -44,7 +54,8 @@ if ($solicitud_id) {
               i.Nombre AS NombreIngrediente,
               c.Nombre AS Categoria,
               pn.porcion,
-              pn.calorias
+              pn.calorias,
+              i.tiempoComidas
           FROM 
               planes_nutricionales pn
           INNER JOIN 
@@ -67,13 +78,30 @@ if ($solicitud_id) {
           echo "No se encontraron alimentos para esta solicitud.";
       }
 } else {
-    echo "Solicitud ID no proporcionado.";
+    header('Location: ../pages/Panel.php');
     $calorias = $proteinas = $grasas = $carbohidratos = 0;
     $alimentos = [];
 }
 
+include('../forms/UsuarioClass.php');
+
+$usuario = new Usuario($conexion);
+$datosUsuario = $usuario->obtenerPorId($_SESSION['IdUsuario']);
 
 
+$solicitud=$usuario->ObtenerSolicitud($_SESSION['IdUsuario']);
+
+$comidas=explode("-",$solicitud[0]["comidas"]);
+
+
+$sql56 = "SELECT n.Titulo, n.descripcion, pu.pregunta
+        FROM notificaciones n
+        JOIN preguntasusuarios pu ON n.idpregunta = pu.idpregunta
+        WHERE n.IdUsuario = ?";
+$stmt23 = $conexion->prepare($sql56);
+$stmt23->bind_param("i", $_SESSION['IdUsuario']);
+$stmt23->execute();
+$resultadoNotificaciones = $stmt23->get_result();
 ?>
 
 <!doctype html>
@@ -127,14 +155,13 @@ if ($solicitud_id) {
   </div>
 </div>
 <!-- [ Pre-loader ] End -->
- <!-- [ Sidebar Menu ] start -->
+  <!-- [ Sidebar Menu ] start -->
  <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
       <a href="../pages/panel.php" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
         <img src="../assets/images/LOGO SIN FONDO-02.png" class="img-fluid" alt="logo" height="95px" width="95px"/>
-        <span class="badge bg-light-success rounded-pill ms-2 theme-version">v1.0.0</span>
       </a>
     </div>
     <div class="navbar-content">
@@ -145,8 +172,8 @@ if ($solicitud_id) {
               <img src="../assets/images/user/avatar-9.jpg" alt="user-image" class="user-avtar wid-45 rounded-circle" />
             </div>
             <div class="flex-grow-1 ms-3 me-2">
-              <h6 class="mb-0">Oriana Cristiano</h6>
-              <small>Administrador</small>
+            <h6 class="mb-0"><?= ucwords($datosUsuario['nombre']) ?> <?= ucwords($datosUsuario['apellido']) ?></h6>
+            <small>Administrador</small>
             </div>
             <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse" href="#pc_sidebar_userlink">
               <svg class="pc-icon">
@@ -213,14 +240,29 @@ if ($solicitud_id) {
           </a>
         </li>
         <li class="pc-item">
-        <li class="pc-item">
-        <a href="../../dist/widget/w_paneladm.php" class="pc-link">
-    <span class="pc-micon">
-      <img src="..//assets/images/icons-tab/icons9.png" alt="Descripción de la imagen">  
-    </span>
-    <span class="pc-mtext">Panel de Administración</span><br><br>
-  </a>
-</li>
+          <a href="../../dist/widget/w_paneladm.php" class="pc-link">
+            <span class="pc-micon">
+              <img src="../assets/images/icons-tab/icons9.png" alt="Recetas">  
+            </span>
+            <span class="pc-mtext">Panel de Administración</span>
+          </a>
+       </li>
+       <li class="pc-item">
+          <a href="../../dist/recetas/index.php" class="pc-link">
+            <span class="pc-micon">
+              <img src="../assets/images/icons-tab/icons8c.png" alt="Recetas">  
+            </span>
+            <span class="pc-mtext">Recetas</span>
+           </a>
+       </li>
+       <li class="pc-item">
+          <a href="../pages/recomendations.php" class="pc-link">
+              <span class="pc-micon">
+                  <i class="ph-duotone ph-book-open-text"></i>
+              </span>
+              <span class="pc-mtext">Recomendaciones</span>
+          </a>
+      </li>
       </ul>
     </div>
   </div>
@@ -242,16 +284,7 @@ if ($solicitud_id) {
         <i class="ti ti-menu-2"></i>
       </a>
     </li>
-    <li class="pc-h-item d-none d-md-inline-flex">
-      <form class="form-search">
-        <i class="search-icon">
-          <svg class="pc-icon">
-            <use xlink:href="#custom-search-normal-1"></use>
-          </svg>
-        </i>
-        <input type="search" class="form-control" placeholder="Ctrl + K" />
-      </form>
-    </li>
+    
   </ul>
 </div>
 <!-- [Mobile Media Block end] -->
@@ -307,33 +340,15 @@ if ($solicitud_id) {
       <div class="dropdown-menu dropdown-menu-end pc-h-dropdown">
         <a href="#!" class="dropdown-item">
           <i class="ti ti-user"></i>
-          <span>My Account</span>
-        </a>
-        <a href="#!" class="dropdown-item">
-          <i class="ti ti-settings"></i>
-          <span>Settings</span>
-        </a>
-        <a href="#!" class="dropdown-item">
-          <i class="ti ti-headset"></i>
-          <span>Support</span>
-        </a>
-        <a href="#!" class="dropdown-item">
-          <i class="ti ti-lock"></i>
-          <span>Lock Screen</span>
+          <span>Mis Planes</span>
         </a>
         <a href="#!" class="dropdown-item">
           <i class="ti ti-power"></i>
-          <span>Logout</span>
+          <span>Cerrar Sesión</span>
         </a>
       </div>
     </li>
-    <li class="pc-h-item">
-      <a href="#" class="pc-head-link me-0" data-bs-toggle="offcanvas" data-bs-target="#announcement" aria-controls="announcement">
-        <svg class="pc-icon">
-          <use xlink:href="#custom-flash"></use>
-        </svg>
-      </a>
-    </li>
+    
     <li class="dropdown pc-h-item">
       <a
         class="pc-head-link dropdown-toggle arrow-none me-0"
@@ -349,109 +364,41 @@ if ($solicitud_id) {
         <span class="badge bg-success pc-h-badge">3</span>
       </a>
       <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
-        <div class="dropdown-header d-flex align-items-center justify-content-between">
-          <h5 class="m-0">Notifications</h5>
-          <a href="#!" class="btn btn-link btn-sm">Mark all read</a>
-        </div>
-        <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
-          <p class="text-span">Today</p>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-layer"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">2 min ago</span>
-                  <h5 class="text-body mb-2">UI/UX Design</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p
-                  >
-                </div>
+      <div class="dropdown-header d-flex align-items-center justify-content-between">
+    <h5 class="m-0">Notificaciones</h5>
+    <a href="#!" class="btn btn-link btn-sm">Marcar como leidas</a>
+  </div>
+  <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
+    <?php if($resultadoNotificaciones->num_rows > 0): ?>
+      <?php while($notificacion = $resultadoNotificaciones->fetch_assoc()): ?>
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="d-flex">
+              <div class="flex-shrink-0">
+                <svg class="pc-icon text-primary">
+                  <use xlink:href="#custom-layer"></use>
+                </svg>
               </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-sms"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">1 hour ago</span>
-                  <h5 class="text-body mb-2">Message</h5>
-                  <p class="mb-0">Lorem Ipsum has been the industry's standard dummy text ever since the 1500.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p class="text-span">Yesterday</p>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-document-text"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">2 hour ago</span>
-                  <h5 class="text-body mb-2">Forms</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p
-                  >
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-user-bold"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">12 hour ago</span>
-                  <h5 class="text-body mb-2">Challenge invitation</h5>
-                  <p class="mb-2"><span class="text-dark">Jonny aber</span> invites to join the challenge</p>
-                  <button class="btn btn-sm btn-outline-secondary me-2">Decline</button>
-                  <button class="btn btn-sm btn-primary">Accept</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-security-safe"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">5 hour ago</span>
-                  <h5 class="text-body mb-2">Security</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p
-                  >
-                </div>
+              <div class="flex-grow-1 ms-3">
+                <span class="float-end text-sm text-muted">
+                </span>
+                <h4 class="text-body mb-2"><?= htmlspecialchars($notificacion['Titulo']); ?></h4>
+                <p>Pregunta:<?=$notificacion['pregunta']?></p>
+                <h5 class="mb-0"><?= htmlspecialchars($notificacion['descripcion']); ?></h5>
               </div>
             </div>
           </div>
         </div>
-        <div class="text-center py-2">
-          <a href="#!" class="link-danger">Clear all Notifications</a>
-        </div>
-      </div>
+      <?php endwhile; ?>
+    <?php else: ?>
+      <p class="text-center">No hay notificaciones</p>
+    <?php endif; ?>
+  </div>
+  <div class="text-center py-2">
+    <a href="#!" class="link-danger">Borrar todas las Notificaciones</a>
+  </div>
+</div>
+
     </li>
     <li class="dropdown pc-h-item header-user-profile">
       <a
@@ -461,8 +408,7 @@ if ($solicitud_id) {
         role="button"
         aria-haspopup="false"
         data-bs-auto-close="outside"
-        aria-expanded="false"
-      >
+        aria-expanded="false">
         <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar" />
       </a>
       <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
@@ -476,30 +422,29 @@ if ($solicitud_id) {
                 <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35" />
               </div>
               <div class="flex-grow-1 ms-3">
-                <h6 class="mb-1">Carson Darrin 🖖</h6>
-                <span>carson.darrin@company.io</span>
+                <h6 class="mb-1"><?= ucwords($datosUsuario['nombre']) ?> <?= ucwords($datosUsuario['apellido']) ?></h6>
+                <span><?=$datosUsuario['correo']?></span>
               </div>
             </div>
             <hr class="border-secondary border-opacity-50" />
             <div class="card">
               <div class="card-body py-3">
                 <div class="d-flex align-items-center justify-content-between">
-                  <h5 class="mb-0 d-inline-flex align-items-center"
-                    ><svg class="pc-icon text-muted me-2">
-                      <use xlink:href="#custom-notification-outline"></use></svg>Notification</h5>
+                  <h5 class="mb-0 d-inline-flex align-items-center"><svg class="pc-icon text-muted me-2">
+                      <use xlink:href="#custom-notification-outline"></use></svg>Notificaciones</h5>
                   <div class="form-check form-switch form-check-reverse m-0">
                     <input class="form-check-input f-18" type="checkbox" role="switch" />
                   </div>
                 </div>
               </div>
             </div>
-            <p class="text-span">Manage</p>
+            <p class="text-span">Administrar</p>
             <a href="#" class="dropdown-item">
               <span>
                 <svg class="pc-icon text-muted me-2">
                   <use xlink:href="#custom-setting-outline"></use>
                 </svg>
-                <span>Settings</span>
+                <span>Configuraciones</span>
               </span>
             </a>
             <a href="#" class="dropdown-item">
@@ -507,7 +452,7 @@ if ($solicitud_id) {
                 <svg class="pc-icon text-muted me-2">
                   <use xlink:href="#custom-share-bold"></use>
                 </svg>
-                <span>Share</span>
+                <span>Compartir</span>
               </span>
             </a>
             <a href="#" class="dropdown-item">
@@ -515,89 +460,17 @@ if ($solicitud_id) {
                 <svg class="pc-icon text-muted me-2">
                   <use xlink:href="#custom-lock-outline"></use>
                 </svg>
-                <span>Change Password</span>
+                <span>Cambiar Contraseña</span>
               </span>
-            </a>
-            <hr class="border-secondary border-opacity-50" />
-            <p class="text-span">Team</p>
-            <a href="#" class="dropdown-item">
-              <span>
-                <svg class="pc-icon text-muted me-2">
-                  <use xlink:href="#custom-profile-2user-outline"></use>
-                </svg>
-                <span>UI Design team</span>
-              </span>
-              <div class="user-group">
-                <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                <span class="avtar bg-danger text-white">K</span>
-                <span class="avtar bg-success text-white">
-                  <svg class="pc-icon m-0">
-                    <use xlink:href="#custom-user"></use>
-                  </svg>
-                </span>
-                <span class="avtar bg-light-primary text-primary">+2</span>
-              </div>
-            </a>
-            <a href="#" class="dropdown-item">
-              <span>
-                <svg class="pc-icon text-muted me-2">
-                  <use xlink:href="#custom-profile-2user-outline"></use>
-                </svg>
-                <span>Friends Groups</span>
-              </span>
-              <div class="user-group">
-                <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                <span class="avtar bg-danger text-white">K</span>
-                <span class="avtar bg-success text-white">
-                  <svg class="pc-icon m-0">
-                    <use xlink:href="#custom-user"></use>
-                  </svg>
-                </span>
-              </div>
-            </a>
-            <a href="#" class="dropdown-item">
-              <span>
-                <svg class="pc-icon text-muted me-2">
-                  <use xlink:href="#custom-add-outline"></use>
-                </svg>
-                <span>Add new</span>
-              </span>
-              <div class="user-group">
-                <span class="avtar bg-primary text-white">
-                  <svg class="pc-icon m-0">
-                    <use xlink:href="#custom-add-outline"></use>
-                  </svg>
-                </span>
-              </div>
             </a>
             <hr class="border-secondary border-opacity-50" />
             <div class="d-grid mb-3">
               <button class="btn btn-primary">
-                <svg class="pc-icon me-2">
+                <svg class="pc-icon me-2">  
                   <use xlink:href="#custom-logout-1-outline"></use></svg>Logout
               </button>
             </div>
-            <div
-              class="card border-0 shadow-none drp-upgrade-card mb-0"
-              style="background-image: url(../assets/images/layout/img-profile-card.jpg)">
-              <div class="card-body">
-                <div class="user-group">
-                  <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                  <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="avtar" />
-                  <img src="../assets/images/user/avatar-3.jpg" alt="user-image" class="avtar" />
-                  <img src="../assets/images/user/avatar-4.jpg" alt="user-image" class="avtar" />
-                  <img src="../assets/images/user/avatar-5.jpg" alt="user-image" class="avtar" />
-                  <span class="avtar bg-light-primary text-primary">+20</span>
-                </div>
-                <h3 class="my-3 text-dark">245.3k <small class="text-muted">Followers</small></h3>
-                <a href="#" class="btn btn btn-warning buynowlinks">
-                  <svg class="pc-icon me-2">
-                    <use xlink:href="#custom-logout-1-outline"></use>
-                  </svg>
-                  Upgrade to Business
-                </a>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -606,74 +479,7 @@ if ($solicitud_id) {
 </div>
  </div>
 </header>
-<div class="offcanvas pc-announcement-offcanvas offcanvas-end" tabindex="-1" id="announcement" aria-labelledby="announcementLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="announcementLabel">What's new announcement?</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <p class="text-span">Today</p>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-success f-12">Big News</div>
-          <p class="mb-0 text-muted">2 min ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Able Pro is Redesigned</h5>
-        <p class="text-muted">Able Pro is completely renowed with high aesthetics User Interface.</p>
-        <img src="../assets/images/layout/img-announcement-1.png" alt="img" class="img-fluid mb-3" />
-        <div class="row">
-          <div class="col-12">
-            <div class="d-grid"
-              ><a class="btn btn-outline-secondary" href="https://1.envato.market/zNkqj6" target="_blank">Check Now</a></div
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-warning f-12">Offer</div>
-          <p class="mb-0 text-muted">2 hour ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Able Pro is in best offer price</h5>
-        <p class="text-muted">Download Able Pro exclusive on themeforest with best price. </p>
-        <a href="https://1.envato.market/zNkqj6" target="_blank"
-          ><img src="../assets/images/layout/img-announcement-2.png" alt="img" class="img-fluid"
-        /></a>
-      </div>
-    </div>
 
-    <p class="text-span mt-4">Yesterday</p>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-primary f-12">Blog</div>
-          <p class="mb-0 text-muted">12 hour ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Featured Dashboard Template</h5>
-        <p class="text-muted">Do you know Able Pro is one of the featured dashboard template selected by Themeforest team.?</p>
-        <img src="../assets/images/layout/img-announcement-3.png" alt="img" class="img-fluid" />
-      </div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-primary f-12">Announcement</div>
-          <p class="mb-0 text-muted">12 hour ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Buy Once - Get Free Updated lifetime</h5>
-        <p class="text-muted">Get the lifetime free updates once you purchase the Able Pro.</p>
-        <img src="../assets/images/layout/img-announcement-4.png" alt="img" class="img-fluid" />
-      </div>
-    </div>
-  </div>
-</div>
 <!-- [ Header ] end -->
 
 
@@ -786,55 +592,210 @@ if ($solicitud_id) {
                 <h5>Lista de Ingredientes</h5>
                 <span class="d-block m-t-5">Debajo encontraras los ingredientes que tendras que incluir en tu dieta para una mayor efectividad del plan según tus objetivos.</span>
               </div>
+              <?php
+if (!empty($alimentos)) {
+    // 1. Definir orden personalizado de comidas
+    $orden_comidas = ['desayuno', 'almuerzo', 'merienda', 'cena', 'snack'];
+    
+    // 2. Obtener tiempos de comida desde planes_nutricionales
+    $sql_tiempos = "SELECT DISTINCT tiempo_comida 
+                   FROM planes_nutricionales 
+                   WHERE solicitud_id = ?
+                   ORDER BY FIELD(tiempo_comida, 'desayuno', 'almuerzo', 'merienda', 'cena', 'snack')";
+    $stmt = $conexion->prepare($sql_tiempos);
+    $stmt->bind_param("i", $solicitud_id);
+    $stmt->execute();
+    $result_tiempos = $stmt->get_result();
+    $comidas_usuario = $result_tiempos->fetch_all(MYSQLI_ASSOC);
+    $comidas_usuario = array_column($comidas_usuario, 'tiempo_comida');
 
-        <?php if (!empty($alimentos)): ?>
-              <div class="card-body table-border-style">
-                <div class="table-responsive">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Tipo</th>
-                        <th>Cantidad</th>
-                        <th>Calorias</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    <?php 
-          $contador = 1; // Inicializar contador para Nro
-          foreach ($alimentos as $alimento): 
-          ?>
-                        <tr class="table-success"> <!--"Succes es para grasas"-->
-                        <td><?php echo $contador++; ?></td>
-                        <td><?php echo $alimento['NombreIngrediente']; ?></td>
-                        <td><?php echo $alimento['Categoria']; ?></td>
-                        <td><?php echo $alimento['porcion']; ?> g</td>
-                        <td><?php echo $alimento['calorias']; ?> kcal</td>
-                      </tr>
-          <?php endforeach; ?>
+    // 3. Obtener requerimientos nutricionales
+    $sql_requerimientos = "SELECT proteinas, grasas, carbohidratos 
+                          FROM resumen_planes 
+                          WHERE solicitud_id = ?";
+    $stmt = $conexion->prepare($sql_requerimientos);
+    $stmt->bind_param("i", $solicitud_id);
+    $stmt->execute();
+    $requerimientos = $stmt->get_result()->fetch_assoc();
 
-                      <!-- <tr class="table-info"> 
-                        <td>2</td>
-                        <td>Fideo</td>
-                        <td>Carbohidratos</td>
-                        <td>300g</td>
-                        <td>1000</td>
-                      </tr>
-                      <tr class="table-warning"> 
-                        <td>3</td>
-                        <td>Pechuga de pollo</td>
-                        <td>Proteina</td>
-                        <td>200g</td>
-                        <td>1000</td>
-                      </tr> -->
-                    </tbody>
-                  </table>
-          <?php else: ?>
-          <p>No se encontraron alimentos asociados a este plan.</p>
-          <?php endif; ?>
+    // 4. Consulta optimizada con ordenamiento personalizado
+    $sql_alimentos = "
+        SELECT 
+            pn.tiempo_comida,
+            pn.idIngrediente,
+            i.Nombre AS NombreIngrediente,
+            i.IdCategoria,
+            i.Gramos_Proteina,
+            i.Gramos_Carbohidratos,
+            i.Gramos_Grasas,
+            i.Calorias,
+            c.Nombre AS Categoria
+        FROM planes_nutricionales pn
+        INNER JOIN ingredientes i ON pn.idIngrediente = i.IdIngrediente
+        INNER JOIN categorias c ON i.IdCategoria = c.IdCategoria
+        WHERE pn.solicitud_id = ?
+        ORDER BY 
+            FIELD(pn.tiempo_comida, 'desayuno', 'almuerzo', 'merienda', 'cena', 'snack'),
+            i.IdCategoria";
 
+    $stmt_alimentos = $conexion->prepare($sql_alimentos);
+    $stmt_alimentos->bind_param("i", $solicitud_id);
+    $stmt_alimentos->execute();
+    $alimentos = $stmt_alimentos->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    // 5. Validar y ajustar requerimientos
+    $requerimientos_validados = [
+        'proteinas' => max($requerimientos['proteinas'] ?? 0, 1), // Evitar división por cero
+        'grasas' => max($requerimientos['grasas'] ?? 0, 1),
+        'carbohidratos' => max($requerimientos['carbohidratos'] ?? 0, 1)
+    ];
+
+    // 6. Calcular distribución por comida
+    $num_comidas = max(count($comidas_usuario), 1); // Nunca dividir por cero
+    $distribucion = [
+        'proteinas' => $requerimientos_validados['proteinas'] / $num_comidas,
+        'grasas' => $requerimientos_validados['grasas'] / $num_comidas,
+        'carbohidratos' => $requerimientos_validados['carbohidratos'] / $num_comidas
+    ];
+
+    // 7. Procesar y agrupar alimentos
+    $plan_final = [];
+    foreach ($alimentos as $alimento) {
+        $tiempo = strtolower($alimento['tiempo_comida']);
+        $categoria = $alimento['IdCategoria'];
+        
+        // Calcular porción con límites
+        $nutriente = match($categoria) {
+            1 => ['tipo' => 'proteinas', 'gramos' => $alimento['Gramos_Proteina']],
+            2 => ['tipo' => 'carbohidratos', 'gramos' => $alimento['Gramos_Carbohidratos']],
+            3 => ['tipo' => 'grasas', 'gramos' => $alimento['Gramos_Grasas']],
+            default => null
+        };
+
+        if ($nutriente && $nutriente['gramos'] > 0) {
+            $porcion = ($distribucion[$nutriente['tipo']] * 100) / $nutriente['gramos'];
+            
+            // Aplicar límite máximo de 400g por ingrediente
+            $porcion = min(round($porcion, 2), 400);
+            
+            $plan_final[$tiempo][] = [
+                'nombre' => $alimento['NombreIngrediente'],
+                'categoria' => $alimento['Categoria'],
+                'porcion' => $porcion,
+                'calorias' => round(($alimento['Calorias'] * $porcion) / 100, 1)
+            ];
+        }
+    }
+
+    // 8. Ordenar final según estructura deseada
+    $plan_ordenado = [];
+    foreach ($orden_comidas as $comida) {
+        if (isset($plan_final[$comida])) {
+            $plan_ordenado[$comida] = $plan_final[$comida];
+        }
+    }
+    $plan_ordenado = [];
+    foreach ($comidas_usuario as $comida) {
+        $comida_lower = strtolower($comida);
+        $plan_ordenado[$comida_lower] = $plan_final[$comida_lower] ?? [];
+    }
+
+    // 8.1 Añadir elementos obligatorios - NUEVA SECCIÓN
+    foreach ($plan_ordenado as $tiempo => &$items) {
+        if (in_array($tiempo, ['desayuno', 'merienda'])) {
+            $items[] = [
+                'nombre' => 'Una Pieza de fruta',
+                'categoria' => 'Fruta',
+                'porcion' => 100,
+                'calorias' => 50
+            ];
+        } elseif (in_array($tiempo, ['almuerzo', 'cena'])) {
+            $items[] = [
+                'nombre' => 'Una pieza de verdura verde',
+                'categoria' => 'Verdura',
+                'porcion' => 100,
+                'calorias' => 30
+            ];
+        }
+    }
+?>
+
+<!-- 9. Mostrar resultados -->
+<div class="card-body">
+    <?php if (!empty($plan_ordenado)): ?>
+        <div class="accordion" id="accordionComidas">
+            <?php foreach ($plan_ordenado as $tiempo => $items): ?>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#collapse<?= htmlspecialchars($tiempo) ?>">
+                            <?= ucfirst($tiempo) ?>
+                        </button>
+                    </h2>
+                    <div id="collapse<?= htmlspecialchars($tiempo) ?>" 
+                         class="accordion-collapse collapse" 
+                         data-bs-parent="#accordionComidas">
+                        <div class="accordion-body">
+                            <table class="table table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="d-none d-md-table-cell">#</th>
+                                        <th>Ingrediente</th>
+                                        <th class="d-none d-md-table-cell">Tipo</th>
+                                        <th>Cantidad (g)</th>
+                                        <th class="d-none d-md-table-cell">Calorías</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $contador = 1; ?>
+                                    <?php foreach ($items as $item): ?>
+                                    <tr>
+                                        <td class="d-none d-md-table-cell"><?= $contador++ ?></td>
+                                        <td><?= htmlspecialchars($item['nombre']) ?></td>
+                                        <td class="d-none d-md-table-cell"><?= $item['categoria'] ?></td>
+                                        <td><?= number_format($item['porcion'], 1) ?></td>
+                                        <td class="d-none d-md-table-cell"><?= number_format($item['calorias'], 1) ?></td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <div class="alert alert-warning mb-0">No se encontraron alimentos en el plan.</div>
+    <?php endif; 
+    }?>
+</div>
+
+<style>
+    @media (max-width: 767.98px) {
+        .accordion-body {
+            padding: 0  ;
+            overflow-x: auto;
+        }
+        .table {
+            font-size: 0.85rem;
+            min-width: 300px;
+        }
+        .table td, .table th {
+            padding: 0.5rem;
+            white-space: nowrap;
+        }
+        .table th:nth-child(1),
+        .table td:nth-child(1),
+        .table th:nth-child(3),
+        .table td:nth-child(3),
+        .table th:nth-child(5),
+        .table td:nth-child(5) {
+            display: none;
+        }
+    }
+</style>
+
               </div>
             </div>
           </div>
@@ -855,6 +816,117 @@ if ($solicitud_id) {
         </div>
       </div>
     </footer>
+
+
+
+    <!-- Botón flotante de ayuda -->
+<button type="button" 
+        class="btn btn-primary rounded-circle shadow-lg p-0"
+        style="
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            z-index: 1000;
+            width: 58px;
+            height: 58px;
+        " 
+        data-bs-toggle="modal" 
+        data-bs-target="#helpModal">
+    <i class="ph-duotone ph-question" style="font-size: 2rem"></i>  <!-- Ícono agrandado -->
+</button>
+<!-- Modal de ayuda -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">¿Necesitas ayuda?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="helpForm">
+                    <div class="mb-3">
+                        <label class="form-label">¡Envíanos tu consulta!</label>
+                        <textarea 
+                            name="mensaje" 
+                            class="form-control" 
+                            rows="4" 
+                            placeholder="Describe tu problema o duda..."
+                            required
+                            maxlength="500"
+                        ></textarea>
+                        <small class="text-muted">Máximo 500 caracteres</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        Enviar consulta
+                    </button>
+                </form>
+          </div>
+        </div>
+    </div>
+</div>
+<script>
+document.getElementById('helpForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const alertContainer = document.querySelector('#helpModal .modal-body');
+    
+    // Resetear alertas anteriores
+    alertContainer.querySelectorAll('.alert').forEach(alert => alert.remove());
+
+    // Estado de carga
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+        <span class="spinner-border spinner-border-sm" role="status"></span>
+        Enviando...
+    `;
+
+    fetch('../foro/envioPreguntasForo.php', {
+        method: 'POST',
+        body: new FormData(form)
+    })
+    .then(async response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new TypeError('Respuesta no es JSON');
+        }
+        
+        return response.json();
+    })
+    .then(data => {
+        const alertType = data.success ? 'success' : 'danger';
+        const message = data.message || (data.success 
+            ? '¡Consulta enviada! Te responderemos a la brevedad.'
+            : 'Error al enviar la consulta');
+
+        const alertHTML = `
+            <div class="alert alert-${alertType} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        alertContainer.insertAdjacentHTML('afterbegin', alertHTML);
+        if (data.success) form.reset();
+    })
+    .catch(error => {
+        console.error('Fetch Error:', error);
+        const alertHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                Error de conexión: ${error.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        alertContainer.insertAdjacentHTML('afterbegin', alertHTML);
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Enviar consulta';
+    });
+});
+</script>
  <!-- Required Js -->
 <script src="../assets/js/plugins/popper.min.js"></script>
 <script src="../assets/js/plugins/simplebar.min.js"></script>
@@ -862,13 +934,7 @@ if ($solicitud_id) {
 <script src="../assets/js/fonts/custom-font.js"></script>
 <script src="../assets/js/pcoded.js"></script>
 <script src="../assets/js/plugins/feather.min.js"></script>
-<div class="floting-button">
-  <a href="https://1.envato.market/zNkqj6" class="btn btn btn-danger buynowlinks d-inline-flex align-items-center gap-2" data-bs-toggle="tooltip" title="Buy Now">
-    <i class="ph-duotone ph-shopping-cart"></i>
-    <span>Buy Now</span>
-    
-  </a>
-</div>
+
 
 <script>
   layout_change('light');
@@ -900,250 +966,7 @@ if ($solicitud_id) {
     <script src="../assets/js/plugins/apexcharts.min.js"></script>
     <script src="../assets/js/pages/w-chart.js"></script>
     <!-- [Page Specific JS] end -->
-    <div class="pct-c-btn">
-      <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_pc_layout">
-        <i class="ph-duotone ph-gear-six"></i>
-      </a>
-    </div>
-    <div class="offcanvas border-0 pct-offcanvas offcanvas-end" tabindex="-1" id="offcanvas_pc_layout">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title">Settings</h5>
-        <button type="button" class="btn btn-icon btn-link-danger ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"
-          ><i class="ti ti-x"></i
-        ></button>
-      </div>
-      <div class="pct-body customizer-body">
-        <div class="offcanvas-body py-0">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <div class="pc-dark">
-                <h6 class="mb-1">Theme Mode</h6>
-                <p class="text-muted text-sm">Choose light or dark mode or Auto</p>
-                <div class="row theme-color theme-layout">
-                  <div class="col-4">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn active"
-                        data-value="true"
-                        onclick="layout_change('light');"
-                        data-bs-toggle="tooltip"
-                        title="Light"
-                      >
-                        <svg class="pc-icon text-warning">
-                          <use xlink:href="#custom-sun-1"></use>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="d-grid">
-                      <button class="preset-btn btn" data-value="false" onclick="layout_change('dark');" data-bs-toggle="tooltip" title="Dark">
-                        <svg class="pc-icon">
-                          <use xlink:href="#custom-moon"></use>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn"
-                        data-value="default"
-                        onclick="layout_change_default();"
-                        data-bs-toggle="tooltip"
-                        title="Automatically sets the theme based on user's operating system's color scheme."
-                      >
-                        <span class="pc-lay-icon d-flex align-items-center justify-content-center">
-                          <i class="ph-duotone ph-cpu"></i>
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <h6 class="mb-1">Theme Contrast</h6>
-              <p class="text-muted text-sm">Choose theme contrast</p>
-              <div class="row theme-contrast">
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button
-                      class="preset-btn btn"
-                      data-value="true"
-                      onclick="layout_theme_contrast_change('true');"
-                      data-bs-toggle="tooltip"
-                      title="True"
-                    >
-                      <svg class="pc-icon">
-                        <use xlink:href="#custom-mask"></use>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button
-                      class="preset-btn btn active"
-                      data-value="false"
-                      onclick="layout_theme_contrast_change('false');"
-                      data-bs-toggle="tooltip"
-                      title="False"
-                    >
-                      <svg class="pc-icon">
-                        <use xlink:href="#custom-mask-1-outline"></use>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <h6 class="mb-1">Custom Theme</h6>
-              <p class="text-muted text-sm">Choose your primary theme color</p>
-              <div class="theme-color preset-color">
-                <a href="#!" data-bs-toggle="tooltip" title="Blue" class="active" data-value="preset-1"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Indigo" data-value="preset-2"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Purple" data-value="preset-3"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Pink" data-value="preset-4"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Red" data-value="preset-5"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Orange" data-value="preset-6"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Yellow" data-value="preset-7"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Green" data-value="preset-8"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Teal" data-value="preset-9"><i class="ti ti-checks"></i></a>
-                <a href="#!" data-bs-toggle="tooltip" title="Cyan" data-value="preset-10"><i class="ti ti-checks"></i></a>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <h6 class="mb-1">Theme layout</h6>
-              <p class="text-muted text-sm">Choose your layout</p>
-              <div class="theme-main-layout d-flex align-center gap-1 w-100">
-                <a href="#!" data-bs-toggle="tooltip" title="Vertical" class="active" data-value="vertical">
-                  <img src="../assets/images/customizer/caption-on.svg" alt="img" class="img-fluid" />
-                </a>
-                <a href="#!" data-bs-toggle="tooltip" title="Horizontal" data-value="horizontal">
-                  <img src="../assets/images/customizer/horizontal.svg" alt="img" class="img-fluid" />
-                </a>
-                <a href="#!" data-bs-toggle="tooltip" title="Color Header" data-value="color-header">
-                  <img src="../assets/images/customizer/color-header.svg" alt="img" class="img-fluid" />
-                </a>
-                <a href="#!" data-bs-toggle="tooltip" title="Compact" data-value="compact">
-                  <img src="../assets/images/customizer/compact.svg" alt="img" class="img-fluid" />
-                </a>
-                <a href="#!" data-bs-toggle="tooltip" title="Tab" data-value="tab">
-                  <img src="../assets/images/customizer/tab.svg" alt="img" class="img-fluid" />
-                </a>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <h6 class="mb-1">Sidebar Caption</h6>
-              <p class="text-muted text-sm">Sidebar Caption Hide/Show</p>
-              <div class="row theme-color theme-nav-caption">
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button
-                      class="preset-btn btn-img btn active"
-                      data-value="true"
-                      onclick="layout_caption_change('true');"
-                      data-bs-toggle="tooltip"
-                      title="Caption Show"
-                    >
-                      <img src="../assets/images/customizer/caption-on.svg" alt="img" class="img-fluid" />
-                    </button>
-                  </div>
-                </div>
-                <div class="col-6">
-                  <div class="d-grid">
-                    <button
-                      class="preset-btn btn-img btn"
-                      data-value="false"
-                      onclick="layout_caption_change('false');"
-                      data-bs-toggle="tooltip"
-                      title="Caption Hide"
-                    >
-                      <img src="../assets/images/customizer/caption-off.svg" alt="img" class="img-fluid" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="pc-rtl">
-                <h6 class="mb-1">Theme Layout</h6>
-                <p class="text-muted text-sm">LTR/RTL</p>
-                <div class="row theme-color theme-direction">
-                  <div class="col-6">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn-img btn active"
-                        data-value="false"
-                        onclick="layout_rtl_change('false');"
-                        data-bs-toggle="tooltip"
-                        title="LTR"
-                      >
-                        <img src="../assets/images/customizer/ltr.svg" alt="img" class="img-fluid" />
-                      </button>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn-img btn"
-                        data-value="true"
-                        onclick="layout_rtl_change('true');"
-                        data-bs-toggle="tooltip"
-                        title="RTL"
-                      >
-                        <img src="../assets/images/customizer/rtl.svg" alt="img" class="img-fluid" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item pc-box-width">
-              <div class="pc-container-width">
-                <h6 class="mb-1">Layout Width</h6>
-                <p class="text-muted text-sm">Choose Full or Container Layout</p>
-                <div class="row theme-color theme-container">
-                  <div class="col-6">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn-img btn active"
-                        data-value="false"
-                        onclick="change_box_container('false')"
-                        data-bs-toggle="tooltip"
-                        title="Full Width"
-                      >
-                        <img src="../assets/images/customizer/full.svg" alt="img" class="img-fluid" />
-                      </button>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="d-grid">
-                      <button
-                        class="preset-btn btn-img btn"
-                        data-value="true"
-                        onclick="change_box_container('true')"
-                        data-bs-toggle="tooltip"
-                        title="Fixed Width"
-                      >
-                        <img src="../assets/images/customizer/fixed.svg" alt="img" class="img-fluid" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="d-grid">
-                <button class="btn btn-light-danger" id="layoutreset">Reset Layout</button>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    
 
   </body>
   <!-- [Body] end -->

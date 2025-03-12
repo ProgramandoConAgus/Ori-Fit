@@ -1,5 +1,20 @@
 <?php
+session_start();
+$IdUsuario=$_SESSION['IdUsuario'];
+include('../widget/db.php');
+include('../forms/UsuarioClass.php');
 
+$usuario = new Usuario($conexion);
+$datosUsuario = $usuario->obtenerPorId($_SESSION['IdUsuario']);
+
+$sql = "SELECT n.Titulo, n.descripcion, pu.pregunta
+        FROM notificaciones n
+        JOIN preguntasusuarios pu ON n.idpregunta = pu.idpregunta
+        WHERE n.IdUsuario = ?";
+$stmt = $conexion->prepare($sql);
+$stmt->bind_param("i", $_SESSION['IdUsuario']);
+$stmt->execute();
+$resultadoNotificaciones = $stmt->get_result();
 ?>
 <!doctype html>
 <html lang="es">
@@ -53,13 +68,12 @@
 </div>
 <!-- [ Pre-loader ] End -->
  <!-- [ Sidebar Menu ] start -->
-<nav class="pc-sidebar">
+ <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
       <a href="../pages/panel.php" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
         <img src="../assets/images/LOGO SIN FONDO-02.png" class="img-fluid" alt="logo" height="95px" width="95px"/>
-        <span class="badge bg-light-success rounded-pill ms-2 theme-version">v1.0.0</span>
       </a>
     </div>
     <div class="navbar-content">
@@ -70,8 +84,8 @@
               <img src="../assets/images/user/avatar-9.jpg" alt="user-image" class="user-avtar wid-45 rounded-circle" />
             </div>
             <div class="flex-grow-1 ms-3 me-2">
-              <h6 class="mb-0">Oriana Cristiano</h6>
-              <small>Administrador</small>
+            <h6 class="mb-0"><?= ucwords($datosUsuario['nombre']) ?> <?= ucwords($datosUsuario['apellido']) ?></h6>
+            <small>Administrador</small>
             </div>
             <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse" href="#pc_sidebar_userlink">
               <svg class="pc-icon">
@@ -138,21 +152,29 @@
           </a>
         </li>
         <li class="pc-item">
-        <a href="../../dist/widget/w_paneladm.php" class="pc-link">
-    <span class="pc-micon">
-      <img src="..//assets/images/icons-tab/icons9.png" alt="Descripción de la imagen">  
-    </span>
-    <span class="pc-mtext">Panel de Administración</span><br><br>
-  </a>
+          <a href="../../dist/widget/w_paneladm.php" class="pc-link">
+            <span class="pc-micon">
+              <img src="../assets/images/icons-tab/icons9.png" alt="Recetas">  
+            </span>
+            <span class="pc-mtext">Panel de Administración</span>
+          </a>
        </li>
        <li class="pc-item">
           <a href="../../dist/recetas/index.php" class="pc-link">
             <span class="pc-micon">
-              <img src="..//assets/images/icons-tab/icons8t.png" alt="Descripción de la imagen">  
+              <img src="../assets/images/icons-tab/icons8c.png" alt="Recetas">  
             </span>
             <span class="pc-mtext">Recetas</span>
            </a>
        </li>
+       <li class="pc-item">
+          <a href="recomendations.php" class="pc-link">
+              <span class="pc-micon">
+                  <i class="ph-duotone ph-book-open-text"></i>
+              </span>
+              <span class="pc-mtext">Recomendaciones</span>
+          </a>
+      </li>
       </ul>
     </div>
   </div>
@@ -174,16 +196,7 @@
         <i class="ti ti-menu-2"></i>
       </a>
     </li>
-    <li class="pc-h-item d-none d-md-inline-flex">
-      <form class="form-search">
-        <i class="search-icon">
-          <svg class="pc-icon">
-            <use xlink:href="#custom-search-normal-1"></use>
-          </svg>
-        </i>
-        <input type="search" class="form-control" placeholder="Ctrl + K" />
-      </form>
-    </li>
+    
   </ul>
 </div>
 <!-- [Mobile Media Block end] -->
@@ -247,13 +260,7 @@
         </a>
       </div>
     </li>
-    <li class="pc-h-item">
-      <a href="#" class="pc-head-link me-0" data-bs-toggle="offcanvas" data-bs-target="#announcement" aria-controls="announcement">
-        <svg class="pc-icon">
-          <use xlink:href="#custom-flash"></use>
-        </svg>
-      </a>
-    </li>
+    
     <li class="dropdown pc-h-item">
       <a
         class="pc-head-link dropdown-toggle arrow-none me-0"
@@ -266,108 +273,44 @@
         <svg class="pc-icon">
           <use xlink:href="#custom-notification"></use>
         </svg>
-        <span class="badge bg-success pc-h-badge">3</span>
+        <span class="badge bg-success pc-h-badge"><?=$resultadoNotificaciones->num_rows?></span>
       </a>
       <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
-        <div class="dropdown-header d-flex align-items-center justify-content-between">
-          <h5 class="m-0">Notifications</h5>
-          <a href="#!" class="btn btn-link btn-sm">Mark all read</a>
-        </div>
-        <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
-          <p class="text-span">Today</p>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-layer"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">2 min ago</span>
-                  <h5 class="text-body mb-2">UI/UX Design</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
-                </div>
+  <div class="dropdown-header d-flex align-items-center justify-content-between">
+    <h5 class="m-0">Notificaciones</h5>
+    <a href="#!" class="btn btn-link btn-sm">Marcar como leidas</a>
+  </div>
+  <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
+    <?php if($resultadoNotificaciones->num_rows > 0): ?>
+      <?php while($notificacion = $resultadoNotificaciones->fetch_assoc()): ?>
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="d-flex">
+              <div class="flex-shrink-0">
+                <svg class="pc-icon text-primary">
+                  <use xlink:href="#custom-layer"></use>
+                </svg>
               </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-sms"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">1 hour ago</span>
-                  <h5 class="text-body mb-2">Message</h5>
-                  <p class="mb-0">Lorem Ipsum has been the industry's standard dummy text ever since the 1500.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p class="text-span">Yesterday</p>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-document-text"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">2 hour ago</span>
-                  <h5 class="text-body mb-2">Forms</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-user-bold"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">12 hour ago</span>
-                  <h5 class="text-body mb-2">Challenge invitation</h5>
-                  <p class="mb-2"><span class="text-dark">Jonny aber</span> invites to join the challenge</p>
-                  <button class="btn btn-sm btn-outline-secondary me-2">Decline</button>
-                  <button class="btn btn-sm btn-primary">Accept</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-security-safe"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">5 hour ago</span>
-                  <h5 class="text-body mb-2">Security</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
-                </div>
+              <div class="flex-grow-1 ms-3">
+                <span class="float-end text-sm text-muted">
+                </span>
+                <h4 class="text-body mb-2"><?= htmlspecialchars($notificacion['Titulo']); ?></h4>
+                <p>Pregunta:<?=$notificacion['pregunta']?></p>
+                <h5 class="mb-0"><?= htmlspecialchars($notificacion['descripcion']); ?></h5>
               </div>
             </div>
           </div>
         </div>
-        <div class="text-center py-2">
-          <a href="#!" class="link-danger">Clear all Notifications</a>
-        </div>
+      <?php endwhile; ?>
+    <?php else: ?>
+      <p class="text-center">No hay notificaciones</p>
+    <?php endif; ?>
+  </div>
+  <div class="text-center py-2">
+    <a href="#!" class="link-danger">Borrar todas las Notificaciones</a>
+  </div>
+</div>
+
       </div>
     </li>
     <li class="dropdown pc-h-item header-user-profile">
@@ -389,11 +332,11 @@
           <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)">
             <div class="d-flex mb-1">
               <div class="flex-shrink-0">
-                <img src="./assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35" />
+                <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35" />
               </div>
               <div class="flex-grow-1 ms-3">
-                <h6 class="mb-1">Carson Darrin 🖖</h6>
-                <span>carson.darrin@company.io</span>
+                <h6 class="mb-1"><?= ucwords($datosUsuario['nombre']) ?> <?= ucwords($datosUsuario['apellido']) ?></h6>
+                <span><?=$datosUsuario['correo']?></span>
               </div>
             </div>
             <hr class="border-secondary border-opacity-50" />
@@ -401,20 +344,20 @@
               <div class="card-body py-3">
                 <div class="d-flex align-items-center justify-content-between">
                   <h5 class="mb-0 d-inline-flex align-items-center"><svg class="pc-icon text-muted me-2">
-                      <use xlink:href="#custom-notification-outline"></use></svg>Notification</h5>
+                      <use xlink:href="#custom-notification-outline"></use></svg>Notificaciones</h5>
                   <div class="form-check form-switch form-check-reverse m-0">
                     <input class="form-check-input f-18" type="checkbox" role="switch" />
                   </div>
                 </div>
               </div>
             </div>
-            <p class="text-span">Manage</p>
+            <p class="text-span">Administrar</p>
             <a href="#" class="dropdown-item">
               <span>
                 <svg class="pc-icon text-muted me-2">
                   <use xlink:href="#custom-setting-outline"></use>
                 </svg>
-                <span>Settings</span>
+                <span>Configuraciones</span>
               </span>
             </a>
             <a href="#" class="dropdown-item">
@@ -422,7 +365,7 @@
                 <svg class="pc-icon text-muted me-2">
                   <use xlink:href="#custom-share-bold"></use>
                 </svg>
-                <span>Share</span>
+                <span>Compartir</span>
               </span>
             </a>
             <a href="#" class="dropdown-item">
@@ -430,60 +373,8 @@
                 <svg class="pc-icon text-muted me-2">
                   <use xlink:href="#custom-lock-outline"></use>
                 </svg>
-                <span>Change Password</span>
+                <span>Cambiar Contraseña</span>
               </span>
-            </a>
-            <hr class="border-secondary border-opacity-50" />
-            <p class="text-span">Team</p>
-            <a href="#" class="dropdown-item">
-              <span>
-                <svg class="pc-icon text-muted me-2">
-                  <use xlink:href="#custom-profile-2user-outline"></use>
-                </svg>
-                <span>UI Design team</span>
-              </span>
-              <div class="user-group">
-                <img src="./assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                <span class="avtar bg-danger text-white">K</span>
-                <span class="avtar bg-success text-white">
-                  <svg class="pc-icon m-0">
-                    <use xlink:href="#custom-user"></use>
-                  </svg>
-                </span>
-                <span class="avtar bg-light-primary text-primary">+2</span>
-              </div>
-            </a>
-            <a href="#" class="dropdown-item">
-              <span>
-                <svg class="pc-icon text-muted me-2">
-                  <use xlink:href="#custom-profile-2user-outline"></use>
-                </svg>
-                <span>Friends Groups</span>
-              </span>
-              <div class="user-group">
-                <img src="./assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                <span class="avtar bg-danger text-white">K</span>
-                <span class="avtar bg-success text-white">
-                  <svg class="pc-icon m-0">
-                    <use xlink:href="#custom-user"></use>
-                  </svg>
-                </span>
-              </div>
-            </a>
-            <a href="#" class="dropdown-item">
-              <span>
-                <svg class="pc-icon text-muted me-2">
-                  <use xlink:href="#custom-add-outline"></use>
-                </svg>
-                <span>Add new</span>
-              </span>
-              <div class="user-group">
-                <span class="avtar bg-primary text-white">
-                  <svg class="pc-icon m-0">
-                    <use xlink:href="#custom-add-outline"></use>
-                  </svg>
-                </span>
-              </div>
             </a>
             <hr class="border-secondary border-opacity-50" />
             <div class="d-grid mb-3">
@@ -492,27 +383,7 @@
                   <use xlink:href="#custom-logout-1-outline"></use></svg>Logout
               </button>
             </div>
-            <div
-              class="card border-0 shadow-none drp-upgrade-card mb-0"
-              style="background-image: url(../assets/images/layout/img-profile-card.jpg)">
-              <div class="card-body">
-                <div class="user-group">
-                  <img src="./assets/images/user/avatar-1.jpg" alt="user-image" class="avtar" />
-                  <img src="./assets/images/user/avatar-2.jpg" alt="user-image" class="avtar" />
-                  <img src="./assets/images/user/avatar-3.jpg" alt="user-image" class="avtar" />
-                  <img src="./assets/images/user/avatar-4.jpg" alt="user-image" class="avtar" />
-                  <img src="./assets/images/user/avatar-5.jpg" alt="user-image" class="avtar" />
-                  <span class="avtar bg-light-primary text-primary">+20</span>
-                </div>
-                <h3 class="my-3 text-dark">245.3k <small class="text-muted">Followers</small></h3>
-                <a href="#" class="btn btn btn-warning buynowlinks">
-                  <svg class="pc-icon me-2">
-                    <use xlink:href="#custom-logout-1-outline"></use>
-                  </svg>
-                  Upgrade to Business
-                </a>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -521,74 +392,7 @@
 </div>
  </div>
 </header>
-<div class="offcanvas pc-announcement-offcanvas offcanvas-end" tabindex="-1" id="announcement" aria-labelledby="announcementLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="announcementLabel">What's new announcement?</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <p class="text-span">Today</p>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-success f-12">Big News</div>
-          <p class="mb-0 text-muted">2 min ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Able Pro is Redesigned</h5>
-        <p class="text-muted">Able Pro is completely renowed with high aesthetics User Interface.</p>
-        <img src="../assets/images/layout/img-announcement-1.png" alt="img" class="img-fluid mb-3" />
-        <div class="row">
-          <div class="col-12">
-            <div class="d-grid"
-              ><a class="btn btn-outline-secondary" href="https://1.envato.market/zNkqj6" target="_blank">Check Now</a></div
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-warning f-12">Offer</div>
-          <p class="mb-0 text-muted">2 hour ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Able Pro is in best offer price</h5>
-        <p class="text-muted">Download Able Pro exclusive on themeforest with best price. </p>
-        <a href="https://1.envato.market/zNkqj6" target="_blank"
-          ><img src="../assets/images/layout/img-announcement-2.png" alt="img" class="img-fluid"
-        /></a>
-      </div>
-    </div>
 
-    <p class="text-span mt-4">Yesterday</p>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-primary f-12">Blog</div>
-          <p class="mb-0 text-muted">12 hour ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Featured Dashboard Template</h5>
-        <p class="text-muted">Do you know Able Pro is one of the featured dashboard template selected by Themeforest team.?</p>
-        <img src="../assets/images/layout/img-announcement-3.png" alt="img" class="img-fluid" />
-      </div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="align-items-center d-flex flex-wrap gap-2 mb-3">
-          <div class="badge bg-light-primary f-12">Announcement</div>
-          <p class="mb-0 text-muted">12 hour ago</p>
-          <span class="badge dot bg-warning"></span>
-        </div>
-        <h5 class="mb-3">Buy Once - Get Free Updated lifetime</h5>
-        <p class="text-muted">Get the lifetime free updates once you purchase the Able Pro.</p>
-        <img src="../assets/images/layout/img-announcement-4.png" alt="img" class="img-fluid" />
-      </div>
-    </div>
-  </div>
-</div>
 <!-- [ Header ] end -->
 
 
@@ -598,6 +402,27 @@
   <div class="pc-content">
     <!-- [ Main Content ] start -->
     <div class="row">
+      <?php
+      $query = "SELECT * FROM solicitudes WHERE usuario_id=?";
+      $stmt = $conexion->prepare($query);
+      $stmt->bind_param("i",$IdUsuario);
+      $stmt->execute();
+      $redireccionamiento="";
+      switch($datosUsuario['idTipoPlan']){
+        case 1:
+          $redireccionamiento="../../dist/forms/alimentosForm.php";
+          break;
+        case 2:
+          $redireccionamiento="../../dist/forms/ejerciciosForm.php";
+          break;
+        case 3:
+          $redireccionamiento="../../dist/forms/alimentosForm.php";
+          break;
+      }
+      $result = $stmt->get_result();
+      if ($result->num_rows == 0) {
+      
+      ?>
       <div class="col-12">
         <div class="card welcome-banner bg-blue-800">
           <div class="card-body">
@@ -606,7 +431,7 @@
                 <div class="p-4">
                   <h2 class="text-white">Comenza tu camino</h2>
                   <p class="text-white">Contesta un breve cuestionario y recibe un plan de alimentación personalizado para que puedas cumplir tus objetivos.</p>
-                  <a href="../../dist/forms/form2_wizard.php" class="btn btn-outline-light">Rellenar Cuestionario</a>
+                  <a href="<?=$redireccionamiento?>" class="btn btn-outline-light">Rellenar Cuestionario</a>
                 </div>
               </div>
               <div class="col-sm-6 text-center">
@@ -618,92 +443,40 @@
           </div>
         </div>
       </div>
-
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body border-bottom pb-0">
-            <div class="d-flex align-items-center justify-content-center">
-              <h5 class="mb-0">Tus planes</h5>
+        <?php
+        }
+       else {
+        // Hay una solicitud, verificar si está aprobada o no
+        $row = $result->fetch_assoc();
+    
+        if ($row['estado'] === 'aprobada') { // Cambia 'estado' y 'aprobada' según tu base de datos
+            ?>
+            <div class="col-12">
+                <div class="card welcome-banner bg-green-800">
+                    <div class="card-body">
+                        <h2 class="text-white">¡Solicitud Aprobada!</h2>
+                        <p class="text-white">Tu solicitud ha sido aprobada. Puedes continuar con tu plan personalizado.</p>
+                        <a href="../widget/w_chart.php" class="btn btn-outline-light">Ver Plan</a>
+                    </div>
+                </div>
             </div>
-            <ul class="nav nav-tabs analytics-tab" id="myTab" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="analytics-tab-1" data-bs-toggle="tab" data-bs-target="#analytics-tab-1-pane" type="button" role="tab" aria-controls="analytics-tab-1-pane" aria-selected="true">
-                  Alimentación
-                </button>
-              </li>
-            </ul>
-          </div>
-          <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="analytics-tab-1-pane" role="tabpanel" aria-labelledby="analytics-tab-1">
-              <!-- Contenido del tab de alimentación -->
+            <?php
+        } else {
+            ?>
+            <div class="col-12">
+                <div class="card welcome-banner bg-yellow-800">
+                    <div class="card-body">
+                        <h2 class="text-white">Solicitud en Revisión</h2>
+                        <p class="text-white">Tu solicitud está pendiente de revisión. Por favor, espera a que sea aprobada.</p>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
+        <?php
+            }
+          }    
+        ?>
+      
 
-      <div class="col-xl-12 col-md-12">
-        <div class="card">
-          <div class="card-body pb-0">
-            <div class="d-flex align-items-center justify-content-between">
-              <h5 class="mb-0">Usuarios</h5>
-              <div class="dropdown">
-                <a class="avtar avtar-s btn-link-secondary dropdown-toggle arrow-none" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <i class="ti ti-dots-vertical f-18"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-end">
-                  <a class="dropdown-item" href="#">Today</a>
-                  <a class="dropdown-item" href="#">Weekly</a>
-                  <a class="dropdown-item" href="#">Monthly</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <ul class="list-group list-group-flush border-top-0">
-            <li class="list-group-item">
-              <div class="d-flex align-items-center">
-                <div class="flex-shrink-0">
-                  <img src="../assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
-                </div>
-                <div class="flex-grow-1 mx-2">
-                  <h6 class="mb-1">David Jones</h6>
-                  <p class="mb-0">Project Leader</p>
-                </div>
-                <div class="flex-shrink-0">
-                  <p class="text-muted mb-0">5 min ago</p>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="d-flex align-items-center">
-                <div class="flex-shrink-0">
-                  <img src="../assets/images/user/avatar-3.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
-                </div>
-                <div class="flex-grow-1 mx-2">
-                  <h6 class="mb-1">Robert Smith</h6>
-                  <p class="mb-0">HR Manager</p>
-                </div>
-                <div class="flex-shrink-0">
-                  <p class="text-muted mb-0">Yesterday</p>
-                </div>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <div class="d-flex align-items-center">
-                <div class="flex-shrink-0">
-                  <img src="../assets/images/user/avatar-5.jpg" alt="user-image" class="user-avtar rounded wid-50 hie-50">
-                </div>
-                <div class="flex-grow-1 mx-2">
-                  <h6 class="mb-1">John larry</h6>
-                  <p class="mb-0">Developer</p>
-                </div>
-                <div class="flex-shrink-0">
-                  <p class="text-muted mb-0">1 hour ago</p>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
     </div>
     <!-- [ Main Content ] end -->
   </div>
@@ -725,242 +498,118 @@
         </div>
       </div>
     </footer>
- <!-- Required Js -->
- <div class="pct-c-btn">
-  <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_pc_layout">
-    <i class="ph-duotone ph-gear-six"></i>
-  </a>
-</div>
-<div class="offcanvas border-0 pct-offcanvas offcanvas-end" tabindex="-1" id="offcanvas_pc_layout">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title">Settings</h5>
-    <button type="button" class="btn btn-icon btn-link-danger ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"
-      ><i class="ti ti-x"></i
-    ></button>
-  </div>
-  <div class="pct-body customizer-body">
-    <div class="offcanvas-body py-0">
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item">
-          <div class="pc-dark">
-            <h6 class="mb-1">Theme Mode</h6>
-            <p class="text-muted text-sm">Choose light or dark mode or Auto</p>
-            <div class="row theme-color theme-layout">
-              <div class="col-4">
-                <div class="d-grid">
-                  <button
-                    class="preset-btn btn active"
-                    data-value="true"
-                    onclick="layout_change('light');"
-                    data-bs-toggle="tooltip"
-                    title="Light">
-                    <svg class="pc-icon text-warning">
-                      <use xlink:href="#custom-sun-1"></use>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="d-grid">
-                  <button class="preset-btn btn" data-value="false" onclick="layout_change('dark');" data-bs-toggle="tooltip" title="Dark">
-                    <svg class="pc-icon">
-                      <use xlink:href="#custom-moon"></use>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="d-grid">
-                  <button
-                    class="preset-btn btn"
-                    data-value="default"
-                    onclick="layout_change_default();"
-                    data-bs-toggle="tooltip"
-                    title="Automatically sets the theme based on user's operating system's color scheme.">
-                    <span class="pc-lay-icon d-flex align-items-center justify-content-center">
-                      <i class="ph-duotone ph-cpu"></i>
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item">
-          <h6 class="mb-1">Theme Contrast</h6>
-          <p class="text-muted text-sm">Choose theme contrast</p>
-          <div class="row theme-contrast">
-            <div class="col-6">
-              <div class="d-grid">
-                <button
-                  class="preset-btn btn"
-                  data-value="true"
-                  onclick="layout_theme_contrast_change('true');"
-                  data-bs-toggle="tooltip"
-                  title="True">
-                  <svg class="pc-icon">
-                    <use xlink:href="#custom-mask"></use>
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="d-grid">
-                <button
-                  class="preset-btn btn active"
-                  data-value="false"
-                  onclick="layout_theme_contrast_change('false');"
-                  data-bs-toggle="tooltip"
-                  title="False">
-                  <svg class="pc-icon">
-                    <use xlink:href="#custom-mask-1-outline"></use>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item">
-          <h6 class="mb-1">Custom Theme</h6>
-          <p class="text-muted text-sm">Choose your primary theme color</p>
-          <div class="theme-color preset-color">
-            <a href="#!" data-bs-toggle="tooltip" title="Blue" class="active" data-value="preset-1"><i class="ti ti-checks"></i></a>
-            <a href="#!" data-bs-toggle="tooltip" title="Indigo" data-value="preset-2"><i class="ti ti-checks"></i></a>
-            <a href="#!" data-bs-toggle="tooltip" title="Purple" data-value="preset-3"><i class="ti ti-checks"></i></a>
-            <a href="#!" data-bs-toggle="tooltip" title="Pink" data-value="preset-4"><i class="ti ti-checks"></i></a>
-            <a href="#!" data-bs-toggle="tooltip" title="Red" data-value="preset-5"><i class="ti ti-checks"></i></a>
-            <a href="#!" data-bs-toggle="tooltip" title="Orange" data-value="preset-6"><i class="ti ti-checks"></i></a>
-            <a href="#!" data-bs-toggle="tooltip" title="Yellow" data-value="preset-7"><i class="ti ti-checks"></i></a>
-            <a href="#!" data-bs-toggle="tooltip" title="Green" data-value="preset-8"><i class="ti ti-checks"></i></a>
-            <a href="#!" data-bs-toggle="tooltip" title="Teal" data-value="preset-9"><i class="ti ti-checks"></i></a>
-            <a href="#!" data-bs-toggle="tooltip" title="Cyan" data-value="preset-10"><i class="ti ti-checks"></i></a>
-          </div>
-        </li>
-        <li class="list-group-item">
-          <h6 class="mb-1">Theme layout</h6>
-          <p class="text-muted text-sm">Choose your layout</p>
-          <div class="theme-main-layout d-flex align-center gap-1 w-100">
-            <a href="#!" data-bs-toggle="tooltip" title="Vertical" class="active" data-value="vertical">
-              <img src="../assets/images/customizer/caption-on.svg" alt="img" class="img-fluid" />
-            </a>
-            <a href="#!" data-bs-toggle="tooltip" title="Horizontal" data-value="horizontal">
-              <img src="../assets/images/customizer/horizontal.svg" alt="img" class="img-fluid" />
-            </a>
-            <a href="#!" data-bs-toggle="tooltip" title="Color Header" data-value="color-header">
-              <img src="../assets/images/customizer/color-header.svg" alt="img" class="img-fluid" />
-            </a>
-            <a href="#!" data-bs-toggle="tooltip" title="Compact" data-value="compact">
-              <img src="../assets/images/customizer/compact.svg" alt="img" class="img-fluid" />
-            </a>
-            <a href="#!" data-bs-toggle="tooltip" title="Tab" data-value="tab">
-              <img src="../assets/images/customizer/tab.svg" alt="img" class="img-fluid" />
-            </a>
-          </div>
-        </li>
-        <li class="list-group-item">
-          <h6 class="mb-1">Sidebar Caption</h6>
-          <p class="text-muted text-sm">Sidebar Caption Hide/Show</p>
-          <div class="row theme-color theme-nav-caption">
-            <div class="col-6">
-              <div class="d-grid">
-                <button
-                  class="preset-btn btn-img btn active"
-                  data-value="true"
-                  onclick="layout_caption_change('true');"
-                  data-bs-toggle="tooltip"
-                  title="Caption Show">
-                  <img src="../assets/images/customizer/caption-on.svg" alt="img" class="img-fluid" />
-                </button>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="d-grid">
-                <button
-                  class="preset-btn btn-img btn"
-                  data-value="false"
-                  onclick="layout_caption_change('false');"
-                  data-bs-toggle="tooltip"
-                  title="Caption Hide">
-                  <img src="../assets/images/customizer/caption-off.svg" alt="img" class="img-fluid" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item">
-          <div class="pc-rtl">
-            <h6 class="mb-1">Theme Layout</h6>
-            <p class="text-muted text-sm">LTR/RTL</p>
-            <div class="row theme-color theme-direction">
-              <div class="col-6">
-                <div class="d-grid">
-                  <button
-                    class="preset-btn btn-img btn active"
-                    data-value="false"
-                    onclick="layout_rtl_change('false');"
-                    data-bs-toggle="tooltip"
-                    title="LTR">
-                    <img src="../assets/images/customizer/ltr.svg" alt="img" class="img-fluid" />
-                  </button>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="d-grid">
-                  <button
-                    class="preset-btn btn-img btn"
-                    data-value="true"
-                    onclick="layout_rtl_change('true');"
-                    data-bs-toggle="tooltip"
-                    title="RTL">
-                    <img src="../assets/images/customizer/rtl.svg" alt="img" class="img-fluid" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item pc-box-width">
-          <div class="pc-container-width">
-            <h6 class="mb-1">Layout Width</h6>
-            <p class="text-muted text-sm">Choose Full or Container Layout</p>
-            <div class="row theme-color theme-container">
-              <div class="col-6">
-                <div class="d-grid">
-                  <button
-                    class="preset-btn btn-img btn active"
-                    data-value="false"
-                    onclick="change_box_container('false')"
-                    data-bs-toggle="tooltip"
-                    title="Full Width">
-                    <img src="../assets/images/customizer/full.svg" alt="img" class="img-fluid" />
-                  </button>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="d-grid">
-                  <button
-                    class="preset-btn btn-img btn"
-                    data-value="true"
-                    onclick="change_box_container('true')"
-                    data-bs-toggle="tooltip"
-                    title="Fixed Width">
-                    <img src="../assets/images/customizer/fixed.svg" alt="img" class="img-fluid" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item">
-          <div class="d-grid">
-            <button class="btn btn-light-danger" id="layoutreset">Reset Layout</button>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
 
+
+<!-- Botón flotante de ayuda -->
+<button type="button" 
+        class="btn btn-primary rounded-circle shadow-lg p-0"
+        style="
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            z-index: 1000;
+            width: 58px;
+            height: 58px;
+        " 
+        data-bs-toggle="modal" 
+        data-bs-target="#helpModal">
+    <i class="ph-duotone ph-question" style="font-size: 2rem"></i>  
+</button>
+<!-- Modal de ayuda -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">¿Necesitas ayuda?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="helpForm">
+                    <div class="mb-3">
+                        <label class="form-label">¡Envíanos tu consulta!</label>
+                        <textarea 
+                            name="mensaje" 
+                            class="form-control" 
+                            rows="4" 
+                            placeholder="Describe tu problema o duda..."
+                            required
+                            maxlength="500"
+                        ></textarea>
+                        <small class="text-muted">Máximo 500 caracteres</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        Enviar consulta
+                    </button>
+                </form>
+          </div>
+        </div>
+    </div>
+</div>
+<script>
+document.getElementById('helpForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const alertContainer = document.querySelector('#helpModal .modal-body');
+    
+    // Resetear alertas anteriores
+    alertContainer.querySelectorAll('.alert').forEach(alert => alert.remove());
+
+    // Estado de carga
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+        <span class="spinner-border spinner-border-sm" role="status"></span>
+        Enviando...
+    `;
+
+    fetch('../foro/envioPreguntasForo.php', {
+        method: 'POST',
+        body: new FormData(form)
+    })
+    .then(async response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new TypeError('Respuesta no es JSON');
+        }
+        
+        return response.json();
+    })
+    .then(data => {
+        const alertType = data.success ? 'success' : 'danger';
+        const message = data.message || (data.success 
+            ? '¡Consulta enviada! Te responderemos a la brevedad.'
+            : 'Error al enviar la consulta');
+
+        const alertHTML = `
+            <div class="alert alert-${alertType} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        alertContainer.insertAdjacentHTML('afterbegin', alertHTML);
+        if (data.success) form.reset();
+    })
+    .catch(error => {
+        console.error('Fetch Error:', error);
+        const alertHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                Error de conexión: ${error.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        alertContainer.insertAdjacentHTML('afterbegin', alertHTML);
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Enviar consulta';
+    });
+});
+</script>
+ <!-- Required Js -->
+ 
     <!-- [Page Specific JS] start -->
     <script src="../assets/js/plugins/apexcharts.min.js"></script>
     <script src="../assets/js/pages/dashboard-default.js"></script>
@@ -974,7 +623,7 @@
     <script src="../assets/js/plugins/feather.min.js"></script>
   
     
-    <script>
+    <script>  
       layout_change('light');
     </script>
       

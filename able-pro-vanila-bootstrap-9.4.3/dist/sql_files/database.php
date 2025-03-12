@@ -1,7 +1,7 @@
 <?php
 class Database {
     public $host = 'localhost';
-    private $db_name = 'orifit';
+    private $db_name = 'testing';
     private $username = 'root';
     private $password = '';
     public $conn;

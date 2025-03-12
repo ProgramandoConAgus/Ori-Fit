@@ -77,8 +77,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
 <script>
-    var ingredientes = [ 
-    ];
+    var ingredientes = [];
     var receta ={};
 
     $(document).ready(function () {
@@ -101,42 +100,45 @@
             renameIngredientes(); 
         });
     });
+ 
+    function addIngrediente(ingre = null) {
+        console.log(ingredientes)
+        const ingredienteItem = $('.ingrediente-clonable:first').clone();
+        const index = $('#ingredientesList').children().length;
 
-    function addIngrediente (ingre=null){
-                const ingredienteItem = $('.ingrediente-clonable:first').clone(); 
-                const index = $('#ingredientesList').children().length;
+        ingredienteItem.removeClass('ingrediente-clonable');
+        ingredienteItem.show(); // Asegurar que el elemento clonado sea visible
 
-                ingredienteItem.removeClass('ingrediente-clonable');
-               
-                let ingrediente_id = ingre!=null?ingre.ingrediente_id:'';
-                let cantidad = ingre!=null?ingre.cantidad:'';
-                let unidad = ingre!=null?ingre.unidad_medida:'';  
-                ingredienteItem.find('input').val(cantidad);  
-                ingredienteItem.find('.select-ingrediente-unidad').val(unidad);  
-                
-                for(var i=0; i< ingredientes.length; i ++){
-                    var opt = document.createElement('option'); 
-                    $(opt).val(ingredientes[i].id);
-                    var text = ingredientes[i].nombre + ' (Pro.:'+ingredientes[i].proteinas + ', Cal.:'+ingredientes[i].calorias + ', Gra.:'+ingredientes[i].grasas+')';
-                    $(opt).text(text); 
-                    ingredienteItem.find('.select-ingrediente').append(opt);
-                } 
+        // Obtener valores del ingrediente (si existe)
+        let ingrediente_id = ingre != null ? ingre.ingrediente_id : '';
+        let cantidad = ingre != null ? ingre.cantidad : '';
+        let unidad = ingre != null ? ingre.unidad_medida : ''; // Asegurar que la propiedad coincida (unidad_medida -> unidad)
 
-                ingredienteItem.find('.select-ingrediente').val(ingrediente_id);  
-                let cantiadName = ingredienteItem.find('input').attr('name');
-                let unidadName = ingredienteItem.find('.select-ingrediente-unidad').attr('name');
-                let ingredienteName = ingredienteItem.find('.select-ingrediente-unidad').attr('name');
-               
-                ingredienteItem.find('input').attr('name', cantiadName.replace("0",index));
-                ingredienteItem.find('.select-ingrediente-unidad').attr('name', unidadName.replace("0",index));
-                ingredienteItem.find('.select-ingrediente').attr('name', ingredienteName.replace("0",index));
+        // Llenar los valores del select y campos
+        ingredienteItem.find('input').val(cantidad);
+        ingredienteItem.find('.select-ingrediente-unidad').val(unidad);
 
-                $('#ingredientesList').append(ingredienteItem);
-        }
+        // Llenar opciones del select de ingredientes
+        ingredienteItem.find('.select-ingrediente').empty().append('<option value="">Seleccione un ingrediente</option>');
+        ingredientes.forEach(ing => {
+            let opt = `<option value="${ing.IdIngrediente}">${ing.Nombre} (Pro: ${ing.Gramos_Proteina}, Cal: ${ing.Calorias}, Gra: ${ing.Gramos_Grasas})</option>`;
+            ingredienteItem.find('.select-ingrediente').append(opt);
+        });
+        
+        // Seleccionar el ingrediente correcto
+        console.log(ingrediente_id)
+        ingredienteItem.find('.select-ingrediente').val(ingrediente_id);
+        // Actualizar los nombres de los campos con el índice correcto
+        ingredienteItem.find('[name="ingredientes[0][ingrediente_id]"]').attr('name', `ingredientes[${index}][ingrediente_id]`);
+        ingredienteItem.find('[name="ingredientes[0][cantidad]"]').attr('name', `ingredientes[${index}][cantidad]`);
+        ingredienteItem.find('[name="ingredientes[0][unidad]"]').attr('name', `ingredientes[${index}][unidad]`);
+
+        $('#ingredientesList').append(ingredienteItem);
+    }
 
     function fetchIngredientes() { 
         $.ajax({
-            url: 'api/ingredientes.php',
+            url: './api/ingredientes.php',
             type: 'GET',
             data: null,
             success: function (response) { 
@@ -147,12 +149,13 @@
 
     function fetchOneReceta() { 
     $.ajax({
-        url: 'api/recetas_one.php?id=<?php echo $_GET['id'] ?>',
+        url: './api/recetas_one.php?id=<?php echo $_GET['id'] ?>',
         type: 'GET',
         data: null,
         success: function (response) { 
             receta = JSON.parse(response); 
             fillFormFields();
+            console.log(receta)
         }
     });
 }
@@ -178,21 +181,11 @@
         } 
     }
 
-    function renameIngredientes(){
-        var children = $('#ingredientesList').children();
-        for(var i = 0; i<children.length; i++){
-            let ingredienteItem = $(children[i]);
-
-            let cantiadName = "ingredientes[0][cantidad]";
-            let unidadName = "ingredientes[0][unidad]"
-            let ingredienteName = "ingredientes[0][ingrediente_id]";
-            
-            ingredienteItem.find('input').attr('name', cantiadName.replace("0",i));
-            ingredienteItem.find('.select-ingrediente-unidad').attr('name', unidadName.replace("0",i));
-            ingredienteItem.find('.select-ingrediente').attr('name', ingredienteName.replace("0",i));
-
-        } 
-
+    function renameIngredientes() {
+    $('#ingredientesList .ingrediente-item').each(function(index) {
+        $(this).find('[name*="ingredientes[0][ingrediente_id]"]').attr('name', `ingredientes[${index}][ingrediente_id]`);
+        $(this).find('[name*="ingredientes[0][cantidad]"]').attr('name', `ingredientes[${index}][cantidad]`);
+        $(this).find('[name*="ingredientes[0][unidad]"]').attr('name', `ingredientes[${index}][unidad]`);
+    });
     }
 </script>
-
