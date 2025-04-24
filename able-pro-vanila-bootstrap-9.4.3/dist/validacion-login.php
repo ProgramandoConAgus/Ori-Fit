@@ -1,10 +1,22 @@
 <?php
 include('widget/db.php');
-$message = '';
 
-if (isset($_POST['email']) && isset($_POST['password'])) {
-    $email = strtolower(trim($_POST['email']));
-    $password = $_POST['password'];
+// Establece la cabecera para indicar que la respuesta es JSON
+header('Content-Type: application/json');
+
+$response = [
+    'success' => false,
+    'message' => '',
+    'redirect' => ''
+];
+
+// Leer el JSON enviado en la petición
+$input = json_decode(file_get_contents('php://input'), true);
+
+// Validar que se hayan recibido los campos necesarios
+if (isset($input['email']) && isset($input['password'])) {
+    $email = strtolower(trim($input['email']));
+    $password = $input['password'];
 
     // Consulta para verificar si el correo existe en la base de datos
     $sql = "SELECT * FROM usuarios WHERE correo = ?";
@@ -20,32 +32,32 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
 
             // Verificar la contraseña
             if (password_verify($password, $user['password'])) {
-                if($user['acceso']==1){    
-                    // Iniciar sesión o redirigir al usuario
+                if ($user['acceso'] == 1) {    
+                    // Iniciar sesión
                     session_start();
                     $_SESSION['IdUsuario'] = $user['id'];
-                    header('Location: ./pages/panel.php'); // Redirigir a un área segura
-                    exit();
-                }
-                else{
-                    $message="No tiene acceso a la plataforma";
+                    
+                    $response['success'] = true;
+                    $response['message'] = 'Ingreso exitoso.';
+                    $response['redirect'] = './pages/panel.php';
+                } else {
+                    $response['message'] = "No tiene acceso a la plataforma.";
                 }
             } else {
-                $message = "La contraseña es incorrecta.";
+                $response['message'] = "La contraseña es incorrecta.";
             }
         } else {
-            $message = "No se encontró una cuenta con este correo.";
+            $response['message'] = "No se encontró una cuenta con este correo.";
         }
     } else {
-        $message = "Error en la consulta: " . $conexion->error;
+        $response['message'] = "Error en la consulta: " . $conexion->error;
     }
 
     $stmt->close();
 } else {
-    $message = "Por favor, completa ambos campos.";
+    $response['message'] = "Por favor, completa ambos campos.";
 }
 
-if ($message !== '') {
-    echo $message;
-}
+echo json_encode($response);
+exit();
 ?>

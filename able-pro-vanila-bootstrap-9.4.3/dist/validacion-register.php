@@ -1,15 +1,26 @@
 <?php
 include('widget/db.php');
-$message='';
-if (isset($_POST['nombre']) && isset($_POST['apellido']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['telefono'])) {
-    $nombre = strtolower(trim($_POST['nombre']));
-    $apellido = strtolower(trim($_POST['apellido']));
-    $email = strtolower(trim($_POST['email']));
-    $telefono=$_POST['telefono'];
-    $password = $_POST['password'];
-	$confirmPassword = $_POST['confirmPassword'];
-	
-    // Consultar la base de datos para obtener el registro del usuario
+header('Content-Type: application/json');
+
+$response = [
+    'success' => false,
+    'message' => '',
+    'redirect' => ''
+];
+
+// Leer el JSON enviado en la petición
+$input = json_decode(file_get_contents('php://input'), true);
+
+// Validar que se hayan recibido todos los campos necesarios
+if (isset($input['nombre'], $input['apellido'], $input['email'], $input['telefono'], $input['password'], $input['confirmPassword'])) {
+    $nombre = strtolower(trim($input['nombre']));
+    $apellido = strtolower(trim($input['apellido']));
+    $email = strtolower(trim($input['email']));
+    $telefono = trim($input['telefono']);
+    $password = $input['password'];
+    $confirmPassword = $input['confirmPassword'];
+
+    // Consulta para verificar si ya existe un usuario con este correo
     $sql = "SELECT * FROM usuarios WHERE correo = ?";
     $stmt = $conexion->prepare($sql);
     $stmt->bind_param('s', $email);
@@ -18,42 +29,41 @@ if (isset($_POST['nombre']) && isset($_POST['apellido']) && isset($_POST['email'
 
     if ($result) {
         if ($result->num_rows > 0) {
-            $message="Ya existe una cuenta con este mail.";
+            $response['message'] = "Ya existe una cuenta con este mail.";
         } else {
-            if($password===$confirmPassword){
-				$hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                $sql_insert = "INSERT INTO usuarios (nombre, apellido, correo, password, idRol, acceso, telefono, fecha_registro,idTipoPlan) VALUES (?, ?, ?, ?,?,?, ?,?,?)";
+            if ($password === $confirmPassword) {
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $sql_insert = "INSERT INTO usuarios (nombre, apellido, correo, password, idRol, acceso, telefono, fecha_registro, idTipoPlan) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt_insert = $conexion->prepare($sql_insert);
-                $idTipoUsuario = 1;
-				$idsuscripcion=2;
-                $fecha=date("Y-m-d");
-				$idTipoPlan=1;
-                $stmt_insert->bind_param('ssssiiisi', $nombre, $apellido, $email, $hashed_password, $idTipoUsuario, $idsuscripcion, $telefono, $fecha,$idTipoPlan);
+                $idTipoUsuario = 1;    // Valor por defecto para rol
+                $idsuscripcion = 2;    // Valor por defecto para acceso/suscripción
+                $fecha = date("Y-m-d");
+                $idTipoPlan = 1;       // Valor por defecto para el plan
+                $stmt_insert->bind_param('ssssiiisi', $nombre, $apellido, $email, $hashed_password, $idTipoUsuario, $idsuscripcion, $telefono, $fecha, $idTipoPlan);
 
                 if ($stmt_insert->execute()) {
-                    header('Location: index.php');
-                    exit(); 
+                    $response['success'] = true;
+                    $response['message'] = "Usuario creado exitosamente.";
+                    $response['redirect'] = "index.php";
                 } else {
-                    $message = "Error al crear el usuario: " . $stmt_insert->error;
+                    $response['message'] = "Error al crear el usuario: " . $stmt_insert->error;
                 }
-
+            } else {
+                $response['message'] = "Las contraseñas deben ser iguales.";
             }
-			else{
-				$message="Las contraseñas deben ser iguales";
-			}
-
-
         }
     } else {
-        $message="Error en la consulta: " . $conexion->error . "<br>";
+        $response['message'] = "Error en la consulta: " . $conexion->error;
     }
-
     $stmt->close();
 } else {
-    echo "Todos los campos son requeridos.";
+    $response['message'] = "Todos los campos son requeridos.";
 }
 
+echo json_encode($response);
+exit();
 ?>
+	
 <?php
 /*
 <!DOCTYPE html>

@@ -500,17 +500,76 @@ $resultadoNotificaciones = $stmt->get_result();
                         <input type="url" class="form-control form-control-solid" name="url" required>
                     </div>
 <br>
-                    <!-- Tipo de Entrenamiento -->
+                    <!-- Grupo Muscular -->
+                     
                     <div class="mb-8 fv-row">
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
-                            <span class="required">Tipo de Entrenamiento</span>
+                            <span class="required">Grupo Muscular</span>
                         </label>
-                        <select class="form-select form-select-solid" name="tipo_entrenamiento" required>
-                            <option value="">Seleccione un tipo...</option>
-                            <option value="fuerza">Entrenamiento de Fuerza</option>
-                            <option value="cardio">Cardio</option>
-                            <option value="flexibilidad">Flexibilidad</option>
-                            <option value="hiit">HIIT</option>
+                        <select class="form-select form-select-solid" name="grupo_muscular" required>
+                            <option value="">Seleccione un grupo...</option>
+                            <option value="gluteos">Glúteos</option>
+                            <option value="cuadriceps">Cuádriceps</option>
+                            <option value="isquiotibiales">Isquiotibiales</option>
+                            <option value="abductores">Abductores (glúteo medio)</option>
+                            <option value="aductores">Aductores</option>
+                            <option value="core">Core</option>
+                            <option value="espalda">Espalda</option>
+                            <option value="pecho">Pecho</option>
+                            <option value="hombros">Hombros</option>
+                            <option value="biceps">Bíceps</option>
+                            <option value="triceps">Tríceps</option>
+                            <option value="gemelos">Gemelos</option>
+                            <option value="trapecio">Trapecio</option>
+                        </select>
+                    </div>
+<br>    
+                    <!-- Tipo de Moviento/direccion -->
+                     
+                    <div class="mb-8 fv-row">
+                    <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                        <span class="required">Movimiento/Dirección</span>
+                    </label>
+                    <select class="form-select form-select-solid" name="movimiento_direccion" required>
+                        <option value="">Seleccione un movimiento...</option>
+                        <optgroup label="Tren inferior">
+                            <option value="sentadilla">Sentadilla (dominancia de rodilla)</option>
+                            <option value="bisagra">Bisagra (dominancia de cadera)</option>
+                            <option value="zancada">Zancada</option>
+                            <option value="paso-lateral">Paso lateral</option>
+                            <option value="subida-banco">Subida a banco</option>
+                            <option value="empuje-cadera">Empuje de cadera</option>
+                            <option value="abduccion-aduccion">Abducción / aducción</option>
+                            <option value="extension-cadera">Extensión de cadera (patada)</option>
+                        </optgroup>
+                        <optgroup label="Tren superior">
+                            <option value="empuje-horizontal">Empuje horizontal</option>
+                            <option value="empuje-vertical">Empuje vertical</option>
+                            <option value="traccion-horizontal">Tracción horizontal</option>
+                            <option value="traccion-vertical">Tracción vertical</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+<br>
+                    <!-- Equipamiento -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Equipamiento</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="sexo" required>
+                            <option value="">Seleccione el Equipamiento</option>
+                            <option value="ninguno">Ninguno (peso corporal)</option>
+                            <option value="mancuernas">Mancuernas</option>
+                            <option value="bandas-mini">Bandas mini</option>
+                            <option value="pesa-rusa">Pesa rusa</option>
+                            <option value="barra-larga">Barra larga</option>
+                            <option value="discos">Discos</option>
+                            <option value="polea">Polea</option>
+                            <option value="banco">Banco</option>
+                            <option value="step-caja">Step o caja</option>
+                            <option value="colchoneta">Colchoneta</option>
+
                         </select>
                     </div>
 <br>
@@ -553,22 +612,7 @@ $resultadoNotificaciones = $stmt->get_result();
                         </select>
                     </div>
 <br>
-                    <!-- Grupo Muscular -->
-                    <div class="mb-8 fv-row">
-                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
-                            <span class="required">Grupo Muscular</span>
-                        </label>
-                        <select class="form-select form-select-solid" name="grupo_muscular" required>
-                            <option value="">Seleccione un grupo...</option>
-                            <option value="piernas">Piernas</option>
-                            <option value="brazos">Brazos</option>
-                            <option value="espalda">Espalda</option>
-                            <option value="pecho">Pecho</option>
-                            <option value="core">Core</option>
-                            <option value="fullbody">Full Body</option>
-                        </select>
-                    </div>
-<br>    
+                    
                         <!-- Grupo Ejercicio -->
                     <div class="mb-8 fv-row">
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">

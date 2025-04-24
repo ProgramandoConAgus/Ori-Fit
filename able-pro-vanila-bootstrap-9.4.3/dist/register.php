@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="./assets/css/style.css" id="main-style-link" />
 <script src="./assets/js/tech-stack.js"></script>
 <link rel="stylesheet" href="./assets/css/style-preset.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   </head>
   <!-- [Head] end -->
@@ -82,43 +83,36 @@
               <div class="saprator my-3">
                 <span>Registrate</span>
               </div>
-              <form method="post" action="validacion-register.php">
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="mb-3">
-                    <input type="text" class="form-control" placeholder="Nombre" name="nombre" />
+
+              <form id="formRegister" method="post" action="validacion-register.php">
+                <div class="row">
+                  <div class="col-sm-6">
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="Nombre" name="nombre" required />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="Apellido" name="apellido" required/>
+                    </div>
                   </div>
                 </div>
-                <div class="col-sm-6">
-                  <div class="mb-3">
-                    <input type="text" class="form-control" placeholder="Apellido" name="apellido"/>
-                  </div>
+                <div class="mb-3">
+                  <input type="email" class="form-control" placeholder="Correo electronico" name="email" required />
+                </div>             
+                <div class="mb-3">
+                  <input type="tel" class="form-control" placeholder="Numero de Telefono" name="telefono" required />
                 </div>
-              </div>
-              <div class="mb-3">
-                <input type="email" class="form-control" placeholder="Correo electronico" name="email" />
-              </div>             
-              <div class="mb-3">
-                <input type="tel" class="form-control" placeholder="Numero de Telefono" name="telefono" />
-              </div>
-              <div class="mb-3">
-                <input type="password" class="form-control" placeholder="Contraseña" name="password"/>
-              </div>
-              <div class="mb-3">
-                <input type="password" class="form-control" placeholder="Confirmar Contraseña"  name="confirmPassword"/>
-              </div>
-              <!--
-              <div class="d-flex mt-1 justify-content-between">
-                <div class="form-check">
-                  <input class="form-check-input input-primary" type="checkbox" id="customCheckc1" checked="" />
-                  <label class="form-check-label text-muted" for="customCheckc1">I agree to all the Terms & Condition</label>
+                <div class="mb-3">
+                  <input type="password" class="form-control" placeholder="Contraseña" name="password" required />
                 </div>
-              </div>
--->
-              <div class="d-grid mt-4">
-                <button type="submit" class="btn "style="background-color: #ab76ff; color:white";>Sign up</button>
-              </div>
-</form>
+                <div class="mb-3">
+                  <input type="password" class="form-control" placeholder="Confirmar Contraseña" name="confirmPassword" required />
+                </div>
+                <div class="d-grid mt-4">
+                  <button type="submit" class="btn" style="background-color: #ab76ff; color:white;">Sign up</button>
+                </div>
+              </form>
               <div class="d-flex justify-content-between align-items-end mt-4">
                 <h6 class="f-w-500 mb-0">Already have an Account?</h6>
                 <a href="./" class="link-primary">Login here</a>
@@ -136,7 +130,62 @@
     <script src="./assets/js/fonts/custom-font.js"></script>
     <script src="./assets/js/pcoded.js"></script>
     <script src="./assets/js/plugins/feather.min.js"></script>
-   
+    <script>
+document.getElementById("formRegister").addEventListener("submit", async function(e) {
+  e.preventDefault(); // Prevenir el envío normal del formulario
+
+  // Recopilar los valores de los inputs y convertir a minúsculas donde corresponda
+  const nombre = document.querySelector('input[name="nombre"]').value.trim().toLowerCase();
+  const apellido = document.querySelector('input[name="apellido"]').value.trim().toLowerCase();
+  const email = document.querySelector('input[name="email"]').value.trim().toLowerCase();
+  const telefono = document.querySelector('input[name="telefono"]').value.trim();
+  const password = document.querySelector('input[name="password"]').value;
+  const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
+
+  // Preparar los datos para enviar
+  const data = { nombre, apellido, email, telefono, password, confirmPassword };
+
+  try {
+    const response = await fetch('validacion-register.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error("Error en la respuesta del servidor: " + response.statusText);
+    }
+
+    const result = await response.json();
+
+    if (result.success) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Registro Exitoso',
+        text: result.message,
+        confirmButtonText: 'Continuar'
+      }).then(() => {
+        window.location.href = result.redirect || 'index.php';
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: result.message || 'Ocurrió un error'
+      });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Error al enviar los datos'
+    });
+  }
+});
+</script>
     
     <script>
       layout_change('light');

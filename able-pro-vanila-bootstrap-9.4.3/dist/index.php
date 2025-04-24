@@ -41,6 +41,7 @@
 <link rel="stylesheet" href="./assets/css/style.css" id="main-style-link" />
 <script src="./assets/js/tech-stack.js"></script>
 <link rel="stylesheet" href="./assets/css/style-preset.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   </head>
   <!-- [Head] end -->
@@ -67,12 +68,12 @@
               <div class="saprator my-3">
                 <span>Ingresar como Usuario</span>
               </div>
-              <form action="./validacion-login.php" method="post">
+              <form id="formLogin">
               <div class="mb-3">
-                <input type="email" class="form-control" id="floatingInput" placeholder="Correo Electronico" name="email" />
+                <input type="email" class="form-control" id="email" placeholder="Correo Electronico" name="email" />
               </div>
               <div class="mb-3">
-                <input type="password" class="form-control" id="floatingInput1" placeholder="Contraseña" name="password" />
+                <input type="password" class="form-control" id="password" placeholder="Contraseña" name="password" />
               </div>
               <div class="d-flex mt-1 justify-content-between align-items-center">
                 <h6 class="text-secondary f-w-400 mb-0">
@@ -101,7 +102,59 @@
     <script src="./assets/js/pcoded.js"></script>
     <script src="./assets/js/plugins/feather.min.js"></script>
    
-    
+    <script>
+    document.getElementById("formLogin").addEventListener("submit", function(e) {
+      e.preventDefault(); // Prevenir el envío normal del formulario
+
+      // Obtener los valores de los inputs y convertir el correo a minúsculas
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const password = document.getElementById('password').value;
+
+      // Preparar los datos para enviar
+      const data = { email, password };
+
+      // Enviar datos usando fetch a login.php
+      fetch('validacion-login.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          Swal.fire({
+            title: 'Éxito',
+            text: result.message,
+            icon: 'success',
+            confirmButtonText: 'Continuar'
+          }).then(() => {
+            // Redireccionar al dashboard en caso de éxito
+            window.location.href = './pages/panel.php';
+          });
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: result.message || 'Datos incorrectos',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'Error al enviar los datos',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+      });
+    });
+
+  </script>
+
     <script>
       layout_change('light');
     </script>
