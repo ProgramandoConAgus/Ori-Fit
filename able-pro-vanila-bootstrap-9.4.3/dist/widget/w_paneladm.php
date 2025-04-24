@@ -471,7 +471,7 @@ $resultadoNotificaciones = $stmt->get_result();
                 </div>
             </div>
             <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
-                <form method="POST" class="form" action="./Admins/guardarVideoEntrenamiento.php">
+                <form method="POST" class="form" action="subir_video.php">
                     <div class="mb-13 text-center">
                         <h1 class="mb-3">Agregar Video de Entrenamiento</h1>
                     </div>
@@ -508,19 +508,19 @@ $resultadoNotificaciones = $stmt->get_result();
                         </label>
                         <select class="form-select form-select-solid" name="grupo_muscular" required>
                             <option value="">Seleccione un grupo...</option>
-                            <option value="gluteos">Glúteos</option>
-                            <option value="cuadriceps">Cuádriceps</option>
-                            <option value="isquiotibiales">Isquiotibiales</option>
-                            <option value="abductores">Abductores (glúteo medio)</option>
-                            <option value="aductores">Aductores</option>
-                            <option value="core">Core</option>
-                            <option value="espalda">Espalda</option>
-                            <option value="pecho">Pecho</option>
-                            <option value="hombros">Hombros</option>
-                            <option value="biceps">Bíceps</option>
-                            <option value="triceps">Tríceps</option>
-                            <option value="gemelos">Gemelos</option>
-                            <option value="trapecio">Trapecio</option>
+                            <option value="1">Glúteos</option>
+                            <option value="2">Cuádriceps</option>
+                            <option value="3">Isquiotibiales</option>
+                            <option value="4">Abductores (glúteo medio)</option>
+                            <option value="5">Aductores</option>
+                            <option value="6">Core</option>
+                            <option value="7">Espalda</option>
+                            <option value="8">Pecho</option>
+                            <option value="9">Hombros</option>
+                            <option value="10">Bíceps</option>
+                            <option value="11">Tríceps</option>
+                            <option value="12">Gemelos</option>
+                            <option value="13">Trapecio</option>
                         </select>
                     </div>
 <br>    
@@ -533,20 +533,20 @@ $resultadoNotificaciones = $stmt->get_result();
                     <select class="form-select form-select-solid" name="movimiento_direccion" required>
                         <option value="">Seleccione un movimiento...</option>
                         <optgroup label="Tren inferior">
-                            <option value="sentadilla">Sentadilla (dominancia de rodilla)</option>
-                            <option value="bisagra">Bisagra (dominancia de cadera)</option>
-                            <option value="zancada">Zancada</option>
-                            <option value="paso-lateral">Paso lateral</option>
-                            <option value="subida-banco">Subida a banco</option>
-                            <option value="empuje-cadera">Empuje de cadera</option>
-                            <option value="abduccion-aduccion">Abducción / aducción</option>
-                            <option value="extension-cadera">Extensión de cadera (patada)</option>
+                            <option value="1">Sentadilla (dominancia de rodilla)</option>
+                            <option value="2">Bisagra (dominancia de cadera)</option>
+                            <option value="3">Zancada</option>
+                            <option value="4">Paso lateral</option>
+                            <option value="5">Subida a banco</option>
+                            <option value="6">Empuje de cadera</option>
+                            <option value="7">Abducción / aducción</option>
+                            <option value="8">Extensión de cadera (patada)</option>
                         </optgroup>
                         <optgroup label="Tren superior">
-                            <option value="empuje-horizontal">Empuje horizontal</option>
-                            <option value="empuje-vertical">Empuje vertical</option>
-                            <option value="traccion-horizontal">Tracción horizontal</option>
-                            <option value="traccion-vertical">Tracción vertical</option>
+                            <option value="9">Empuje horizontal</option>
+                            <option value="10">Empuje vertical</option>
+                            <option value="11">Tracción horizontal</option>
+                            <option value="12">Tracción vertical</option>
                         </optgroup>
                     </select>
                 </div>
@@ -557,18 +557,18 @@ $resultadoNotificaciones = $stmt->get_result();
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Equipamiento</span>
                         </label>
-                        <select class="form-select form-select-solid" name="sexo" required>
+                        <select class="form-select form-select-solid" name="equipamiento" required>
                             <option value="">Seleccione el Equipamiento</option>
-                            <option value="ninguno">Ninguno (peso corporal)</option>
-                            <option value="mancuernas">Mancuernas</option>
-                            <option value="bandas-mini">Bandas mini</option>
-                            <option value="pesa-rusa">Pesa rusa</option>
-                            <option value="barra-larga">Barra larga</option>
-                            <option value="discos">Discos</option>
-                            <option value="polea">Polea</option>
-                            <option value="banco">Banco</option>
-                            <option value="step-caja">Step o caja</option>
-                            <option value="colchoneta">Colchoneta</option>
+                            <option value="1">Ninguno (peso corporal)</option>
+                            <option value="2">Mancuernas</option>
+                            <option value="3">Bandas mini</option>
+                            <option value="4">Pesa rusa</option>
+                            <option value="5">Barra larga</option>
+                            <option value="6">Discos</option>
+                            <option value="7">Polea</option>
+                            <option value="8">Banco</option>
+                            <option value="9">Step o caja</option>
+                            <option value="10">Colchoneta</option>
 
                         </select>
                     </div>
@@ -580,9 +580,9 @@ $resultadoNotificaciones = $stmt->get_result();
                         </label>
                         <select class="form-select form-select-solid" name="lugar" required>
                             <option value="">Seleccione un lugar...</option>
-                            <option value="gimnasio">Gimnasio</option>
-                            <option value="casa">Casa</option>
-                            <option value="exterior">Exterior</option>
+                            <option value="1">Gimnasio</option>
+                            <option value="2">Casa</option>
+                            <option value="3">Exterior</option>
                         </select>
                     </div>
 <br>
@@ -593,9 +593,9 @@ $resultadoNotificaciones = $stmt->get_result();
                         </label>
                         <select class="form-select form-select-solid" name="sexo" required>
                             <option value="">Seleccione el sexo...</option>
-                            <option value="gimnasio">Hombre</option>
-                            <option value="casa">Mujer</option>
-                            <option value="exterior">Ambos</option>
+                            <option value="1">Hombre</option>
+                            <option value="2">Mujer</option>
+                            <option value="3">Ambos</option>
                         </select>
                     </div>
 <br>
@@ -604,11 +604,11 @@ $resultadoNotificaciones = $stmt->get_result();
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Dificultad</span>
                         </label>
-                        <select class="form-select form-select-solid" name="lugar" required>
+                        <select class="form-select form-select-solid" name="dificultad" required>
                             <option value="">Seleccione una dificultad...</option>
-                            <option value="gimnasio">Facil</option>
-                            <option value="casa">Medio</option>
-                            <option value="exterior">Dificil</option>
+                            <option value="1">Facil</option>
+                            <option value="2">Medio</option>
+                            <option value="3">Dificil</option>
                         </select>
                     </div>
 <br>
@@ -618,7 +618,7 @@ $resultadoNotificaciones = $stmt->get_result();
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Grupo Ejercicio</span>
                         </label>
-                        <select class="form-select form-select-solid" name="grupo_muscular" required>
+                        <select class="form-select form-select-solid" name="grupo_ejercicio" required>
                             <option value="">Seleccione un grupo...</option>
                             <option value="1">Grupo 1</option>
                             <option value="2">Grupo 2</option>
