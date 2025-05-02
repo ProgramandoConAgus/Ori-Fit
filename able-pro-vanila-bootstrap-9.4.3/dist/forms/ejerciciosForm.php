@@ -444,8 +444,6 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
 <!-- [ Main Content ] start -->
     <div class="pc-container">
       <div class="pc-content">
-
-
         <!-- [ Main Content ] start -->
         <div class="row">
           <!-- [ sample-page ] start -->
@@ -453,251 +451,269 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
            
             <div id="basicwizard" class="form-wizard row justify-content-center">
               
-            <div class="col-12">
-          <div class="card">
-         <div class="card-body p-3">
-        <ul class="nav nav-pills nav-justified">
-        <li class="nav-item" data-target-form="#contactDetailForm">
-          <a href="#contactDetail" class="nav-link active">
-          <img src="..//assets/images/icons-tab/icons8n.png" alt="Descripción de la imagen">
-            <span class="d-none d-sm-inline">Datos Personales</span>
-          </a>
-        </li>
-        <!-- end nav item -->
-          <li class="nav-item" data-target-form="#educationDetailForm">
-            <a href="#educationDetail" class="nav-link icon-btn">
-            <img src="..//assets/images/icons-tab/icon8b.png" alt="Descripción de la imagen">
-            <span class="d-none d-sm-inline">Actividad Física</span>
-          </a>
-        </li>
-        <!-- end nav item -->
-        <li class="nav-item">
-          <a href="#finish" class="nav-link icon-btn">
-          <img src="..//assets/images/icons-tab/icons8h.png" alt="Descripción de la imagen">
-            <span class="d-none d-sm-inline">¡Listo!</span>
-          </a>
-        </li>
-                      <!-- end nav item -->
-                    </ul>
-                  </div>
-                </div>
+              <div class="col-12">
                 <div class="card">
                   <div class="card-body">
-                    <div class="tab-content">
-                      <!-- START: Define your progress bar here -->
+                    <form id="contactForm" action="./guardar_datos.php" method="POST">
+                      <!-- PROGRESS BAR -->
                       <div id="bar" class="progress mb-3" style="height: 7px;">
-  <div class="bar progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
-                      <!-- END: Define your progress bar here -->
-                      <!-- START: Define your tab pans here -->
-                      <div class="tab-pane show active" id="contactDetail">
-                      <form id="contactForm" action="./guardar_datos.php" method="POST">
-    <div class="text-center">
-        <h3 class="mb-2">Datos personales</h3>
-        <small class="text-muted">Tus datos personales nos ayudarán a generar un plan único y adecuado a tu situación.</small>
-    </div>
-    <div class="row mt-4">
-        <div class="col-sm-auto text-center">
-            <div class="position-relative me-3 d-inline-flex">
-                <div class="position-absolute top-50 start-100 translate-middle">
-                    <button class="btn btn-sm btn-primary btn-icon">
-                        <i class="ti ti-pencil"></i>
-                    </button>
-                </div>
-                <img src="../assets/images/icons-tab/orii.png" alt="user-image" class="wid-150 rounded img-fluid ms-2" />
-            </div>
-        </div>
-        <div class="col">
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="mb-3">
-                        <label class="form-label" for="nombre">Nombre completo</label>
-                        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Introduzca su nombre completo" required />
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="mb-3">
-                        <label class="form-label" for="edad">Edad</label>
-                        <input type="number" id="edad" name="edad" class="form-control" placeholder="Introduzca su edad" required />
-                    </div>
-               </div>
-                    <div class="col-sm-6">
-                    <div class="mb-3">
-                        <label class="form-label">Género</label>
-                        <select name="genero" id="genero" class="form-control" required>
-                            <option value="default" disabled selected>Seleccionar</option>
-                            <option value="mujer">Mujer</option>
-                            <option value="hombre">Hombre</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="mb-3">
-                        <label class="form-label" for="email">Email</label>
-                        <input type="email" id="email" name="email" class="form-control" placeholder="Introduzca su email" required />
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="mb-3">
-                        <label class="form-label" for="peso">Peso(kg)</label>
-                        <input type="number" id="peso" name="peso" class="form-control" step="0.01" placeholder="Introduzca su peso en kilogramos" required />
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="mb-3">
-                        <label class="form-label" for="altura">Altura(cm)</label>
-                        <input type="number" id="altura" name="altura" class="form-control" placeholder="Introduzca su altura en centímetros" required />
-                    </div>
-                </div>
-                
-                <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label" for="objetivo">Objetivo</label>
-                        <select id="objetivo" name="objetivo" class="form-control" required>
-                            <option value="default" disabled selected>Seleccionar</option>
-                            <option value="perder_peso">Perder peso</option>
-                            <option value="ganar_peso">Aumentar masa muscular</option>
-                            <option value="mantener_peso">Alimentación saludable</option>
-                        </select>
-                     </div>
-                 </div>
-                    <div class="col-sm-12">
-                    <div class="mb-3">
-                        <label class="form-label" for="suscripcion">¿Qué tipo de suscripción quiere?</label>
-                        <select id="suscripcion" name="suscripcion" class="form-control" required>
-                            <option value="default" disabled selected>Seleccionar</option>
-                            <option value="Mensual">Suscripción Mensual</option>
-                            <option value="Anual">Suscripción Anual</option>
-                        </select>
+                        <div
+                          class="bar progress-bar progress-bar-striped progress-bar-animated bg-success"
+                          role="progressbar"
+                          style="width: 0%"
+                          aria-valuenow="0"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        ></div>
                       </div>
-                  </div>
-               </div>
-             </div>
-                </div>
-                  </div>
-                      <!-- end contact detail tab pane -->
-                      <div class="tab-pane" id="educationDetail">
-    <div class="text-center">
-        <h3 class="mb-2">Actividad Física</h3>
-        <small class="text-muted">La información sobre tu rutina de ejercicio es esencial para adaptar tu plan a tu actividad física habitual.</small>
-    </div>
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="mb-3">
-                <label class="form-label" for="actividadtrabajo">¿Tu trabajo es sedentario o activo?</label>
-                <select name="trabajo" class="form-control" required>
-                    <option value="default" disabled selected>Seleccionar</option>
-                    <option value="sedentario">Sedentario</option>
-                    <option value="activo">Activo</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="mb-3">
-                <label class="form-label" for="ejercicio">¿Haces o empezarás a hacer ejercicio físico?</label>
-                <select name="ejercicio" id="ejercicio" class="form-control" required>
-                    <option value="default" disabled selected>Seleccionar</option>
-                    <option value="si">Sí</option>
-                    <option value="no">No</option>
-                </select>
-            </div>
-        </div>
 
-        <!-- Campos adicionales ocultos inicialmente -->
-        <div id="extraFields" style="display: none; gap: 20px; margin-top: 10px;">
-            <div class="col-sm-6">
-                <div class="mb-3">
-                    <label class="form-label" for="diasEntrenamiento">Días de entrenamiento (1-7)</label>
-                    <input name="dias_entrenamiento" type="number" id="diasEntrenamiento" class="form-control" min="1" max="7" placeholder="Días de entrenamiento" required />
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="mb-3">
-                    <label class="form-label" for="intensidad">Intensidad (1-6)</label>
-                    <input name="intensidad" type="number" id="intensidad" class="form-control" min="1" max="6" placeholder="Intensidad" required />
-                </div>
-            </div>
-        </div>
-            <!-- Campos adicionales para idTipoPlan 3 -->
-            <div class="col-md-12">
-                <div class="mb-3">
-                    <label class="form-label" for="actividad_previas">¿Ya realizaste actividad física en otro momento? ¿Cuál?</label>
-                    <input type="text" name="actividad_previas" class="form-control" required>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="mb-3">
-                    <label class="form-label" for="lesiones">¿Tenés o tuviste alguna lesión?</label>
-                    <input type="text" name="lesiones" class="form-control" required>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="mb-3">
-                    <label class="form-label" for="ultimo_entrenamiento">Si no te encuentras entrenando actualmente, ¿Cuándo fue la última vez que lo hiciste?</label>
-                    <input type="text" name="ultimo_entrenamiento" class="form-control" required>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="mb-3">
-                    <label class="form-label" for="dias_disponibles">¿De cuántos días de la semana dispones para entrenar? (3, 4 o 5)</label>
-                    <input type="number" name="dias_disponibles" class="form-control" min="3" max="5" required>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="mb-3">
-                    <label class="form-label" for="lugar_entrenamiento">La rutina de entrenamiento ¿la realizarás en un gimnasio o en tu casa?</label>
-                    <select name="lugar_entrenamiento" class="form-control" required>
-                        <option value="" disabled selected>Seleccionar</option>
-                        <option value="gimnasio">Gimnasio</option>
-                        <option value="casa">Casa</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="mb-3">
-                    <label class="form-label" for="preferencia_ejercicios">Te gustan los ejercicios con elementos/máquinas o sin elementos:</label>
-                    <select name="preferencia_ejercicios" class="form-control" required>
-                        <option value="" disabled selected>Seleccionar</option>
-                        <option value="con elementos">Con elementos/máquinas</option>
-                        <option value="sin elementos">Sin elementos</option>
-                    </select>
-                </div>
-            </div>
-    </div>
-                      
-                      <!-- end education detail tab pane -->
-                      <div class="tab-pane" id="finish">
-                        <div class="row d-flex justify-content-center">
-                          <div class="col-lg-6">
-                            <div class="text-center">
-                              <i class="ph-duotone ph-gift f-50 text-danger"></i>
-                              <h3 class="mt-4 mb-3">Muy bien !</h3>
-                              <div class="mb-3">
-                                <div class="form-check d-inline-block">
-                                  <label class="form-check-label" for="customCheck1">Recibiras un email en las próximas 72 hs con tu plan personalizado</label>
+                      <!-- NAV DE PESTAÑAS -->
+                      <ul class="nav nav-pills nav-justified mb-4">
+                        <li class="nav-item">
+                          <a class="nav-link active" data-bs-toggle="pill" href="#contactDetail">
+                            Datos Personales
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" data-bs-toggle="pill" href="#educationDetail">
+                            Actividad Física
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" data-bs-toggle="pill" href="#finish">
+                            Finish
+                          </a>
+                        </li>
+                      </ul>
+
+                      <!-- CONTENIDO DE PESTAÑAS -->
+                      <div class="tab-content">
+                        <!-- PESTAÑA 1: DATOS PERSONALES -->
+                        <div class="tab-pane fade show active" id="contactDetail">
+                          <div class="text-center">
+                            <h3 class="mb-2">Datos personales</h3>
+                            <small class="text-muted">
+                              Tus datos personales nos ayudarán a generar un plan único y adecuado a tu situación.
+                            </small>
+                          </div>
+                          <div class="row mt-4">
+                            <div class="col-sm-auto text-center">
+                              <div class="position-relative me-3 d-inline-flex">
+                                <div class="position-absolute top-50 start-100 translate-middle">
+                                  <button class="btn btn-sm btn-primary btn-icon">
+                                    <i class="ti ti-pencil"></i>
+                                  </button>
+                                </div>
+                                <img src="../assets/images/icons-tab/orii.png" alt="user-image"
+                                    class="wid-150 rounded img-fluid ms-2" />
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                  <label class="form-label" for="nombre">Nombre completo</label>
+                                  <input type="text" id="nombre" name="nombre"
+                                        class="form-control"
+                                        placeholder="Introduzca su nombre completo" required />
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                  <label class="form-label" for="edad">Edad</label>
+                                  <input type="number" id="edad" name="edad"
+                                        class="form-control"
+                                        placeholder="Introduzca su edad" required />
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                  <label class="form-label" for="genero">Género</label>
+                                  <select id="genero" name="genero"
+                                          class="form-control" required>
+                                    <option value="default" disabled selected>Seleccionar</option>
+                                    <option value="mujer">Mujer</option>
+                                    <option value="hombre">Hombre</option>
+                                  </select>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                  <label class="form-label" for="email">Email</label>
+                                  <input type="email" id="email" name="email"
+                                        class="form-control"
+                                        placeholder="Introduzca su email" required />
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                  <label class="form-label" for="peso">Peso (kg)</label>
+                                  <input type="number" id="peso" name="peso"
+                                        class="form-control" step="0.01"
+                                        placeholder="Introduzca su peso en kilogramos" required />
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                  <label class="form-label" for="altura">Altura (cm)</label>
+                                  <input type="number" id="altura" name="altura"
+                                        class="form-control"
+                                        placeholder="Introduzca su altura en centímetros" required />
+                                </div>
+                                <div class="col-sm-12 mb-3">
+                                  <label class="form-label" for="objetivo">Objetivo</label>
+                                  <select id="objetivo" name="objetivo"
+                                          class="form-control" required>
+                                    <option value="default" disabled selected>Seleccionar</option>
+                                    <option value="perder_peso">Perder peso</option>
+                                    <option value="ganar_peso">Aumentar masa muscular</option>
+                                    <option value="mantener_peso">Alimentación saludable</option>
+                                  </select>
+                                </div>
+                                <div class="col-sm-12 mb-3">
+                                  <label class="form-label" for="suscripcion">
+                                    ¿Qué tipo de suscripción quiere?
+                                  </label>
+                                  <select id="suscripcion" name="suscripcion"
+                                          class="form-control" required>
+                                    <option value="default" disabled selected>Seleccionar</option>
+                                    <option value="Mensual">Suscripción Mensual</option>
+                                    <option value="Anual">Suscripción Anual</option>
+                                  </select>
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <!-- end col -->
                         </div>
-                        <!-- end row -->
-                      </div>
-                      <!-- END: Define your tab pans here -->
-                      <!-- START: Define your controller buttons here-->
-                     <!-- Controles de Navegación -->
-                          <div class="d-flex justify-content-between mt-4">
-                            <button type="button" class="btn btn-secondary" id="btnAnterior" style="display: none;">Anterior</button>
-                            <button type="button" class="btn btn-primary" id="btnSiguiente">Siguiente</button>
-                            <button type="submit" class="btn btn-success" id="btnTerminar" style="display: none;">Terminar</button>
+
+                        <!-- PESTAÑA 2: ACTIVIDAD FÍSICA -->
+                        <div class="tab-pane fade" id="educationDetail">
+                          <div class="text-center">
+                            <h3 class="mb-2">Actividad Física</h3>
+                            <small class="text-muted">
+                              La información sobre tu rutina de ejercicio es esencial para adaptar tu plan a tu actividad física habitual.
+                            </small>
                           </div>
+                          <div class="row mt-4">
+                            <div class="col-md-12 mb-3">
+                              <label class="form-label" for="trabajo">
+                                ¿Tu trabajo es sedentario o activo?
+                              </label>
+                              <select id="trabajo" name="trabajo"
+                                      class="form-control" required>
+                                <option value="default" disabled selected>Seleccionar</option>
+                                <option value="sedentario">Sedentario</option>
+                                <option value="activo">Activo</option>
+                              </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                              <label class="form-label" for="ejercicio">
+                                ¿Haces o empezarás a hacer ejercicio físico?
+                              </label>
+                              <select id="ejercicio" name="ejercicio"
+                                      class="form-control" required>
+                                <option value="default" disabled selected>Seleccionar</option>
+                                <option value="si">Sí</option>
+                                <option value="no">No</option>
+                              </select>
+                            </div>
+
+                            <!-- Campos adicionales ocultos -->
+                            <div id="extraFields" class="row" style="display: none; gap: 20px; margin-top: 10px;">
+                              <div class="col-sm-6 mb-3">
+                                <label class="form-label" for="diasEntrenamiento">
+                                  Días de entrenamiento (1-7)
+                                </label>
+                                <input id="diasEntrenamiento" name="dias_entrenamiento"
+                                      type="number" class="form-control"
+                                      min="1" max="7"
+                                      placeholder="Días de entrenamiento" required />
+                              </div>
+                              <div class="col-sm-6 mb-3">
+                                <label class="form-label" for="intensidad">
+                                  Intensidad (1-6)
+                                </label>
+                                <input id="intensidad" name="intensidad"
+                                      type="number" class="form-control"
+                                      min="1" max="6"
+                                      placeholder="Intensidad" required />
+                              </div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                              <label class="form-label" for="actividad_previas">
+                                ¿Ya realizaste actividad física en otro momento? ¿Cuál?
+                              </label>
+                              <input id="actividad_previas" name="actividad_previas"
+                                    type="text" class="form-control" required />
+                            </div>
+                            <div class="col-md-12 mb-3">
+                              <label class="form-label" for="lesiones">
+                                ¿Tenés o tuviste alguna lesión?
+                              </label>
+                              <input id="lesiones" name="lesiones"
+                                    type="text" class="form-control" required />
+                            </div>
+                            <div class="col-md-12 mb-3">
+                              <label class="form-label" for="ultimo_entrenamiento">
+                                Si no te encuentras entrenando actualmente, ¿cuándo fue la última vez que lo hiciste?
+                              </label>
+                              <input id="ultimo_entrenamiento" name="ultimo_entrenamiento"
+                                    type="text" class="form-control" required />
+                            </div>
+                            <div class="col-md-12 mb-3">
+                              <label class="form-label" for="dias_disponibles">
+                                ¿De cuántos días de la semana dispones para entrenar? (3, 4 o 5)
+                              </label>
+                              <input id="dias_disponibles" name="dias_disponibles"
+                                    type="number" class="form-control"
+                                    min="3" max="5" required />
+                            </div>
+                            <div class="col-md-12 mb-3">
+                              <label class="form-label" for="lugar_entrenamiento">
+                                La rutina de entrenamiento ¿la realizarás en un gimnasio o en tu casa?
+                              </label>
+                              <select id="lugar_entrenamiento" name="lugar_entrenamiento"
+                                      class="form-control" required>
+                                <option value="" disabled selected>Seleccionar</option>
+                                <option value="gimnasio">Gimnasio</option>
+                                <option value="casa">Casa</option>
+                              </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                              <label class="form-label" for="preferencia_ejercicios">
+                                Te gustan los ejercicios con elementos/máquinas o sin elementos:
+                              </label>
+                              <select id="preferencia_ejercicios" name="preferencia_ejercicios"
+                                      class="form-control" required>
+                                <option value="" disabled selected>Seleccionar</option>
+                                <option value="con elementos">Con elementos/máquinas</option>
+                                <option value="sin elementos">Sin elementos</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- PESTAÑA 3: FIN -->
+                        <div class="tab-pane fade" id="finish">
+                          <div class="row d-flex justify-content-center">
+                            <div class="col-lg-6 text-center">
+                              <i class="ph-duotone ph-gift f-50 text-danger"></i>
+                              <h3 class="mt-4 mb-3">¡Muy bien!</h3>
+                              <p>
+                                Recibirás un email en las próximas 72 hs con tu plan personalizado.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- BOTONES DE NAVEGACIÓN -->
+                      <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-secondary" id="btnAnterior" style="display: none;">
+                          Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btnSiguiente">
+                          Siguiente
+                        </button>
+                        <button type="submit" class="btn btn-success" id="btnTerminar" style="display: none;">
+                          Terminar
+                        </button>
+                      </div>
                     </form>
-                      <!-- END: Define your controller buttons here-->
-                    </div>
                   </div>
                 </div>
-                <!-- end tab content-->
               </div>
+
             </div>
           </div>
           <!-- [ sample-page ] end -->
@@ -744,115 +760,98 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
     }
   });
 </script>
-
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const btnSiguiente = document.getElementById("btnSiguiente");
-    const btnAnterior = document.getElementById("btnAnterior");
-    const btnTerminar = document.getElementById("btnTerminar");
-    const barraProgreso = document.querySelector("#bar .bar");
-    const progreso = barraProgreso;
+    const btnAnterior  = document.getElementById("btnAnterior");
+    const btnTerminar  = document.getElementById("btnTerminar");
+    const progressBar  = document.querySelector("#bar .bar");
+    const navLinks     = Array.from(document.querySelectorAll(".nav-pills .nav-link"));
 
-    function validarCampos(seccion) {
-      const campos = seccion.querySelectorAll("input[required], select[required]");
-      for (let campo of campos) {
-        if (campo.value === "" || campo.value === "default") {
-          return false;
+    function getActiveNav() {
+      return document.querySelector(".nav-pills .nav-link.active");
+    }
+
+    function obtenerCamposFaltantes(pane) {
+      const faltantes = [];
+      pane.querySelectorAll("input[required], select[required]").forEach(campo => {
+        if (campo.offsetParent === null) return;
+        if (!campo.value || campo.value === "default") {
+          const lbl = pane.querySelector(`label[for="${campo.id}"]`);
+          const nombre = lbl
+            ? lbl.textContent.trim().replace(/[:?]$/, "")
+            : (campo.name || campo.id);
+          faltantes.push(nombre);
         }
-      }
-      return true;
+      });
+      return faltantes;
     }
 
     function actualizarProgreso() {
-      const secciones = document.querySelectorAll(".tab-pane");
-      const seccionActual = document.querySelector(".tab-pane.show");
-      const indexActual = Array.from(secciones).indexOf(seccionActual);
-      const porcentaje = ((indexActual + 1) / secciones.length) * 100;
-      progreso.style.width = porcentaje + "%";
-      progreso.setAttribute("aria-valuenow", porcentaje);
+      const activoNav = getActiveNav();
+      const idx       = navLinks.indexOf(activoNav);
+      const pct       = ((idx + 1) / navLinks.length) * 100;
+      progressBar.style.width = pct + "%";
+      progressBar.setAttribute("aria-valuenow", Math.round(pct));
+    }
+
+    function actualizarBotones() {
+      const activoNav = getActiveNav();
+      const id        = activoNav.getAttribute("href").substring(1);
+      btnAnterior.style.display = "none";
+      btnSiguiente.style.display = "none";
+      btnTerminar.style.display = "none";
+
+      if (id === "contactDetail") {
+        btnSiguiente.style.display = "inline-block";
+      } else if (id === "educationDetail") {
+        btnAnterior.style.display  = "inline-block";
+        btnSiguiente.style.display = "inline-block";
+      } else if (id === "finish") {
+        btnAnterior.style.display  = "inline-block";
+        btnTerminar.style.display  = "inline-block";
+      }
+    }
+
+    function showNavLink(link) {
+      bootstrap.Tab.getOrCreateInstance(link).show();
     }
 
     btnSiguiente.addEventListener("click", function () {
-      const seccionActual = document.querySelector(".tab-pane.show");
-      if (validarCampos(seccionActual)) {
-        const siguienteTab = seccionActual.nextElementSibling;
-        if (siguienteTab) {
-          const idSiguienteTab = siguienteTab.id;
-          const navLink = document.querySelector(`a[href="#${idSiguienteTab}"]`);
-          if (navLink) {
-            const bootstrapTab = new bootstrap.Tab(navLink);
-            bootstrapTab.show();
-          }
-        }
-        actualizarProgreso();
-        actualizarBotones();
-      } else {
-        alert("Por favor, rellene todos los campos antes de continuar.");
+      const activoNav = getActiveNav();
+      const pane      = document.querySelector(activoNav.getAttribute("href"));
+      const faltantes = obtenerCamposFaltantes(pane);
+      if (faltantes.length) {
+        return alert(
+          "Por favor completa los siguientes campos:\n• " +
+          faltantes.join("\n• ")
+        );
       }
+      const idx = navLinks.indexOf(activoNav);
+      const next = navLinks[idx + 1];
+      if (next) showNavLink(next);
     });
 
     btnAnterior.addEventListener("click", function () {
-      const seccionActual = document.querySelector(".tab-pane.show");
-      const tabAnterior = seccionActual.previousElementSibling;
-      if (tabAnterior) {
-        const idTabAnterior = tabAnterior.id;
-        const navLink = document.querySelector(`a[href="#${idTabAnterior}"]`);
-        if (navLink) {
-          const bootstrapTab = new bootstrap.Tab(navLink);
-          bootstrapTab.show();
-        }
-      }
-      actualizarProgreso();
-      actualizarBotones();
+      const activoNav = getActiveNav();
+      const idx       = navLinks.indexOf(activoNav);
+      const prev      = navLinks[idx - 1];
+      if (prev) showNavLink(prev);
     });
 
-    function actualizarBotones() {
-      const seccionActual = document.querySelector(".tab-pane.show");
+    navLinks.forEach(link => {
+      link.addEventListener("shown.bs.tab", () => {
+        actualizarProgreso();
+        actualizarBotones();
+      });
+    });
 
-      if (seccionActual.id === "finish") {
-        btnSiguiente.style.display = "none";
-        btnTerminar.style.display = "none";
-      } else {
-        btnSiguiente.style.display = "inline-block";
-        btnTerminar.style.display = "none";
-      }
-
-      if (seccionActual.id === "contactDetail") {
-        btnAnterior.style.display = "none";
-        btnSiguiente.style.marginLeft = "auto"; // Mueve el botón a la derecha
-        btnSiguiente.style.marginRight = "0";
-        btnSiguiente.style.display = "inline-block";
-      } else {
-        btnAnterior.style.display = "inline-block";
-        btnSiguiente.style.marginLeft = ""; // Restablece el margen para otras secciones
-        btnSiguiente.style.marginRight = "";
-      }
-
-      if (seccionActual.id === "educationDetail") {
-        btnSiguiente.style.display = "inline-block";
-        btnSiguiente.style.display = "none";
-        btnTerminar.style.display = "inline-block";
-      }
-    }
-
-    function terminarFormulario() {
-      const seccionActual = document.querySelector(".tab-pane.show");
-      const tabFinal = document.querySelector("#finish");
-      if (tabFinal) {
-        const navLink = document.querySelector(`a[href="#${tabFinal.id}"]`);
-        if (navLink) {
-          const bootstrapTab = new bootstrap.Tab(navLink);
-          bootstrapTab.show();
-        }
-      }
-      actualizarProgreso();
-      actualizarBotones();
-    }
-
+    // Inicializar
     actualizarProgreso();
     actualizarBotones();
   });
 </script>
+
 
 
 
