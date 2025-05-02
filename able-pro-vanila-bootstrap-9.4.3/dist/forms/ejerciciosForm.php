@@ -454,7 +454,7 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
               <div class="col-12">
                 <div class="card">
                   <div class="card-body">
-                    <form id="contactForm" action="./guardar_datos.php" method="POST">
+                    <form id="contactForm" action="./guardar_ejercicios.php" method="POST">
                       <!-- PROGRESS BAR -->
                       <div id="bar" class="progress mb-3" style="height: 7px;">
                         <div
