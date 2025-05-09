@@ -12,19 +12,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $lugar = isset($_POST['lugar']) ? intval($_POST['lugar']) : 0;
     $sexo = isset($_POST['sexo']) ? intval($_POST['sexo']) : 0;
     $dificultad = isset($_POST['dificultad']) ? intval($_POST['dificultad']) : 0;
-    $grupoEjercicio = isset($_POST['grupo_ejercicio']) ? intval($_POST['grupo_ejercicio']) : 0;
+    $grupoEnfoque = isset($_POST['grupo_enfoque']) ? intval($_POST['grupo_enfoque']) : 0;
 
 
     try{
     
-    $query = "INSERT INTO videos (Nombre, Descripcion, URL, idGrupoMuscular, idDireccion, idEquipamiento, idLugar, idSexo, idDificultad, idGrupo) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO videos (Nombre, Descripcion, URL, idGrupoMuscular, idDireccion, idEquipamiento, idLugar, idSexo, idDificultad, idGrupoEnfoque) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conexion->prepare($query);
 
     if(!$stmt){
         throw new Exception("Error al preparar la consulta: " . $conexion->error);
     }
 
-    $stmt->bind_param("sssiiiiiii", $nombre, $descripcion, $url, $grupoMuscular, $direccion, $equipamiento, $lugar, $sexo, $dificultad, $grupoEjercicio);
+    $stmt->bind_param("sssiiiiiii", $nombre, $descripcion, $url, $grupoMuscular, $direccion, $equipamiento, $lugar, $sexo, $dificultad, $grupoEnfoque);
 
      // Ejecutar consulta
      if ($stmt->execute()) {

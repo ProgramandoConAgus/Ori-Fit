@@ -453,12 +453,108 @@ $resultadoNotificaciones = $stmt->get_result();
             <a class="nav-link" id="solicitudes-tab" data-bs-toggle="pill" href="#solicitudes" role="tab">Gestión de Solicitudes</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="modal" href="#videosEntrenamientoModal" role="button">Videos Entrenamiento</a>
+            <a class="nav-link" id="videos-tab"data-bs-toggle="pill" href="#videos" role="tab">Videos Entrenamiento</a>
         </li>
     </ul>
 </div>
 
+
 <!-- Modal para Videos de Entrenamiento -->
+<?php
+
+$query = "SELECT v.IdVideo, v.Nombre, v.Descripcion, v.IdGrupoEnfoque, v.IdGrupoMuscular, v.URL, v.IdDificultad  FROM videos v";
+$result = $conexion->query($query);
+
+// Verificamos si la consulta fue exitosa
+if ($result && $result->num_rows > 0) {
+    // Convertimos los resultados a un array asociativo
+    $videos = $result->fetch_all(MYSQLI_ASSOC);
+} else {
+    $videos = []; // Si no hay videos
+}
+
+?>
+
+</div>
+    <hr>
+     <!-- Contenido de la página -->
+     <div class="container mt-4">
+    <!-- Pestañas -->
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="videos" role="tabpanel">
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th colspan="9" style="background-color: #f8f9fa; font-size: 1.5rem; border: none;">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                                    <!-- Buscador -->
+                                    <div class="mb-2 mb-md-0">
+                                        <label for="userSearch" class="form-label" style="font-size: 1rem;">Buscador</label>
+                                        <input type="text" class="form-control form-control-sm" id="userSearch" placeholder="Buscar por nombre, dificultad..." style="width: 200px;">
+                                    </div>
+
+                                    <!-- Título -->
+                                    <div class="text-center mb-2 mb-md-0">Gestión de Videos</div>
+
+                                    <!-- Botón Agregar Usuario -->
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#videosEntrenamientoModal">
+                                        <img src="../assets/images/icons-tab/añadir.png" alt="añadir" style="height: 20px; width: 20px; margin-right: 5px;">
+                                        Agregar video
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th class="d-none d-md-table-cell">Descripcion</th>
+                            <th>Enfoque</th>
+                            <th class="d-none d-md-table-cell">Grupo Muscular</th>
+                            <th>Dificultad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($videos as $video): ?>
+                            <tr>
+                                <td><?php echo $video['IdVideo']; ?></td>
+                                <td><?php echo $video['Nombre']; ?></td>
+                                <td class="d-none d-md-table-cell"><?php echo $video['Descripcion']; ?></td>
+                                <td><?php echo $video['IdGrupoEnfoque']; ?></td>
+                                <td class="d-none d-md-table-cell"><?php echo $video['IdGrupoMuscular']; ?></td>
+                                <td><?php echo $video['IdDificultad']; ?></td>
+                                <td>
+                                    <div class="d-flex flex-column flex-md-row justify-content-center gap-1">
+                                    <button class="btn btn-sm btn-warning" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editModal"
+                                        data-IdVideo="<?= $video['IdVideo'] ?>"
+                                        data-Nombre="<?= $video['Nombre'] ?>"
+                                        data-Descripcion="<?= $video['Descripcion'] ?>"
+                                        data-IdGrupoEnfoque="<?= $video['IdGrupoEnfoque'] ?>"
+                                        data-GrupoMuscular="<?= $video['IdGrupoMuscular'] ?>">
+                                          <img src="../assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px;">
+                                      </button>
+
+                                        <form method="POST" action="borrar_usuario.php" style="display: inline;">
+                                            <input type="hidden" name="IdVideo" value="<?php echo $video['IdVideo']; ?>">
+                                            <button type="submit" class="btn btn-danger btn-sm w-100 w-md-auto" title="Eliminar Video">
+                                                <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar" style="width: 16px; height: 16px;">
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal de Agregar Video-->
 <div class="modal fade" id="videosEntrenamientoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered mw-650px">
         <div class="modal-content rounded">
@@ -582,7 +678,7 @@ $resultadoNotificaciones = $stmt->get_result();
                             <option value="">Seleccione un lugar...</option>
                             <option value="1">Gimnasio</option>
                             <option value="2">Casa</option>
-                            <option value="3">Exterior</option>
+                            <option value="3">Ambos</option>
                         </select>
                     </div>
 <br>
@@ -616,16 +712,15 @@ $resultadoNotificaciones = $stmt->get_result();
                         <!-- Grupo Ejercicio -->
                     <div class="mb-8 fv-row">
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
-                            <span class="required">Grupo Ejercicio</span>
+                            <span class="required">Grupo Enfoque</span>
                         </label>
-                        <select class="form-select form-select-solid" name="grupo_ejercicio" required>
+                        <select class="form-select form-select-solid" name="grupo_enfoque" required>
                             <option value="">Seleccione un grupo...</option>
-                            <option value="1">Grupo 1</option>
-                            <option value="2">Grupo 2</option>
-                            <option value="3">Grupo 3</option>
-                            <option value="4">Grupo 4</option>
-                            <option value="5">Grupo 5</option>
-                            <option value="6">Grupo 6</option>
+                            <option value="1">Gluteos</option>
+                            <option value="2">Piernas</option>
+                            <option value="3">Abdomen</option>
+                            <option value="4">Tren Superior</option>
+                            <option value="5">Full body</option>
                         </select>
                     </div>
 <br>  
