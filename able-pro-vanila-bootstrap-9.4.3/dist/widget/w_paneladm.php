@@ -74,6 +74,8 @@ $resultadoNotificaciones = $stmt->get_result();
 <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
 <script src="../assets/js/tech-stack.js"></script>
 <link rel="stylesheet" href="../assets/css/style-preset.css" />
+<link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+
 
 
 <!-- Colocar esto en el head -->
@@ -462,7 +464,27 @@ $resultadoNotificaciones = $stmt->get_result();
 <!-- Modal para Videos de Entrenamiento -->
 <?php
 
-$query = "SELECT v.IdVideo, v.Nombre, v.Descripcion, v.IdGrupoEnfoque, v.IdGrupoMuscular, v.URL, v.IdDificultad  FROM videos v";
+$query = "SELECT v.IdVideo, v.IdEquipamiento, e.Equipamiento v.Nombre, v.Descripcion, v.IdGrupoEnfoque, v.IdGrupoMuscular, v.URL, v.IdDificultad, v.IdDireccion, v.idLugar, v.idSexo, s.Sexo, gm.Grupo_Muscular, ge.Grupo, d.Direccion, dif.Dificultad, l.Lugar 
+FROM 
+    videos v
+JOIN 
+    Sexo s ON v.idSexo = s.idSexo
+JOIN 
+    grupo_muscular gm ON v.IdGrupoMuscular = gm.IdGrupoMuscular
+JOIN 
+    grupo_enfoque ge ON v.IdGrupoEnfoque = ge.IdGrupo
+JOIN 
+    direccion d ON v.IdDireccion = d.IdDireccion
+JOIN 
+    dificultad dif ON v.IdDificultad = dif.IdDificultad
+JOIN 
+    lugar l ON v.idLugar = l.idLugar
+JOIN
+    equipamiento e ON v.IdEquipamiento = e.Equipamiento
+ORDER BY 
+    v.IdVideo 
+ASC";
+
 $result = $conexion->query($query);
 
 // Verificamos si la consulta fue exitosa
@@ -499,7 +521,8 @@ if ($result && $result->num_rows > 0) {
 
                                     <!-- Botón Agregar Usuario -->
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#videosEntrenamientoModal">
-                                        <img src="../assets/images/icons-tab/añadir.png" alt="añadir" style="height: 20px; width: 20px; margin-right: 5px;">
+                                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                                        <!--<img src="../assets/images/icons-tab/añadir.png" alt="añadir" style="height: 20px; width: 20px; margin-right: 5px;"> -->
                                         Agregar video
                                     </button>
                                 </div>
@@ -511,8 +534,8 @@ if ($result && $result->num_rows > 0) {
                             <th class="d-none d-md-table-cell">Descripcion</th>
                             <th>Enfoque</th>
                             <th class="d-none d-md-table-cell">Grupo Muscular</th>
-                            <th>Dificultad</th>
                             <th>Acciones</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -520,24 +543,27 @@ if ($result && $result->num_rows > 0) {
                             <tr>
                                 <td><?php echo $video['IdVideo']; ?></td>
                                 <td><?php echo $video['Nombre']; ?></td>
-                                <td class="d-none d-md-table-cell"><?php echo $video['Descripcion']; ?></td>
-                                <td><?php echo $video['IdGrupoEnfoque']; ?></td>
-                                <td class="d-none d-md-table-cell"><?php echo $video['IdGrupoMuscular']; ?></td>
-                                <td><?php echo $video['IdDificultad']; ?></td>
+                                <td class="d-none d-md-table-cell limit-text" ><?php echo $video['Descripcion']; ?></td>
+                                <td><?php echo $video['Grupo']; ?></td>
+                                <td class="d-none d-md-table-cell"><?php echo $video['Grupo_Muscular']; ?></td>
                                 <td>
                                     <div class="d-flex flex-column flex-md-row justify-content-center gap-1">
                                     <button class="btn btn-sm btn-warning" 
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#editModal"
+                                        data-bs-target="#editModalVideos"
                                         data-IdVideo="<?= $video['IdVideo'] ?>"
                                         data-Nombre="<?= $video['Nombre'] ?>"
                                         data-Descripcion="<?= $video['Descripcion'] ?>"
-                                        data-IdGrupoEnfoque="<?= $video['IdGrupoEnfoque'] ?>"
-                                        data-GrupoMuscular="<?= $video['IdGrupoMuscular'] ?>">
+                                        data-IdGrupoEnfoque="<?= $video['Grupo'] ?>"
+                                        data-GrupoMuscular="<?= $video['Grupo_Muscular'] ?>"
+                                        data-Sexo="<?= $video['Sexo'] ?>"
+                                        data-URL="<?= $video['URL'] ?>"
+                                        data-Equipamiento="<?= $video['Equipamiento'] ?>"
+                                        data-Lugar="<?= $video['Lugar'] ?>">
                                           <img src="../assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px;">
                                       </button>
 
-                                        <form method="POST" action="borrar_usuario.php" style="display: inline;">
+                                        <form method="POST" action="borrar_video.php" style="display: inline;">
                                             <input type="hidden" name="IdVideo" value="<?php echo $video['IdVideo']; ?>">
                                             <button type="submit" class="btn btn-danger btn-sm w-100 w-md-auto" title="Eliminar Video">
                                                 <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar" style="width: 16px; height: 16px;">
@@ -553,6 +579,15 @@ if ($result && $result->num_rows > 0) {
         </div>
     </div>
 </div>
+
+<style>
+td.limit-text {
+  max-width: 150px;       /* o el ancho que quieras */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>
 
 <!--Modal de Agregar Video-->
 <div class="modal fade" id="videosEntrenamientoModal" tabindex="-1" aria-hidden="true">
@@ -735,6 +770,193 @@ if ($result && $result->num_rows > 0) {
             </div>
         </div>
     </div>
+</div>
+        <!-- Modal de Edición -->
+        <div class="modal fade" id="editModalVideos" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar video</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Pestañas -->
+                        <ul class="nav nav-tabs" id="editTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">Datos</button>
+                            </li>
+                        </ul>
+
+                        <!-- Contenido de las pestañas -->
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="contact" role="tabpanel">
+                                <!-- Formulario de Edición -->
+                                <form action="editar_video.php" method="POST">
+                                <input type="hidden" id="editId" name="id"><br>
+                                <h4 style="text-align: center;">Datos del video</h4>
+                                                <!-- Nombre -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Nombre del Video</span>
+                        </label>
+                        <input type="text" class="form-control form-control-solid" name="nombre" required>
+                    </div>
+<br>
+                    <!-- Descripción -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Descripción</span>
+                        </label>
+                        <textarea class="form-control form-control-solid" rows="3" name="descripcion" required></textarea>
+                    </div>
+<br>
+                    <!-- URL del Video -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Enlace del Video</span>
+                        </label>
+                        <input type="url" class="form-control form-control-solid" name="url" required>
+                    </div>
+<br>
+                    <!-- Grupo Muscular -->
+                     
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Grupo Muscular</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="grupo_muscular" required>
+                            <option value="">Seleccione un grupo...</option>
+                            <option value="1">Glúteos</option>
+                            <option value="2">Cuádriceps</option>
+                            <option value="3">Isquiotibiales</option>
+                            <option value="4">Abductores (glúteo medio)</option>
+                            <option value="5">Aductores</option>
+                            <option value="6">Core</option>
+                            <option value="7">Espalda</option>
+                            <option value="8">Pecho</option>
+                            <option value="9">Hombros</option>
+                            <option value="10">Bíceps</option>
+                            <option value="11">Tríceps</option>
+                            <option value="12">Gemelos</option>
+                            <option value="13">Trapecio</option>
+                        </select>
+                    </div>
+<br>    
+                    <!-- Tipo de Moviento/direccion -->
+                     
+                    <div class="mb-8 fv-row">
+                    <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                        <span class="required">Movimiento/Dirección</span>
+                    </label>
+                    <select class="form-select form-select-solid" name="movimiento_direccion" required>
+                        <option value="">Seleccione un movimiento...</option>
+                        <optgroup label="Tren inferior">
+                            <option value="1">Sentadilla (dominancia de rodilla)</option>
+                            <option value="2">Bisagra (dominancia de cadera)</option>
+                            <option value="3">Zancada</option>
+                            <option value="4">Paso lateral</option>
+                            <option value="5">Subida a banco</option>
+                            <option value="6">Empuje de cadera</option>
+                            <option value="7">Abducción / aducción</option>
+                            <option value="8">Extensión de cadera (patada)</option>
+                        </optgroup>
+                        <optgroup label="Tren superior">
+                            <option value="9">Empuje horizontal</option>
+                            <option value="10">Empuje vertical</option>
+                            <option value="11">Tracción horizontal</option>
+                            <option value="12">Tracción vertical</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+<br>
+                    <!-- Equipamiento -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Equipamiento</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="equipamiento" required>
+                            <option value="">Seleccione el Equipamiento</option>
+                            <option value="1">Ninguno (peso corporal)</option>
+                            <option value="2">Mancuernas</option>
+                            <option value="3">Bandas mini</option>
+                            <option value="4">Pesa rusa</option>
+                            <option value="5">Barra larga</option>
+                            <option value="6">Discos</option>
+                            <option value="7">Polea</option>
+                            <option value="8">Banco</option>
+                            <option value="9">Step o caja</option>
+                            <option value="10">Colchoneta</option>
+
+                        </select>
+                    </div>
+<br>
+                    <!-- Lugar de Entrenamiento -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Lugar</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="lugar" required>
+                            <option value="">Seleccione un lugar...</option>
+                            <option value="1">Gimnasio</option>
+                            <option value="2">Casa</option>
+                            <option value="3">Ambos</option>
+                        </select>
+                    </div>
+<br>
+                    <!-- Sexo -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Sexo</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="sexo" required>
+                            <option value="">Seleccione el sexo...</option>
+                            <option value="1">Hombre</option>
+                            <option value="2">Mujer</option>
+                            <option value="3">Ambos</option>
+                        </select>
+                    </div>
+<br>
+                    <!-- Dificultad -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Dificultad</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="dificultad" required>
+                            <option value="">Seleccione una dificultad...</option>
+                            <option value="1">Facil</option>
+                            <option value="2">Medio</option>
+                            <option value="3">Dificil</option>
+                        </select>
+                    </div>
+<br>
+                    
+                        <!-- Grupo Ejercicio -->
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                            <span class="required">Grupo Enfoque</span>
+                        </label>
+                        <select class="form-select form-select-solid" name="grupo_enfoque" required>
+                            <option value="">Seleccione un grupo...</option>
+                            <option value="1">Gluteos</option>
+                            <option value="2">Piernas</option>
+                            <option value="3">Abdomen</option>
+                            <option value="4">Tren Superior</option>
+                            <option value="5">Full body</option>
+                        </select>
+                    </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                </div>
+                            </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 </div>
     <hr>
      <!-- Contenido de la página -->
@@ -2138,7 +2360,30 @@ function cambiarPestana(evt, tabName, modalId) {
         editModal.querySelector('#editRol').value = rol;
     });
 </script>
+ <script>
+    // Este script se ejecutará cuando el modal se abra
+    const editModal = document.getElementById('editModalVideos');
+    editModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+        
+        // Obtener datos del botón
+        const acceso = parseInt(button.dataset.acceso) === 1;
+        const plan = button.dataset.plan;
+        const rol = button.dataset.rol;
 
+        // Asignar valores a los campos del formulario
+        editModal.querySelector('#editId').value = button.dataset.id;
+        editModal.querySelector('#editNombre').value = button.dataset.nombre;
+        editModal.querySelector('#editApellido').value = button.dataset.apellido;
+        editModal.querySelector('#editTelefono').value = button.dataset.telefono;
+        editModal.querySelector('#editCorreo').value = button.dataset.correo;
+        editModal.querySelector('#editAcceso').checked = acceso;
+        
+        // Seleccionar opciones en los combos
+        editModal.querySelector('#editPlan').value = plan;
+        editModal.querySelector('#editRol').value = rol;
+    });
+</script>
 <script>
 document.getElementById('userSearch').addEventListener('input', function() {
     const searchTerm = this.value.toLowerCase();
