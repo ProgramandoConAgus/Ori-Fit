@@ -18,10 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ejercicio = trim($_POST['ejercicio']);
     $diasEntrenamiento = isset($_POST['dias_entrenamiento']) ? filter_var(trim($_POST['dias_entrenamiento']), FILTER_VALIDATE_INT) : null;
     $intensidad = isset($_POST['intensidad']) ? filter_var(trim($_POST['intensidad']), FILTER_VALIDATE_INT) : null;
-    $actividad_previa = trim($_POST['actividad_previas']);
+    $nivel = trim($_POST['nivel']);
     $lesiones = trim($_POST['lesiones']);
-    $ultimo_entrenamiento = trim($_POST['ultimo_entrenamiento']);
-    $dias_disponibles = trim($_POST['dias_disponibles']);
+    $dias_disponibles = isset($_POST['dias_disponibles']) ? filter_var(trim($_POST['dias_disponibles']), FILTER_VALIDATE_INT) : null;
     $lugar_entrenamiento = trim($_POST['lugar_entrenamiento']);
     $preferencia_ejercicios = trim($_POST['preferencia_ejercicios']);
     $estado = "pendiente"; // Estado por defecto
@@ -36,9 +35,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         empty($suscripcion) || 
         empty($trabajo) ||
         empty($ejercicio) ||
-        empty($actividad_previa) ||
+        empty($nivel) ||
         empty($lesiones) ||
-        empty($ultimo_entrenamiento) ||
         empty($dias_disponibles) ||
         empty($lugar_entrenamiento) ||
         empty($preferencia_ejercicios) ||
@@ -54,11 +52,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Campos opcionales (asegurar que no sean NULL si no se proporcionan)
     $diasEntrenamiento = $diasEntrenamiento ?? 0; // Si no se envía, valor por defecto
     $intensidad = $intensidad ?? 0;
+    $nivel = $nivel ?? "";
 
 
     try {
         // Verificar si ya existe una solicitud
-        $sql = "SELECT * FROM solicitudes WHERE usuario_id = ?";
+        $sql = "SELECT * FROM solicitudes_ejercicios WHERE usuario_id = ?";
         $stmt = $conexion->prepare($sql);
         $stmt->bind_param("i", $usuario_id);
         $stmt->execute();
@@ -68,14 +67,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Insertar nueva solicitud
             $sql = "INSERT INTO solicitudes_ejercicios (
                 usuario_id, nombre, edad, email, peso, altura, genero, objetivo, suscripcion, trabajo,
-                ejercicio, diasEntrenamiento, intensidad, actividad_previa, lesiones, ultimo_entrenamiento,
+                ejercicio, diasEntrenamiento, intensidad, nivel, lesiones,
                 dias_disponibles, lugar_entrenamiento, preferencias, estado, fecha_envio
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     } else {
             // Actualizar solicitud existente
             $sql = "UPDATE solicitudes_ejercicios SET 
             nombre = ?, edad = ?, email = ?, peso = ?, altura = ?, genero = ?, objetivo = ?, suscripcion = ?, trabajo = ?, ejercicio = ?, 
-            diasEntrenamiento = ?, intensidad = ?, actividad_previa = ?, lesiones = ?, ultimo_entrenamiento = ?, 
+            diasEntrenamiento = ?, intensidad = ?, nivel = ?, lesiones = ?,
             dias_disponibles = ?, lugar_entrenamiento = ?, preferencias = ?, estado = ?, fecha_envio = ?
             WHERE usuario_id = ?";
         }
@@ -89,57 +88,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Asociar los parámetros y ejecutar la consulta
         if ($resultado->num_rows == 0) {
-           // Para INSERT (22 columnas)
-           $stmt->bind_param(
-            "isisiisssssiiisssssss",
-            $usuario_id,
-            $nombre,
-            $edad,
-            $email,
-            $peso,
-            $altura,
-            $genero,
-            $objetivo,
-            $suscripcion,
-            $trabajo,
-            $ejercicio,
-            $diasEntrenamiento,
-            $intensidad,
-            $actividad_previa,
-            $lesiones,
-            $ultimo_entrenamiento,
-            $dias_disponibles,
-            $lugar_entrenamiento,
-            $preferencia_ejercicios,
-            $estado,
-            $fechaHoraActual
-        );
-                } else {
-                    $stmt->bind_param(
-                        "sisisiissssiiissssssi",
-                        $nombre,
-                        $edad,
-                        $email,
-                        $peso,
-                        $altura,
-                        $genero,
-                        $objetivo,
-                        $suscripcion,
-                        $trabajo,
-                        $ejercicio,
-                        $diasEntrenamiento,
-                        $intensidad,
-                        $actividad_previa,
-                        $lesiones,
-                        $ultimo_entrenamiento,
-                        $dias_disponibles,
-                        $lugar_entrenamiento,
-                        $preferencia_ejercicios,
-                        $estado,
-                        $fechaHoraActual,
-                        $usuario_id
-                    );
-                            }
+            // Para INSERT (21 columnas)
+            $stmt->bind_param(
+                "isisdisssssiississss",
+                $usuario_id,                 // i
+                $nombre,                     // s
+                $edad,                       // i
+                $email,                      // s
+                $peso,                       // d
+                $altura,                     // i
+                $genero,                     // s
+                $objetivo,                   // s
+                $suscripcion,                // s
+                $trabajo,                    // s
+                $ejercicio,                  // s
+                $diasEntrenamiento,          // i
+                $intensidad,                 // i 
+                $nivel,                      // s
+                $lesiones,                   // s
+                $dias_disponibles,           // i 
+                $lugar_entrenamiento,        // s
+                $preferencia_ejercicios,     // s
+                $estado,                     // s
+                $fechaHoraActual             // s
+            );
+            
+            
+        } else {
+            $stmt->bind_param(
+                "sisdisisssssiississssi",
+                $nombre,                      // s
+                $edad,                        // i
+                $email,                       // s
+                $peso,                        // d
+                $altura,                      // i
+                $genero,                      // s
+                $objetivo,                    // s
+                $suscripcion,                 // s
+                $trabajo,                     // s
+                $ejercicio,                   // s
+                $diasEntrenamiento,           // i
+                $intensidad,                  // i 
+                $nivel,                       // s
+                $lesiones,                    // s
+                $dias_disponibles,            // i 
+                $lugar_entrenamiento,         // s
+                $preferencia_ejercicios,      // s
+                $estado,                      // s
+                $fechaHoraActual,             // s
+                $usuario_id                   // i
+            );
+        }
+        
         
         if ($stmt->execute()) {
             $exitoso = true;
@@ -147,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($exitoso) {
                 echo "Datos guardados exitosamente.";
-                header("Location: ../widget/asignar_entrenamientos.php");
+                header("Location: ../widget/calcula_ejercicios.php");
                 exit();
             }
         } else {
