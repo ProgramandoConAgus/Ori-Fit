@@ -3,38 +3,34 @@ include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Recibir los datos del formulario
-    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+    $id = isset($_POST['IdVideo']) ? intval($_POST['IdVideo']) : 0;
     $nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
-    $apellido = isset($_POST['apellido']) ? trim($_POST['apellido']) : '';
-    $telefono = isset($_POST['telefono']) ? trim($_POST['telefono']) : '';
-    $correo = isset($_POST['correo']) ? trim($_POST['correo']) : '';
-    $acceso = isset($_POST['acceso']) && $_POST['acceso'] === 'permitido' ? 'Habilitado' : 'Deshabilitado';
-    $plan = isset($_POST['plan']) ? intval($_POST['plan']) : 0;
-    $rol = isset($_POST['rol']) ? intval($_POST['rol']) : 0;
+    $descripcion = isset($_POST['descripcion']) ? trim($_POST['descripcion']) : '';
+    $url = isset($_POST['url']) ? trim($_POST['url']) : '';
+    $grupoMuscular = isset($_POST['grupo_muscular']) ? intval($_POST['grupo_muscular']) : 0;
+    $direccion = isset($_POST['movimiento_direccion']) ? intval($_POST['movimiento_direccion']) : 0;
+    $equipamiento = isset($_POST['equipamiento']) ? intval($_POST['equipamiento']) : 0;
+    $lugar = isset($_POST['lugar']) ? intval($_POST['lugar']) : 0;
+    $sexo = isset($_POST['sexo']) ? intval($_POST['sexo']) : 0;
+    $dificultad = isset($_POST['dificultad']) ? intval($_POST['dificultad']) : 0;
+    $grupoEnfoque = isset($_POST['grupo_enfoque']) ? intval($_POST['grupo_enfoque']) : 0;
 
     // Validar campos obligatorios
-    if (empty($id) || empty($nombre) || empty($apellido) || empty($telefono) || empty($correo) || empty($plan) || empty($rol)) {
+    if (empty($id) || empty($nombre) || empty($descripcion) || empty($url) || empty($grupoMuscular) || empty($direccion) || empty($equipamiento) || empty($lugar) || empty($sexo) || empty($grupoEnfoque)) {
         echo "Todos los campos son obligatorios.";
         exit();
-    }
-    if($acceso=="Habilitado"){
-        $acceso=1;
-    }
-    else{
-        $acceso=2;
     }
 
     try {
         // Preparar consulta
-        $query = "UPDATE usuarios SET nombre = ?, apellido = ?, telefono = ?, correo = ?, acceso = ?, idTipoPlan = ?, idRol = ? WHERE id = ?";
-        $stmt = $conexion->prepare($query);
-        
-        if (!$stmt) {
-            throw new Exception("Error al preparar la consulta: " . $conexion->error);
-        }
+    $query = "UPDATE videos SET Nombre = ?, Descripcion = ?, URL = ?, idGrupoMuscular = ?, idDireccion = ?, idEquipamiento = ?, idLugar = ?, idSexo = ?, idDificultad = ?, idGrupoEnfoque = ?";
+    $stmt = $conexion->prepare($query);
 
-        // Asignar parámetros correctamente
-        $stmt->bind_param("ssssssii", $nombre, $apellido, $telefono, $correo, $acceso, $plan, $rol, $id);
+    if(!$stmt){
+        throw new Exception("Error al preparar la consulta: " . $conexion->error);
+    }
+
+    $stmt->bind_param("sssiiiiiii", $nombre, $descripcion, $url, $grupoMuscular, $direccion, $equipamiento, $lugar, $sexo, $dificultad, $grupoEnfoque);
 
         // Ejecutar consulta
         if ($stmt->execute()) {
@@ -42,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             header("Location: w_paneladm.php?#videos");
             exit(); // Detener ejecución tras redirección
         } else {
-            throw new Exception("Error al actualizar el usuario: " . $stmt->error);
+            throw new Exception("Error al actualizar el video: " . $stmt->error);
         }
 
         $stmt->close();

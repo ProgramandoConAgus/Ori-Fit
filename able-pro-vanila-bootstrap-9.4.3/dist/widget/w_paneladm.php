@@ -74,7 +74,7 @@ $resultadoNotificaciones = $stmt->get_result();
 <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
 <script src="../assets/js/tech-stack.js"></script>
 <link rel="stylesheet" href="../assets/css/style-preset.css" />
-<link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+<!--<link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">-->
 
 
 
@@ -464,7 +464,7 @@ $resultadoNotificaciones = $stmt->get_result();
 <!-- Modal para Videos de Entrenamiento -->
 <?php
 
-$query = "SELECT v.IdVideo, v.IdEquipamiento, e.Equipamiento v.Nombre, v.Descripcion, v.IdGrupoEnfoque, v.IdGrupoMuscular, v.URL, v.IdDificultad, v.IdDireccion, v.idLugar, v.idSexo, s.Sexo, gm.Grupo_Muscular, ge.Grupo, d.Direccion, dif.Dificultad, l.Lugar 
+$query = "SELECT v.IdVideo, v.IdEquipamiento, v.Nombre, v.Descripcion, v.IdGrupoEnfoque, v.IdGrupoMuscular, v.URL, v.IdDificultad, v.IdDireccion, v.idLugar, v.idSexo, s.Sexo, gm.Grupo_Muscular, ge.Grupo, d.Direccion, dif.Dificultad, l.Lugar, e.Equipamiento
 FROM 
     videos v
 JOIN 
@@ -480,7 +480,7 @@ JOIN
 JOIN 
     lugar l ON v.idLugar = l.idLugar
 JOIN
-    equipamiento e ON v.IdEquipamiento = e.Equipamiento
+    equipamiento e ON v.IdEquipamiento = e.IdEquipamiento
 ORDER BY 
     v.IdVideo 
 ASC";
@@ -503,19 +503,19 @@ if ($result && $result->num_rows > 0) {
      <div class="container mt-4">
     <!-- Pestañas -->
     <div class="tab-content">
-        <div class="tab-pane fade show active" id="videos" role="tabpanel">
+        <div class="tab-pane fade " id="videos" role="tabpanel">
             <div class="table-responsive">
                 <table class="table table-bordered text-center">
                     <thead>
                         <tr>
                             <th colspan="9" style="background-color: #f8f9fa; font-size: 1.5rem; border: none;">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
-                                    <!-- Buscador -->
+                                    <!-- Buscador 
                                     <div class="mb-2 mb-md-0">
                                         <label for="userSearch" class="form-label" style="font-size: 1rem;">Buscador</label>
                                         <input type="text" class="form-control form-control-sm" id="userSearch" placeholder="Buscar por nombre, dificultad..." style="width: 200px;">
                                     </div>
-
+-->
                                     <!-- Título -->
                                     <div class="text-center mb-2 mb-md-0">Gestión de Videos</div>
 
@@ -551,15 +551,17 @@ if ($result && $result->num_rows > 0) {
                                     <button class="btn btn-sm btn-warning" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#editModalVideos"
-                                        data-IdVideo="<?= $video['IdVideo'] ?>"
-                                        data-Nombre="<?= $video['Nombre'] ?>"
-                                        data-Descripcion="<?= $video['Descripcion'] ?>"
-                                        data-IdGrupoEnfoque="<?= $video['Grupo'] ?>"
-                                        data-GrupoMuscular="<?= $video['Grupo_Muscular'] ?>"
-                                        data-Sexo="<?= $video['Sexo'] ?>"
-                                        data-URL="<?= $video['URL'] ?>"
-                                        data-Equipamiento="<?= $video['Equipamiento'] ?>"
-                                        data-Lugar="<?= $video['Lugar'] ?>">
+                                        data-idvideo="<?= $video['IdVideo'] ?>"
+                                        data-nombre="<?= $video['Nombre'] ?>"
+                                        data-descripcion="<?= $video['Descripcion'] ?>"
+                                        data-grupoenfoque="<?= $video['IdGrupoEnfoque'] ?>"
+                                        data-grupomuscular="<?= $video['IdGrupoMuscular'] ?>"
+                                        data-sexo="<?= $video['idSexo'] ?>"
+                                        data-url="<?= $video['URL'] ?>"
+                                        data-equipamiento="<?= $video['IdEquipamiento'] ?>"
+                                        data-lugar="<?= $video['idLugar'] ?>"
+                                        data-dificultad="<?= $video['IdDificultad'] ?>"
+                                        data-movimiento="<?= $video['IdDireccion'] ?>">
                                           <img src="../assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px;">
                                       </button>
 
@@ -792,14 +794,14 @@ td.limit-text {
                             <div class="tab-pane fade show active" id="contact" role="tabpanel">
                                 <!-- Formulario de Edición -->
                                 <form action="editar_video.php" method="POST">
-                                <input type="hidden" id="editId" name="id"><br>
+                                <input type="hidden" id="editIdVideo" name="id"><br>
                                 <h4 style="text-align: center;">Datos del video</h4>
                                                 <!-- Nombre -->
                     <div class="mb-8 fv-row">
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Nombre del Video</span>
                         </label>
-                        <input type="text" class="form-control form-control-solid" name="nombre" required>
+                        <input type="text" class="form-control form-control-solid" name="nombre" id="editNombreVideo" required>
                     </div>
 <br>
                     <!-- Descripción -->
@@ -807,7 +809,7 @@ td.limit-text {
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Descripción</span>
                         </label>
-                        <textarea class="form-control form-control-solid" rows="3" name="descripcion" required></textarea>
+                        <textarea class="form-control form-control-solid" rows="3" name="descripcion" id="editDescripcion" required></textarea>
                     </div>
 <br>
                     <!-- URL del Video -->
@@ -815,7 +817,7 @@ td.limit-text {
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Enlace del Video</span>
                         </label>
-                        <input type="url" class="form-control form-control-solid" name="url" required>
+                        <input type="url" class="form-control form-control-solid" name="url" id="editURL" required>
                     </div>
 <br>
                     <!-- Grupo Muscular -->
@@ -824,7 +826,7 @@ td.limit-text {
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Grupo Muscular</span>
                         </label>
-                        <select class="form-select form-select-solid" name="grupo_muscular" required>
+                        <select class="form-select form-select-solid" name="grupo_muscular" id="editGrupoMuscular" required>
                             <option value="">Seleccione un grupo...</option>
                             <option value="1">Glúteos</option>
                             <option value="2">Cuádriceps</option>
@@ -848,7 +850,7 @@ td.limit-text {
                     <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                         <span class="required">Movimiento/Dirección</span>
                     </label>
-                    <select class="form-select form-select-solid" name="movimiento_direccion" required>
+                    <select class="form-select form-select-solid" name="movimiento_direccion" id="editMovimiento" required>
                         <option value="">Seleccione un movimiento...</option>
                         <optgroup label="Tren inferior">
                             <option value="1">Sentadilla (dominancia de rodilla)</option>
@@ -875,7 +877,7 @@ td.limit-text {
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Equipamiento</span>
                         </label>
-                        <select class="form-select form-select-solid" name="equipamiento" required>
+                        <select class="form-select form-select-solid" name="equipamiento" id="editEquipamiento" required>
                             <option value="">Seleccione el Equipamiento</option>
                             <option value="1">Ninguno (peso corporal)</option>
                             <option value="2">Mancuernas</option>
@@ -896,7 +898,7 @@ td.limit-text {
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Lugar</span>
                         </label>
-                        <select class="form-select form-select-solid" name="lugar" required>
+                        <select class="form-select form-select-solid" name="lugar" id="editLugar" required>
                             <option value="">Seleccione un lugar...</option>
                             <option value="1">Gimnasio</option>
                             <option value="2">Casa</option>
@@ -909,7 +911,7 @@ td.limit-text {
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Sexo</span>
                         </label>
-                        <select class="form-select form-select-solid" name="sexo" required>
+                        <select class="form-select form-select-solid" name="sexo" id="editSexo" required>
                             <option value="">Seleccione el sexo...</option>
                             <option value="1">Hombre</option>
                             <option value="2">Mujer</option>
@@ -922,7 +924,7 @@ td.limit-text {
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Dificultad</span>
                         </label>
-                        <select class="form-select form-select-solid" name="dificultad" required>
+                        <select class="form-select form-select-solid" name="dificultad" id="editDificultad" required>
                             <option value="">Seleccione una dificultad...</option>
                             <option value="1">Facil</option>
                             <option value="2">Medio</option>
@@ -936,7 +938,7 @@ td.limit-text {
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
                             <span class="required">Grupo Enfoque</span>
                         </label>
-                        <select class="form-select form-select-solid" name="grupo_enfoque" required>
+                        <select class="form-select form-select-solid" name="grupo_enfoque" id="editGrupoEnfoque" required>
                             <option value="">Seleccione un grupo...</option>
                             <option value="1">Gluteos</option>
                             <option value="2">Piernas</option>
@@ -2338,6 +2340,7 @@ function cambiarPestana(evt, tabName, modalId) {
 </script>
  <script>
     // Este script se ejecutará cuando el modal se abra
+    
     const editModal = document.getElementById('editModal');
     editModal.addEventListener('show.bs.modal', event => {
         const button = event.relatedTarget;
@@ -2360,30 +2363,27 @@ function cambiarPestana(evt, tabName, modalId) {
         editModal.querySelector('#editRol').value = rol;
     });
 </script>
- <script>
+<script>
     // Este script se ejecutará cuando el modal se abra
-    const editModal = document.getElementById('editModalVideos');
-    editModal.addEventListener('show.bs.modal', event => {
+    const editModalV = document.getElementById('editModalVideos');
+    editModalV.addEventListener('show.bs.modal', event => {
         const button = event.relatedTarget;
         
-        // Obtener datos del botón
-        const acceso = parseInt(button.dataset.acceso) === 1;
-        const plan = button.dataset.plan;
-        const rol = button.dataset.rol;
 
         // Asignar valores a los campos del formulario
-        editModal.querySelector('#editId').value = button.dataset.id;
-        editModal.querySelector('#editNombre').value = button.dataset.nombre;
-        editModal.querySelector('#editApellido').value = button.dataset.apellido;
-        editModal.querySelector('#editTelefono').value = button.dataset.telefono;
-        editModal.querySelector('#editCorreo').value = button.dataset.correo;
-        editModal.querySelector('#editAcceso').checked = acceso;
-        
-        // Seleccionar opciones en los combos
-        editModal.querySelector('#editPlan').value = plan;
-        editModal.querySelector('#editRol').value = rol;
+        editModalV.querySelector('#editIdVideo').value = button.dataset.idvideo;
+        editModalV.querySelector('#editNombreVideo').value = button.dataset.nombre;
+        editModalV.querySelector('#editDescripcion').value = button.dataset.descripcion;
+        editModalV.querySelector('#editGrupoMuscular').value = button.dataset.grupomuscular;
+        editModalV.querySelector('#editSexo').value = button.dataset.sexo;
+        editModalV.querySelector('#editGrupoEnfoque').value = button.dataset.grupoenfoque;
+        editModalV.querySelector('#editLugar').value = button.dataset.lugar;
+        editModalV.querySelector('#editURL').value = button.dataset.url;
+        editModalV.querySelector('#editEquipamiento').value = button.dataset.equipamiento;
+        editModalV.querySelector('#editDificultad').value = button.dataset.dificultad;
+        editModalV.querySelector('#editMovimiento').value = button.dataset.movimiento;
     });
-</script>
+</script> 
 <script>
 document.getElementById('userSearch').addEventListener('input', function() {
     const searchTerm = this.value.toLowerCase();
@@ -2434,11 +2434,11 @@ window.onload = function () {
 <script>
   layout_change('light');
 </script>
-  
+  <!--
 <script>
   change_box_container('false');
 </script>
- 
+-->
 <script>
   layout_caption_change('true');
 </script>
@@ -2456,12 +2456,13 @@ window.onload = function () {
 </script>
 
 <script>
+    /*
   const edicionPlan=document.getElementById("edicionPlanNutricional");
 
   edicionPlan.addEventListener('submit',function(){
     
   })
-
+*/
   async function guardarPlan(data) {
     try {
         const response = await fetch('guardar_plan.php', {
