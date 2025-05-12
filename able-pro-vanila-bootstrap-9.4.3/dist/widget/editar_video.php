@@ -23,14 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     try {
         // Preparar consulta
-    $query = "UPDATE videos SET Nombre = ?, Descripcion = ?, URL = ?, idGrupoMuscular = ?, idDireccion = ?, idEquipamiento = ?, idLugar = ?, idSexo = ?, idDificultad = ?, idGrupoEnfoque = ?";
+    $query = "UPDATE videos SET Nombre = ?, Descripcion = ?, URL = ?, idGrupoMuscular = ?, idDireccion = ?, idEquipamiento = ?, idLugar = ?, idSexo = ?, idDificultad = ?, idGrupoEnfoque = ?
+    WHERE IdVideo = ?";
     $stmt = $conexion->prepare($query);
 
     if(!$stmt){
         throw new Exception("Error al preparar la consulta: " . $conexion->error);
     }
 
-    $stmt->bind_param("sssiiiiiii", $nombre, $descripcion, $url, $grupoMuscular, $direccion, $equipamiento, $lugar, $sexo, $dificultad, $grupoEnfoque);
+    $stmt->bind_param("sssiiiiiiii", $nombre, $descripcion, $url, $grupoMuscular, $direccion, $equipamiento, $lugar, $sexo, $dificultad, $grupoEnfoque, $id);
 
         // Ejecutar consulta
         if ($stmt->execute()) {

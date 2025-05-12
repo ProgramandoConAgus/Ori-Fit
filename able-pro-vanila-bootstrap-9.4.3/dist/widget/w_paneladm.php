@@ -794,7 +794,7 @@ td.limit-text {
                             <div class="tab-pane fade show active" id="contact" role="tabpanel">
                                 <!-- Formulario de Edición -->
                                 <form action="editar_video.php" method="POST">
-                                <input type="hidden" id="editIdVideo" name="id"><br>
+                                <input type="hidden" id="editIdVideo" name="IdVideo"><br>
                                 <h4 style="text-align: center;">Datos del video</h4>
                                                 <!-- Nombre -->
                     <div class="mb-8 fv-row">
