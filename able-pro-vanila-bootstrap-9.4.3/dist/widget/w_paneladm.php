@@ -542,7 +542,7 @@ if ($result && $result->num_rows > 0) {
                         <?php foreach ($videos as $video): ?>
                             <tr>
                                 <td><?php echo $video['IdVideo']; ?></td>
-                                <td><?php echo $video['Nombre']; ?></td>
+                                <td><a href="<?php echo $video['URL']; ?>"><?php echo $video['Nombre']; ?></a></td>
                                 <td class="d-none d-md-table-cell limit-text" ><?php echo $video['Descripcion']; ?></td>
                                 <td><?php echo $video['Grupo']; ?></td>
                                 <td class="d-none d-md-table-cell"><?php echo $video['Grupo_Muscular']; ?></td>
