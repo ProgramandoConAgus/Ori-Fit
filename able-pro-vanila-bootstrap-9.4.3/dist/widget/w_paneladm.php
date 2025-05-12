@@ -56,7 +56,11 @@ $resultadoNotificaciones = $stmt->get_result();
     />
     <meta name="author" content="Phoenixcoded" />
 
-   <!-- [Favicon] icon -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0/dist/css/bootstrap-select.min.css"
+/>
+  <!-- [Favicon] icon -->
    <link rel="icon" href="../assets/images/LOGO SIN FONDO-02.png" type="image/x-icon" />
  <!-- [Font] Family -->
 <link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
@@ -76,10 +80,6 @@ $resultadoNotificaciones = $stmt->get_result();
 <link rel="stylesheet" href="../assets/css/style-preset.css" />
 <!--<link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">-->
 
-
-
-<!-- Colocar esto en el head -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <style>
         /* Estilos personalizados */
         body {
@@ -464,26 +464,45 @@ $resultadoNotificaciones = $stmt->get_result();
 <!-- Modal para Videos de Entrenamiento -->
 <?php
 
-$query = "SELECT v.IdVideo, v.IdEquipamiento, v.Nombre, v.Descripcion, v.IdGrupoEnfoque, v.IdGrupoMuscular, v.URL, v.IdDificultad, v.IdDireccion, v.idLugar, v.idSexo, s.Sexo, gm.Grupo_Muscular, ge.Grupo, d.Direccion, dif.Dificultad, l.Lugar, e.Equipamiento
-FROM 
-    videos v
-JOIN 
-    Sexo s ON v.idSexo = s.idSexo
-JOIN 
-    grupo_muscular gm ON v.IdGrupoMuscular = gm.IdGrupoMuscular
-JOIN 
-    grupo_enfoque ge ON v.IdGrupoEnfoque = ge.IdGrupo
-JOIN 
-    direccion d ON v.IdDireccion = d.IdDireccion
-JOIN 
-    dificultad dif ON v.IdDificultad = dif.IdDificultad
-JOIN 
-    lugar l ON v.idLugar = l.idLugar
-JOIN
-    equipamiento e ON v.IdEquipamiento = e.IdEquipamiento
-ORDER BY 
-    v.IdVideo 
-ASC";
+$query = "SELECT
+  v.IdVideo,
+  v.Nombre,
+  v.Descripcion,
+  v.URL,
+  v.IdGrupoEnfoque,
+  ge.Grupo,        
+  v.IdGrupoMuscular,
+  gm.Grupo_Muscular,
+  v.IdDireccion,
+  d.Direccion,
+  v.IdDificultad,
+  dif.Dificultad,
+  v.idLugar,
+  l.Lugar,
+  v.idSexo,
+  s.Sexo,
+  GROUP_CONCAT(e.Equipamiento ORDER BY e.Equipamiento SEPARATOR ', ') AS Equipamientos,
+  GROUP_CONCAT(e.IdEquipamiento ORDER BY e.IdEquipamiento SEPARATOR ',') AS EquipamientoIds
+FROM videos v
+  JOIN Sexo s ON v.idSexo = s.idSexo
+  JOIN grupo_muscular gm ON v.IdGrupoMuscular = gm.IdGrupoMuscular
+  JOIN grupo_enfoque ge ON v.IdGrupoEnfoque = ge.IdGrupo
+  JOIN direccion d ON v.IdDireccion = d.IdDireccion
+  JOIN dificultad dif ON v.IdDificultad = dif.IdDificultad
+  JOIN lugar l ON v.idLugar = l.idLugar
+  LEFT JOIN video_equipamiento ve ON v.IdVideo = ve.idVideo
+  LEFT JOIN equipamiento e ON ve.idEquipamiento = e.IdEquipamiento
+GROUP BY
+  v.IdVideo, v.Nombre, v.Descripcion, v.URL,
+  v.IdGrupoEnfoque, ge.Grupo,
+  v.IdGrupoMuscular, gm.Grupo_Muscular,
+  v.IdDireccion, d.Direccion,
+  v.IdDificultad, dif.Dificultad,
+  v.idLugar, l.Lugar,
+  v.idSexo, s.Sexo
+ORDER BY v.IdVideo ASC";
+
+
 
 $result = $conexion->query($query);
 
@@ -510,18 +529,18 @@ if ($result && $result->num_rows > 0) {
                         <tr>
                             <th colspan="9" style="background-color: #f8f9fa; font-size: 1.5rem; border: none;">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
-                                     <!-- Buscador --> 
+                                    <!-- Buscador -->
                                     <div class="mb-2 mb-md-0">
                                         <label for="videoSearch" class="form-label" style="font-size: 1rem;">Buscador</label>
-                                        <input type="text" class="form-control form-control-sm" id="videoSearch" placeholder="Buscar por nombre, dificultad..." style="width: 200px;">
+                                        <input type="text" class="form-control form-control-sm" id="videoSearch" placeholder="Buscar por nombre, correo..." style="width: 200px;">
                                     </div>
+
                                     <!-- Título -->
-                                    <div class="text-center mb-2 mb-md-0">Gestión de Videos</div>
+                                    <div class="text-center mb-2 mb-md-0">Gestión de videos</div>
 
                                     <!-- Botón Agregar Usuario -->
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#videosEntrenamientoModal">
-                                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                                        <!--<img src="../assets/images/icons-tab/añadir.png" alt="añadir" style="height: 20px; width: 20px; margin-right: 5px;"> -->
+                                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
                                         Agregar video
                                     </button>
                                 </div>
@@ -533,48 +552,50 @@ if ($result && $result->num_rows > 0) {
                             <th class="d-none d-md-table-cell">Descripcion</th>
                             <th>Enfoque</th>
                             <th class="d-none d-md-table-cell">Grupo Muscular</th>
+                            <th>Equipamiento</th> <!-- NUEVA COLUMNA -->
                             <th>Acciones</th>
-
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($videos as $video): ?>
-                            <tr>
-                                <td><?php echo $video['IdVideo']; ?></td>
-                                <td><a href="<?php echo $video['URL']; ?>" target="_blank"><?php echo $video['Nombre']; ?></a></td>
-                                <td class="d-none d-md-table-cell limit-text" ><?php echo $video['Descripcion']; ?></td>
-                                <td><?php echo $video['Grupo']; ?></td>
-                                <td class="d-none d-md-table-cell"><?php echo $video['Grupo_Muscular']; ?></td>
-                                <td>
-                                    <div class="d-flex flex-column flex-md-row justify-content-center gap-1">
+                    <?php foreach ($videos as $video): ?>
+                        <tr>
+                            <td><?= $video['IdVideo'] ?></td>
+                            <td><a href="<?= $video['URL'] ?>" target="_blank"><?= $video['Nombre'] ?></a></td>
+                            <td class="d-none d-md-table-cell limit-text"><?= $video['Descripcion'] ?></td>
+                            <td><?= $video['Grupo'] ?></td>
+                            <td class="d-none d-md-table-cell"><?= $video['Grupo_Muscular'] ?></td>
+                            <td><?= $video['Equipamientos'] ?></td> <!-- Mostrar texto -->
+                            <td>
+                                <div class="d-flex flex-column flex-md-row justify-content-center gap-1">
                                     <button class="btn btn-sm btn-warning" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#editModalVideos"
                                         data-idvideo="<?= $video['IdVideo'] ?>"
-                                        data-nombre="<?= $video['Nombre'] ?>"
-                                        data-descripcion="<?= $video['Descripcion'] ?>"
+                                        data-nombre="<?= htmlspecialchars($video['Nombre']) ?>"
+                                        data-descripcion="<?= htmlspecialchars($video['Descripcion']) ?>"
                                         data-grupoenfoque="<?= $video['IdGrupoEnfoque'] ?>"
                                         data-grupomuscular="<?= $video['IdGrupoMuscular'] ?>"
                                         data-sexo="<?= $video['idSexo'] ?>"
                                         data-url="<?= $video['URL'] ?>"
-                                        data-equipamiento="<?= $video['IdEquipamiento'] ?>"
+                                        data-equipamiento="<?= $video['EquipamientoIds'] ?>" 
                                         data-lugar="<?= $video['idLugar'] ?>"
                                         data-dificultad="<?= $video['IdDificultad'] ?>"
                                         data-movimiento="<?= $video['IdDireccion'] ?>">
-                                          <img src="../assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px;">
-                                      </button>
+                                        <img src="../assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px;">
+                                    </button>
 
-                                        <form method="POST" action="borrar_video.php" style="display: inline;">
-                                            <input type="hidden" name="IdVideo" value="<?php echo $video['IdVideo']; ?>">
-                                            <button type="submit" class="btn btn-danger btn-sm w-100 w-md-auto" title="Eliminar Video">
-                                                <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar" style="width: 16px; height: 16px;">
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
+                                    <form method="POST" action="borrar_video.php" style="display: inline;">
+                                        <input type="hidden" name="IdVideo" value="<?= $video['IdVideo'] ?>">
+                                        <button type="submit" class="btn btn-danger btn-sm w-100 w-md-auto" title="Eliminar Video">
+                                            <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar" style="width: 16px; height: 16px;">
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                     </tbody>
+
                 </table>
             </div>
         </div>
@@ -685,25 +706,34 @@ td.limit-text {
 
 <br>
                     <!-- Equipamiento -->
-                    <div class="mb-8 fv-row">
-                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
-                            <span class="required">Equipamiento</span>
-                        </label>
-                        <select class="form-select form-select-solid" name="equipamiento" required>
-                            <option value="">Seleccione el Equipamiento</option>
-                            <option value="1">Ninguno (peso corporal)</option>
-                            <option value="2">Mancuernas</option>
-                            <option value="3">Bandas mini</option>
-                            <option value="4">Pesa rusa</option>
-                            <option value="5">Barra larga</option>
-                            <option value="6">Discos</option>
-                            <option value="7">Polea</option>
-                            <option value="8">Banco</option>
-                            <option value="9">Step o caja</option>
-                            <option value="10">Colchoneta</option>
-
-                        </select>
+                  <div class="mb-8 fv-row">
+                    <label for="Equipamiento" class="form-label fw-semibold required">
+                        Equipamiento
+                    </label>
+                    <select
+                        id="Equipamiento"
+                        name="equipamiento[]"
+                        class="form-select selectpicker"
+                        multiple
+                        data-live-search="true"
+                        data-actions-box="true"
+                        title="Seleccioná equipamiento…"
+                        required
+                    >
+                        <option value="1">Ninguno (peso corporal)</option>
+                        <option value="2">Mancuernas</option>
+                        <option value="3">Bandas mini</option>
+                        <option value="4">Pesa rusa</option>
+                        <option value="5">Barra larga</option>
+                        <option value="6">Discos</option>
+                        <option value="7">Polea</option>
+                        <option value="8">Banco</option>
+                        <option value="9">Step o caja</option>
+                        <option value="10">Colchoneta</option>
+                        <option value="11">Máquinas de Gimnasio</option>
+                    </select>
                     </div>
+
 <br>
                     <!-- Lugar de Entrenamiento -->
                     <div class="mb-8 fv-row">
@@ -871,26 +901,34 @@ td.limit-text {
                 </div>
 
 <br>
-                    <!-- Equipamiento -->
+                    <!-- Equipamiento -->               
                     <div class="mb-8 fv-row">
-                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
-                            <span class="required">Equipamiento</span>
-                        </label>
-                        <select class="form-select form-select-solid" name="equipamiento" id="editEquipamiento" required>
-                            <option value="">Seleccione el Equipamiento</option>
-                            <option value="1">Ninguno (peso corporal)</option>
-                            <option value="2">Mancuernas</option>
-                            <option value="3">Bandas mini</option>
-                            <option value="4">Pesa rusa</option>
-                            <option value="5">Barra larga</option>
-                            <option value="6">Discos</option>
-                            <option value="7">Polea</option>
-                            <option value="8">Banco</option>
-                            <option value="9">Step o caja</option>
-                            <option value="10">Colchoneta</option>
-
-                        </select>
+                    <label for="editEquipamiento" class="form-label fw-semibold required">
+                        Equipamiento
+                    </label>
+                    <select
+                        id="editEquipamiento"
+                        name="equipamiento[]"
+                        class="form-select selectpicker"
+                        multiple
+                        data-live-search="true"
+                        data-actions-box="true"
+                        required
+                    >
+                        <option value="1">Ninguno (peso corporal)</option>
+                        <option value="2">Mancuernas</option>
+                        <option value="3">Bandas mini</option>
+                        <option value="4">Pesa rusa</option>
+                        <option value="5">Barra larga</option>
+                        <option value="6">Discos</option>
+                        <option value="7">Polea</option>
+                        <option value="8">Banco</option>
+                        <option value="9">Step o caja</option>
+                        <option value="10">Colchoneta</option>
+                        <option value="11">Máquinas de Gimnasio</option>
+                    </select>
                     </div>
+
 <br>
                     <!-- Lugar de Entrenamiento -->
                     <div class="mb-8 fv-row">
@@ -2378,9 +2416,23 @@ function cambiarPestana(evt, tabName, modalId) {
         editModalV.querySelector('#editGrupoEnfoque').value = button.dataset.grupoenfoque;
         editModalV.querySelector('#editLugar').value = button.dataset.lugar;
         editModalV.querySelector('#editURL').value = button.dataset.url;
-        editModalV.querySelector('#editEquipamiento').value = button.dataset.equipamiento;
         editModalV.querySelector('#editDificultad').value = button.dataset.dificultad;
         editModalV.querySelector('#editMovimiento').value = button.dataset.movimiento;
+        const equipamientoStr = button.dataset.equipamiento;
+        const equipamientoSelect = editModalV.querySelector('#editEquipamiento');
+
+        // Limpiar selección previa
+        Array.from(equipamientoSelect.options).forEach(option => option.selected = false);
+
+        // Seleccionar los nuevos valores
+        if (equipamientoStr) {
+            const equipamientoIds = equipamientoStr.split(',');
+            equipamientoIds.forEach(id => {
+                const option = equipamientoSelect.querySelector(`option[value="${id}"]`);
+                if (option) option.selected = true;
+            });
+        }
+
     });
 </script> 
 <script>
@@ -2508,6 +2560,16 @@ window.onload = function () {
 }
 </script>
 
+<!-- JS de Bootstrap 5 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- JS de Bootstrap-Select -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0/dist/js/bootstrap-select.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Activa bootstrap-select sobre tu <select>
+    $('.selectpicker').selectpicker();
+  });
+</script>
 
     <!-- [Page Specific JS] start -->
     <!-- Apex Chart -->

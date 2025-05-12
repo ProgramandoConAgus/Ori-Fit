@@ -2,53 +2,64 @@
 include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Recibir los datos del formulario
     $id = isset($_POST['IdVideo']) ? intval($_POST['IdVideo']) : 0;
-    $nombre = isset($_POST['nombre']) ? trim($_POST['nombre']) : '';
-    $descripcion = isset($_POST['descripcion']) ? trim($_POST['descripcion']) : '';
-    $url = isset($_POST['url']) ? trim($_POST['url']) : '';
-    $grupoMuscular = isset($_POST['grupo_muscular']) ? intval($_POST['grupo_muscular']) : 0;
-    $direccion = isset($_POST['movimiento_direccion']) ? intval($_POST['movimiento_direccion']) : 0;
-    $equipamiento = isset($_POST['equipamiento']) ? intval($_POST['equipamiento']) : 0;
-    $lugar = isset($_POST['lugar']) ? intval($_POST['lugar']) : 0;
-    $sexo = isset($_POST['sexo']) ? intval($_POST['sexo']) : 0;
-    $dificultad = isset($_POST['dificultad']) ? intval($_POST['dificultad']) : 0;
-    $grupoEnfoque = isset($_POST['grupo_enfoque']) ? intval($_POST['grupo_enfoque']) : 0;
+    $nombre = trim($_POST['nombre'] ?? '');
+    $descripcion = trim($_POST['descripcion'] ?? '');
+    $url = trim($_POST['url'] ?? '');
+    $grupoMuscular = intval($_POST['grupo_muscular'] ?? 0);
+    $direccion = intval($_POST['movimiento_direccion'] ?? 0);
+    $lugar = intval($_POST['lugar'] ?? 0);
+    $sexo = intval($_POST['sexo'] ?? 0);
+    $dificultad = intval($_POST['dificultad'] ?? 0);
+    $grupoEnfoque = intval($_POST['grupo_enfoque'] ?? 0);
+    $equipamientos = $_POST['equipamiento'] ?? [];
 
-    // Validar campos obligatorios
-    if (empty($id) || empty($nombre) || empty($descripcion) || empty($url) || empty($grupoMuscular) || empty($direccion) || empty($equipamiento) || empty($lugar) || empty($sexo) || empty($grupoEnfoque)) {
+    if (
+        empty($id) || empty($nombre) || empty($descripcion) || empty($url) ||
+        empty($grupoMuscular) || empty($direccion) || empty($lugar) ||
+        empty($sexo) || empty($grupoEnfoque)
+    ) {
         echo "Todos los campos son obligatorios.";
         exit();
     }
 
     try {
-        // Preparar consulta
-    $query = "UPDATE videos SET Nombre = ?, Descripcion = ?, URL = ?, idGrupoMuscular = ?, idDireccion = ?, idEquipamiento = ?, idLugar = ?, idSexo = ?, idDificultad = ?, idGrupoEnfoque = ?
-    WHERE IdVideo = ?";
-    $stmt = $conexion->prepare($query);
+        // Actualizar datos básicos del video
+        $query = "UPDATE videos SET Nombre = ?, Descripcion = ?, URL = ?, idGrupoMuscular = ?, idDireccion = ?, idLugar = ?, idSexo = ?, idDificultad = ?, idGrupoEnfoque = ? WHERE IdVideo = ?";
+        $stmt = $conexion->prepare($query);
+        if (!$stmt) throw new Exception("Error preparando UPDATE: " . $conexion->error);
 
-    if(!$stmt){
-        throw new Exception("Error al preparar la consulta: " . $conexion->error);
-    }
+        $stmt->bind_param("sssiiiiiii", $nombre, $descripcion, $url, $grupoMuscular, $direccion, $lugar, $sexo, $dificultad, $grupoEnfoque, $id);
+        if (!$stmt->execute()) throw new Exception("Error al actualizar video: " . $stmt->error);
+        $stmt->close();
 
-    $stmt->bind_param("sssiiiiiiii", $nombre, $descripcion, $url, $grupoMuscular, $direccion, $equipamiento, $lugar, $sexo, $dificultad, $grupoEnfoque, $id);
+        // Eliminar equipamiento actual del video
+        $del = $conexion->prepare("DELETE FROM video_equipamiento WHERE idVideo = ?");
+        $del->bind_param("i", $id);
+        $del->execute();
+        $del->close();
 
-        // Ejecutar consulta
-        if ($stmt->execute()) {
-            // Redirigir con mensaje de éxito
-            header("Location: w_paneladm.php?#videos");
-            exit(); // Detener ejecución tras redirección
-        } else {
-            throw new Exception("Error al actualizar el video: " . $stmt->error);
+        // Insertar nuevo equipamiento (si hay)
+        if (!empty($equipamientos) && is_array($equipamientos)) {
+            $ins = $conexion->prepare("INSERT INTO video_equipamiento (idVideo, idEquipamiento) VALUES (?, ?)");
+            foreach ($equipamientos as $eqId) {
+                $eqInt = intval($eqId);
+                $ins->bind_param("ii", $id, $eqInt);
+                $ins->execute();
+            }
+            $ins->close();
         }
 
-        $stmt->close();
+        // Redirigir al panel
+        header("Location: w_paneladm.php?#videos");
+        exit();
+
     } catch (Exception $e) {
         echo "Error: " . $e->getMessage();
     } finally {
         $conexion->close();
     }
-        
+
 } else {
     echo "Método no permitido.";
 }
