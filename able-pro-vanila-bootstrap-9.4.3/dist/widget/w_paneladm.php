@@ -510,12 +510,11 @@ if ($result && $result->num_rows > 0) {
                         <tr>
                             <th colspan="9" style="background-color: #f8f9fa; font-size: 1.5rem; border: none;">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
-                                    <!-- Buscador 
+                                     <!-- Buscador --> 
                                     <div class="mb-2 mb-md-0">
-                                        <label for="userSearch" class="form-label" style="font-size: 1rem;">Buscador</label>
-                                        <input type="text" class="form-control form-control-sm" id="userSearch" placeholder="Buscar por nombre, dificultad..." style="width: 200px;">
+                                        <label for="videoSearch" class="form-label" style="font-size: 1rem;">Buscador</label>
+                                        <input type="text" class="form-control form-control-sm" id="videoSearch" placeholder="Buscar por nombre, dificultad..." style="width: 200px;">
                                     </div>
--->
                                     <!-- Título -->
                                     <div class="text-center mb-2 mb-md-0">Gestión de Videos</div>
 
@@ -542,7 +541,7 @@ if ($result && $result->num_rows > 0) {
                         <?php foreach ($videos as $video): ?>
                             <tr>
                                 <td><?php echo $video['IdVideo']; ?></td>
-                                <td><a href="<?php echo $video['URL']; ?>"><?php echo $video['Nombre']; ?></a></td>
+                                <td><a href="<?php echo $video['URL']; ?>" target="_blank"><?php echo $video['Nombre']; ?></a></td>
                                 <td class="d-none d-md-table-cell limit-text" ><?php echo $video['Descripcion']; ?></td>
                                 <td><?php echo $video['Grupo']; ?></td>
                                 <td class="d-none d-md-table-cell"><?php echo $video['Grupo_Muscular']; ?></td>
@@ -2388,6 +2387,28 @@ function cambiarPestana(evt, tabName, modalId) {
 document.getElementById('userSearch').addEventListener('input', function() {
     const searchTerm = this.value.toLowerCase();
     const rows = document.querySelectorAll('#usuarios tbody tr');
+    
+    rows.forEach(row => {
+        const cells = row.getElementsByTagName('td');
+        let rowMatches = false;
+        
+        // Iterar sobre las celdas para ver si alguna coincide con el término de búsqueda
+        for (let i = 0; i < cells.length; i++) {
+            if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
+                rowMatches = true;
+                break;
+            }
+        }
+        
+        // Mostrar u ocultar la fila según si coincide o no
+        row.style.display = rowMatches ? '' : 'none';
+    });
+});
+</script>
+<script>
+document.getElementById('videoSearch').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#videos tbody tr');
     
     rows.forEach(row => {
         const cells = row.getElementsByTagName('td');
