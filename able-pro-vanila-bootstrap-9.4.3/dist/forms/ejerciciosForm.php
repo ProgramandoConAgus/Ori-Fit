@@ -454,7 +454,7 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
               <div class="col-12">
                 <div class="card">
                   <div class="card-body">
-                    <form id="contactForm" action="./guardar_datos.php" method="POST">
+                    <form id="contactForm" action="./guardar_ejercicios.php" method="POST">
                       <!-- PROGRESS BAR -->
                       <div id="bar" class="progress mb-3" style="height: 7px;">
                         <div
@@ -616,7 +616,7 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
                                 <input id="diasEntrenamiento" name="dias_entrenamiento"
                                       type="number" class="form-control"
                                       min="1" max="7"
-                                      placeholder="Días de entrenamiento" required />
+                                      placeholder="Días de entrenamiento" />
                               </div>
                               <div class="col-sm-6 mb-3">
                                 <label class="form-label" for="intensidad">
@@ -625,17 +625,11 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
                                 <input id="intensidad" name="intensidad"
                                       type="number" class="form-control"
                                       min="1" max="6"
-                                      placeholder="Intensidad" required />
+                                      placeholder="Intensidad" />
                               </div>
                             </div>
 
-                            <div class="col-md-12 mb-3">
-                              <label class="form-label" for="actividad_previas">
-                                ¿Ya realizaste actividad física en otro momento? ¿Cuál?
-                              </label>
-                              <input id="actividad_previas" name="actividad_previas"
-                                    type="text" class="form-control" required />
-                            </div>
+
                             <div class="col-md-12 mb-3">
                               <label class="form-label" for="lesiones">
                                 ¿Tenés o tuviste alguna lesión?
@@ -643,12 +637,6 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
                               <input id="lesiones" name="lesiones"
                                     type="text" class="form-control" required />
                             </div>
-                            <div class="col-md-12 mb-3">
-                              <label class="form-label" for="ultimo_entrenamiento">
-                                Si no te encuentras entrenando actualmente, ¿cuándo fue la última vez que lo hiciste?
-                              </label>
-                              <input id="ultimo_entrenamiento" name="ultimo_entrenamiento"
-                                    type="text" class="form-control" required />
                             </div>
                             <div class="col-md-12 mb-3">
                               <label class="form-label" for="dias_disponibles">
@@ -669,6 +657,18 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
                                 <option value="casa">Casa</option>
                               </select>
                             </div>
+                                                        <!-- Campos adicionales ocultos -->
+                                                        <div id="extraField" class="row" style="display: none; gap: 20px; margin-top: 10px;">
+                                                          <div class="col-sm-6 mb-3">
+                                                            <label class="form-label" for="nivel">Experiencia en Gimnasios</label>
+                                                            <select id="nivel" name="nivel" class="form-control" required>
+                                                              <option value="default">Seleccionar</option>
+                                                              <option value="Principiante">Principiante</option>
+                                                              <option value="Avanzado">Avanzado</option>
+                                                            </select>
+
+                                                          </div>
+                                                        </div>
                             <div class="col-md-12 mb-3">
                               <label class="form-label" for="preferencia_ejercicios">
                                 Te gustan los ejercicios con elementos/máquinas o sin elementos:
@@ -759,6 +759,18 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
       intensidad.value = ""; // Limpia el campo
     }
   });
+
+  document.getElementById("lugar_entrenamiento").addEventListener("change", function(){
+        const campo = document.getElementById("extraField");
+        const nivel = document.getElementById("nivel");
+        if(this.value === "gimnasio"){
+            campo.style.display = "flex";
+            nivel.required = true;
+        }else{
+            campo.style.display = "none";
+            nivel.required = false;
+        }
+    });
 </script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -816,6 +828,9 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
     function showNavLink(link) {
       bootstrap.Tab.getOrCreateInstance(link).show();
     }
+
+    
+
 
     btnSiguiente.addEventListener("click", function () {
       const activoNav = getActiveNav();
