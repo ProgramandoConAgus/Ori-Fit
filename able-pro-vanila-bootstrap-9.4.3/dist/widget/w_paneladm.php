@@ -34,6 +34,20 @@ $stmt = $conexion->prepare($sql);
 $stmt->bind_param("i", $_SESSION['IdUsuario']);
 $stmt->execute();
 $resultadoNotificaciones = $stmt->get_result();
+
+
+function getYoutubeId(string $url): ?string {
+    // soporta youtu.be/, watch?v=, embed/
+    if (preg_match(
+      '/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/))([^\?&"\'>]+)/',
+      $url,
+      $m
+    )) {
+        return $m[1];
+    }
+    return null;
+}
+
 ?>
 
 <!doctype html>
@@ -55,11 +69,12 @@ $resultadoNotificaciones = $stmt->get_result();
       content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard"
     />
     <meta name="author" content="Phoenixcoded" />
-
-<link
+    <link
+  href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.css"
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0/dist/css/bootstrap-select.min.css"
 />
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
   <!-- [Favicon] icon -->
    <link rel="icon" href="../assets/images/LOGO SIN FONDO-02.png" type="image/x-icon" />
  <!-- [Font] Family -->
@@ -102,6 +117,26 @@ $resultadoNotificaciones = $stmt->get_result();
         }
         
     </style>
+<!--Para que aparezca la imagen al hacer hover al video -->
+<style>
+  .video-cell {
+    position: relative;
+  }
+  .video-cell .thumbnail {
+    display: none;
+    position: absolute;
+    top: -70px;
+    left: 100%;
+    width: 300px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border-radius: 4px;
+    z-index: 10;
+  }
+  .video-cell:hover .thumbnail {
+    display: block;
+  }
+</style>
+
   </head>
   <!-- [Head] end -->
   <!-- [Body] Start -->
@@ -560,7 +595,18 @@ if ($result && $result->num_rows > 0) {
                     <?php foreach ($videos as $video): ?>
                         <tr>
                             <td><?= $video['IdVideo'] ?></td>
-                            <td><a href="<?= $video['URL'] ?>" target="_blank"><?= $video['Nombre'] ?></a></td>
+                            <td class="video-cell">
+                                <a href="<?= htmlspecialchars($video['URL'], ENT_QUOTES) ?>" target="_blank">
+                                    <?= htmlspecialchars($video['Nombre'], ENT_QUOTES) ?>
+                                </a>
+                                <?php if ($id = getYoutubeId($video['URL'])): ?>
+                                    <img
+                                    class="thumbnail"
+                                    src="https://img.youtube.com/vi/<?= $id ?>/hqdefault.jpg"
+                                    alt="Portada de <?= htmlspecialchars($video['Nombre'], ENT_QUOTES) ?>"
+                                    />
+                                <?php endif; ?>
+                            </td>
                             <td class="d-none d-md-table-cell limit-text"><?= $video['Descripcion'] ?></td>
                             <td><?= $video['Grupo'] ?></td>
                             <td class="d-none d-md-table-cell"><?= $video['Grupo_Muscular'] ?></td>
@@ -657,23 +703,29 @@ td.limit-text {
                      
                     <div class="mb-8 fv-row">
                         <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
-                            <span class="required">Grupo Muscular</span>
+                        <span class="required">Grupo Muscular</span>
                         </label>
-                        <select class="form-select form-select-solid" name="grupo_muscular" required>
-                            <option value="">Seleccione un grupo...</option>
-                            <option value="1">Glúteos</option>
-                            <option value="2">Cuádriceps</option>
-                            <option value="3">Isquiotibiales</option>
-                            <option value="4">Abductores (glúteo medio)</option>
-                            <option value="5">Aductores</option>
-                            <option value="6">Core</option>
-                            <option value="7">Espalda</option>
-                            <option value="8">Pecho</option>
-                            <option value="9">Hombros</option>
-                            <option value="10">Bíceps</option>
-                            <option value="11">Tríceps</option>
-                            <option value="12">Gemelos</option>
-                            <option value="13">Trapecio</option>
+                        <select
+                        id="nuevoGrupoMuscular"
+                        name="grupo_muscular[]"
+                        class="form-select form-select-solid"
+                        multiple
+                        required
+                        placeholder="Elige uno o más grupos"
+                        >
+                        <option value="1">Glúteos</option>
+                        <option value="2">Cuádriceps</option>
+                        <option value="3">Isquiotibiales</option>
+                        <option value="4">Abductores (glúteo medio)</option>
+                        <option value="5">Aductores</option>
+                        <option value="6">Core</option>
+                        <option value="7">Espalda</option>
+                        <option value="8">Pecho</option>
+                        <option value="9">Hombros</option>
+                        <option value="10">Bíceps</option>
+                        <option value="11">Tríceps</option>
+                        <option value="12">Gemelos</option>
+                        <option value="13">Trapecio</option>
                         </select>
                     </div>
 <br>    
@@ -706,20 +758,18 @@ td.limit-text {
 
 <br>
                     <!-- Equipamiento -->
-                  <div class="mb-8 fv-row">
-                    <label for="Equipamiento" class="form-label fw-semibold required">
-                        Equipamiento
-                    </label>
-                    <select
-                        id="Equipamiento"
+                    <div class="mb-8 fv-row">
+                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
+                        <span class="required">Equipamiento</span>
+                        </label>
+                        <select
+                        id="nuevoEquipamiento"
                         name="equipamiento[]"
-                        class="form-select selectpicker"
+                        class="form-select form-select-solid"
                         multiple
-                        data-live-search="true"
-                        data-actions-box="true"
-                        title="Seleccioná equipamiento…"
                         required
-                    >
+                        placeholder="Elige uno o más equipos"
+                        >
                         <option value="1">Ninguno (peso corporal)</option>
                         <option value="2">Mancuernas</option>
                         <option value="3">Bandas mini</option>
@@ -731,7 +781,7 @@ td.limit-text {
                         <option value="9">Step o caja</option>
                         <option value="10">Colchoneta</option>
                         <option value="11">Máquinas de Gimnasio</option>
-                    </select>
+                        </select>
                     </div>
 
 <br>
@@ -850,28 +900,27 @@ td.limit-text {
                     </div>
 <br>
                     <!-- Grupo Muscular -->
-                     
-                    <div class="mb-8 fv-row">
-                        <label class="d-flex align-items-center fs-6 fw-semibold mb-2">
-                            <span class="required">Grupo Muscular</span>
+                    <div class="mb-3">
+                        <label for="editGrupoMuscular" class="form-label fw-semibold">
+                        Grupo Muscular
                         </label>
-                        <select class="form-select form-select-solid" name="grupo_muscular" id="editGrupoMuscular" required>
-                            <option value="">Seleccione un grupo...</option>
-                            <option value="1">Glúteos</option>
-                            <option value="2">Cuádriceps</option>
-                            <option value="3">Isquiotibiales</option>
-                            <option value="4">Abductores (glúteo medio)</option>
-                            <option value="5">Aductores</option>
-                            <option value="6">Core</option>
-                            <option value="7">Espalda</option>
-                            <option value="8">Pecho</option>
-                            <option value="9">Hombros</option>
-                            <option value="10">Bíceps</option>
-                            <option value="11">Tríceps</option>
-                            <option value="12">Gemelos</option>
-                            <option value="13">Trapecio</option>
+                        <select id="editGrupoMuscular" name="grupo_muscular[]" class="form-select form-select-solid" multiple required placeholder="Seleccione uno o más grupos">
+                        <option value="1">Glúteos</option>
+                        <option value="2">Cuádriceps</option>
+                        <option value="3">Isquiotibiales</option>
+                        <option value="4">Abductores (glúteo medio)</option>
+                        <option value="5">Aductores</option>
+                        <option value="6">Core</option>
+                        <option value="7">Espalda</option>
+                        <option value="8">Pecho</option>
+                        <option value="9">Hombros</option>
+                        <option value="10">Bíceps</option>
+                        <option value="11">Tríceps</option>
+                        <option value="12">Gemelos</option>
+                        <option value="13">Trapecio</option>
                         </select>
                     </div>
+
 <br>    
                     <!-- Tipo de Moviento/direccion -->
                      
@@ -901,34 +950,23 @@ td.limit-text {
                 </div>
 
 <br>
-                    <!-- Equipamiento -->               
-                    <div class="mb-8 fv-row">
-                    <label for="editEquipamiento" class="form-label fw-semibold required">
-                        Equipamiento
+                <div class="mb-3">
+                    <label for="editEquipamiento" class="form-label fw-semibold">
+                    Equipamiento 
                     </label>
-                    <select
-                        id="editEquipamiento"
-                        name="equipamiento[]"
-                        class="form-select selectpicker"
-                        multiple
-                        data-live-search="true"
-                        data-actions-box="true"
-                        required
-                    >
-                        <option value="1">Ninguno (peso corporal)</option>
-                        <option value="2">Mancuernas</option>
-                        <option value="3">Bandas mini</option>
-                        <option value="4">Pesa rusa</option>
-                        <option value="5">Barra larga</option>
-                        <option value="6">Discos</option>
-                        <option value="7">Polea</option>
-                        <option value="8">Banco</option>
-                        <option value="9">Step o caja</option>
-                        <option value="10">Colchoneta</option>
-                        <option value="11">Máquinas de Gimnasio</option>
+                    <select id="editEquipamiento" name="equipamiento[]" class="form-select form-select-solid" multiple required placeholder="Seleccione uno o más equipos">
+                    <option value="1">Mancuernas</option>
+                    <option value="2">Barra olímpica</option>
+                    <option value="3">Kettlebell</option>
+                    <option value="4">Bandas elásticas</option>
+                    <option value="5">Banco plano/inclinado</option>
+                    <option value="6">Stepper</option>
+                    <option value="7">Cuerda para saltar</option>
+                    <option value="8">Máquina de poleas</option>
+                    <option value="9">Swiss Ball</option>
+                    <option value="10">Rodillo de espuma</option>
                     </select>
-                    </div>
-
+                </div>
 <br>
                     <!-- Lugar de Entrenamiento -->
                     <div class="mb-8 fv-row">
@@ -2089,6 +2127,26 @@ window.onclick = function(event) {
 </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cfg = {
+      plugins: ['remove_button'],  // permite la "×" para quitar ítems
+      maxItems: null,              // sin límite
+      create: false,               // NO permite crear nuevos ítems
+      dropdownDirection: 'auto'
+    };
+    new TomSelect('#nuevoGrupoMuscular', {
+      ...cfg,
+      placeholder: 'Elige uno o más grupos'
+    });
+    new TomSelect('#nuevoEquipamiento', {
+      ...cfg,
+      placeholder: 'Elige uno o más equipos'
+    });
+  });
+</script>
 <script>
 // Función para manejar el cambio de pestañas
 function cambiarPestana(evt, tabName) {
@@ -2402,38 +2460,57 @@ function cambiarPestana(evt, tabName, modalId) {
 </script>
 <script>
     // Este script se ejecutará cuando el modal se abra
-    const editModalV = document.getElementById('editModalVideos');
-    editModalV.addEventListener('show.bs.modal', event => {
-        const button = event.relatedTarget;
-        
+    // Declaramos las instancias globales
+let tsGrupo, tsEquip;
 
-        // Asignar valores a los campos del formulario
-        editModalV.querySelector('#editIdVideo').value = button.dataset.idvideo;
-        editModalV.querySelector('#editNombreVideo').value = button.dataset.nombre;
-        editModalV.querySelector('#editDescripcion').value = button.dataset.descripcion;
-        editModalV.querySelector('#editGrupoMuscular').value = button.dataset.grupomuscular;
-        editModalV.querySelector('#editSexo').value = button.dataset.sexo;
-        editModalV.querySelector('#editGrupoEnfoque').value = button.dataset.grupoenfoque;
-        editModalV.querySelector('#editLugar').value = button.dataset.lugar;
-        editModalV.querySelector('#editURL').value = button.dataset.url;
-        editModalV.querySelector('#editDificultad').value = button.dataset.dificultad;
-        editModalV.querySelector('#editMovimiento').value = button.dataset.movimiento;
-        const equipamientoStr = button.dataset.equipamiento;
-        const equipamientoSelect = editModalV.querySelector('#editEquipamiento');
+document.addEventListener('DOMContentLoaded', () => {
+  // Inicializamos Tom Select y guardamos las instancias
+  const baseConfig = {
+    plugins: ['remove_button'],
+    maxItems: null,
+    dropdownDirection: 'auto'
+  };
+  tsEquip = new TomSelect('#editEquipamiento', {
+    ...baseConfig,
+    placeholder: 'Seleccione uno o más equipos'
+  });
+  tsGrupo = new TomSelect('#editGrupoMuscular', {
+    ...baseConfig,
+    placeholder: 'Seleccione uno o más grupos'
+  });
 
-        // Limpiar selección previa
-        Array.from(equipamientoSelect.options).forEach(option => option.selected = false);
+  // Ahora el listener del modal
+  const editModalV = document.getElementById('editModalVideos');
+  editModalV.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget;
+    
+    // Campos simples (inputs, selects normales)
+    editModalV.querySelector('#editIdVideo').value       = button.dataset.idvideo;
+    editModalV.querySelector('#editNombreVideo').value   = button.dataset.nombre;
+    editModalV.querySelector('#editDescripcion').value   = button.dataset.descripcion;
+    editModalV.querySelector('#editSexo').value          = button.dataset.sexo;
+    editModalV.querySelector('#editGrupoEnfoque').value  = button.dataset.grupoenfoque;
+    editModalV.querySelector('#editLugar').value         = button.dataset.lugar;
+    editModalV.querySelector('#editURL').value           = button.dataset.url;
+    editModalV.querySelector('#editDificultad').value    = button.dataset.dificultad;
+    editModalV.querySelector('#editMovimiento').value    = button.dataset.movimiento;
 
-        // Seleccionar los nuevos valores
-        if (equipamientoStr) {
-            const equipamientoIds = equipamientoStr.split(',');
-            equipamientoIds.forEach(id => {
-                const option = equipamientoSelect.querySelector(`option[value="${id}"]`);
-                if (option) option.selected = true;
-            });
-        }
+    // Para Tom Select: grupo muscular
+    const grp = button.dataset.grupomuscular
+      ? button.dataset.grupomuscular.split(',').map(v => v.trim())
+      : [];
+    tsGrupo.clear(true);      // limpia selección anterior
+    tsGrupo.setValue(grp);    // marca las opciones preseleccionadas
 
-    });
+    // Para Tom Select: equipamiento
+    const eq = button.dataset.equipamiento
+      ? button.dataset.equipamiento.split(',').map(v => v.trim())
+      : [];
+    tsEquip.clear(true);
+    tsEquip.setValue(eq);
+  });
+});
+
 </script> 
 <script>
 document.getElementById('userSearch').addEventListener('input', function() {
