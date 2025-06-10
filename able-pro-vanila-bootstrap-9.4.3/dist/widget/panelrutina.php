@@ -6,82 +6,131 @@ include 'db.php';
 // Iniciar la sesión para obtener datos de usuario
 session_start();
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+if (!isset($_SESSION['IdUsuario'])) {
+    echo "⚠️ ERROR: sesión no iniciada correctamente.";
+    exit;
+}
+
 // $usuario_id = $_SESSION['usuario_id']; // Captura el id de la sesión del usuario (para pruebas está hardcodeado)
 //$usuario_id = 1;  ID de usuario hardcodeado para pruebas
 $usuario_id = $_SESSION['IdUsuario']; // ID de usuario hardcodeado para pruebas
 
 // Obtener el ID de la solicitud
 //$solicitud_id = $_GET['solicitud_id'] ?? null;
-$sql = "SELECT solicitud_id FROM resumen_planes WHERE idUsuario = ?";
+$sql = "SELECT idSolicitud FROM resumen_rutinas WHERE idUsuario = ?";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
+
+
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc(); // Obtiene la fila como un array asociativo
-    $solicitud_id = $row["solicitud_id"]; // Accede al valor de solicitud_id
+    $solicitud_id = $row["idSolicitud"]; // Accede al valor de solicitud_id
 } else {
     $solicitud_id = null; // Asignar null si no hay resultados
 }
 if ($solicitud_id) {
-    // Recuperar el resumen del plan
-    $sql_resumen = "SELECT calorias, proteinas, grasas, carbohidratos 
-                    FROM resumen_planes 
-                    WHERE solicitud_id = ?";
-    $stmt = $conexion->prepare($sql_resumen);
-    $stmt->bind_param("i", $solicitud_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
 
-    if ($result->num_rows > 0) {
-        $resumen = $result->fetch_assoc();
-        $calorias = $resumen['calorias'];
-        $proteinas = $resumen['proteinas'];
-        $grasas = $resumen['grasas'];
-        $carbohidratos = $resumen['carbohidratos'];
-    } else {
-        echo "No se encontraron datos para esta solicitud.";
-        $calorias = $proteinas = $grasas = $carbohidratos = 0;
+    $sql_resumen = "SELECT 
+                    r.dias_disponible, 
+                    r.tiempo_disponible, 
+                    se.usuario_id, 
+                    se.nombre, 
+                    se.lugar_entrenamiento, 
+                    se.sexo,
+                    se.nivel,
+                    v.Nombre AS videoNombre,
+                    v.Descripcion,
+                    v.URL,
+                    re.dia,
+                    re.orden
+                FROM solicitudes_ejercicios se
+                JOIN rutina r ON se.usuario_id = r.idUsuario
+                JOIN rutina_ejercicio re ON re.idRutina = r.IdRutina
+                JOIN videos v ON re.idVideo = v.IdVideo
+                WHERE se.usuario_id = ?
+                ORDER BY re.dia ASC, re.orden ASC";
+
+$stmt = $conexion->prepare($sql_resumen);
+$stmt->bind_param("i", $usuario_id);
+$stmt->execute();
+$result_solicitud= $stmt->get_result();
+$resumen = [];  // inicializar antes de leer resultados
+if ($result_solicitud && $result_solicitud->num_rows > 0) {
+    while ($row = $result_solicitud->fetch_assoc()) {
+        $resumen[] = $row;
     }
 
-    // Recuperar los alimentos del plan
-    // Recuperar los alimentos del plan con todos los campos necesarios
-// Consulta mejorada para recuperar los alimentos del plan con nombre, categoría y detalles
-      $sql_alimentos = "
-          SELECT 
-              pn.idIngrediente,
-              i.Nombre AS NombreIngrediente,
-              c.Nombre AS Categoria,
-              pn.porcion,
-              pn.calorias,
-              i.tiempoComidas
-          FROM 
-              planes_nutricionales pn
-          INNER JOIN 
-              ingredientes i ON pn.idIngrediente = i.idIngrediente
-          INNER JOIN 
-              categorias c ON i.idCategoria = c.idCategoria
-          WHERE 
-              pn.solicitud_id = ?";
-      $stmt_alimentos = $conexion->prepare($sql_alimentos);
-      $stmt_alimentos->bind_param("i", $solicitud_id);
-      $stmt_alimentos->execute();
-      $result_alimentos = $stmt_alimentos->get_result();
+    $agrupado_por_dia = [];
+    foreach ($resumen as $fila) {
+        $dia = "Día " . $fila['dia'];
+        $agrupado_por_dia[$dia][] = $fila;
+    }
+    // Obtener valores base desde la primera fila
+        $nivel = $resumen[0]['nivel'];
+        $tiempo_disponible = $resumen[0]['tiempo_disponible'];
+        $dias_disponible = $resumen[0]['dias_disponible'];
 
-      $alimentos = [];
-      if ($result_alimentos->num_rows > 0) {
-          while ($row = $result_alimentos->fetch_assoc()) {
-              $alimentos[] = $row;
-          }
-      } else {
-          echo "No se encontraron alimentos para esta solicitud.";
-      }
-} else {
-    header('Location: ../pages/Panel.php');
-    $calorias = $proteinas = $grasas = $carbohidratos = 0;
-    $alimentos = [];
+        // Generar series y repeticiones
+        list($series, $repeticiones) = generarSeriesYRepeticiones($nivel, $tiempo_disponible, $dias_disponible);
+
+  } else {
+    echo "❌ No se encontró ninguna coincidencia entre las tablas.<br>";
+    $agrupado_por_dia = [];
+  }
+}else {
+    echo "⚠️ No se encontró ninguna solicitud para este usuario.<br>";
+    $agrupado_por_dia = [];
 }
+
+function generarSeriesYRepeticiones($nivel, $tiempo, $dias) {
+    $series = 0;
+    $reps = '';
+
+    if ($nivel == 1) { // Principiante
+        if ($tiempo == 30) {
+            $series = 2;
+            $reps = '12-15';
+        } elseif ($tiempo == 45) {
+            $series = 3;
+            $reps = '12-15';
+        } elseif($tiempo == 60) {
+            $series = 3;
+            $reps = '10-12';
+        }
+    } elseif ($nivel == 2) { // Intermedio
+        if ($tiempo == 30) {
+            $series = 3;
+            $reps = '10-12';
+        } elseif ($tiempo == 45) {
+            $series = 4;
+            $reps = '8-12';
+        } elseif($tiempo == 60) {
+            $series = 4;
+            $reps = '8-10';
+        }
+    } elseif ($nivel == 3) { // Avanzado
+        if ($tiempo == 30) {
+            $series = 4;
+            $reps = '8-10';
+        } elseif ($tiempo == 45) {
+            $series = 4;
+            $reps = '6-10';
+        } elseif ($tiempo == 60) {
+            $series = 4;
+            $reps = '6-8';
+        }
+    }
+
+    return [$series, $reps];
+}
+
+
 
 include('../forms/UsuarioClass.php');
 
@@ -91,9 +140,6 @@ $datosUsuario = $usuario->obtenerPorId($_SESSION['IdUsuario']);
 
 $solicitud=$usuario->ObtenerSolicitud($_SESSION['IdUsuario']);
 
-$comidas=explode("-",$solicitud[0]["comidas"]);
-
-
 $sql56 = "SELECT n.Titulo, n.descripcion, pu.pregunta
         FROM notificaciones n
         JOIN preguntasusuarios pu ON n.idpregunta = pu.idpregunta
@@ -102,6 +148,17 @@ $stmt23 = $conexion->prepare($sql56);
 $stmt23->bind_param("i", $_SESSION['IdUsuario']);
 $stmt23->execute();
 $resultadoNotificaciones = $stmt23->get_result();
+function getYoutubeId(string $url): ?string {
+    // soporta youtu.be/, watch?v=, embed/
+    if (preg_match(
+      '/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/))([^\?&"\'>]+)/',
+      $url,
+      $m
+    )) {
+        return $m[1];
+    }
+    return null;
+}
 ?>
 
 <!doctype html>
@@ -109,7 +166,7 @@ $resultadoNotificaciones = $stmt23->get_result();
   <!-- [Head] start -->
 
   <head>
-    <title>Mi plan de Alimentación - Team Ori</title>
+    <title>Mi plan de Entrenamiento - Team Ori</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
@@ -124,25 +181,48 @@ $resultadoNotificaciones = $stmt23->get_result();
     />
     <meta name="author" content="Phoenixcoded" />
 
-   <!-- [Favicon] icon -->
-   <link rel="icon" href="../assets/images/LOGO SIN FONDO-02.png" type="image/x-icon" />
- <!-- [Font] Family -->
-<link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
-<!-- [phosphor Icons] https://phosphoricons.com/ -->
-<link rel="stylesheet" href="../assets/fonts/phosphor/duotone/style.css" />
-<!-- [Tabler Icons] https://tablericons.com -->
-<link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" />
-<!-- [Feather Icons] https://feathericons.com -->
-<link rel="stylesheet" href="../assets/fonts/feather.css" />
-<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
-<link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
-<!-- [Material Icons] https://fonts.google.com/icons -->
-<link rel="stylesheet" href="../assets/fonts/material.css" />
-<!-- [Template CSS Files] -->
-<link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
-<script src="../assets/js/tech-stack.js"></script>
-<link rel="stylesheet" href="../assets/css/style-preset.css" />
+    <!-- [Favicon] icon -->
+    <link rel="icon" href="../assets/images/LOGO SIN FONDO-02.png" type="image/x-icon" />
+    <!-- [Font] Family -->
+    <link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
+    <!-- [phosphor Icons] https://phosphoricons.com/ -->
+    <link rel="stylesheet" href="../assets/fonts/phosphor/duotone/style.css" />
+    <!-- [Tabler Icons] https://tablericons.com -->
+    <link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" />
+    <!-- [Feather Icons] https://feathericons.com -->
+    <link rel="stylesheet" href="../assets/fonts/feather.css" />
+    <!-- [Font Awesome Icons] https://fontawesome.com/icons -->
+    <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
+    <!-- [Material Icons] https://fonts.google.com/icons -->
+    <link rel="stylesheet" href="../assets/fonts/material.css" />
+    <!-- [Template CSS Files] -->
+    <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <script src="../assets/js/tech-stack.js"></script>
+    <link rel="stylesheet" href="../assets/css/style-preset.css" />
+    <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+    <!-- Font Awesome 4 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Font Awesome 6 (recomendado si usás íconos nuevos como fa-solid, etc.) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <style>
+      .video-cell {
+        position: relative;
+      }
+      .video-cell .thumbnail {
+        display: none;
+        position: absolute;
+        top: -70px;
+        left: 100%;
+        width: 300px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        border-radius: 4px;
+        z-index: 10;
+      }
+      .video-cell:hover .thumbnail {
+        display: block;
+      }
+    </style>
   </head>
   <!-- [Head] end -->
   <!-- [Body] Start -->
@@ -494,283 +574,165 @@ $resultadoNotificaciones = $stmt23->get_result();
               
               <div class="col-md-12">
                 <div class="page-header-title">
-                  <h2 class="mb-0">Mi plan de alimentación</h2>
+                  <h2 class="mb-0">Mi plan de entrenamiento</h2>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <!-- [ breadcrumb ] end -->
-
         <div class="row">
-          <div class="col-md-12 col-xxl-12">
-            <div class="card">
-              <div class="card-body">
-                <div class="d-flex align-items-center">
-                  <div class="flex-shrink-0">
-                    <div class="avtar avtar-s bg-light-primary">
-                      <i class="ti ti-wallet f-20"></i>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-0">Total Calorias</h6>
-                  </div>
-                </div>
-                <div class="bg-body p-3 mt-3 rounded">
-                  <div class="mt-3 row align-items-center">
-                    <div class="col-7">
-                      <div id="all-earnings-graph"></div>
-                    </div>
-                    <div class="col-5">
-                      <h5 class="mb-1"><?= ($calorias) ?></h5> <!-- varible calorias -->
-                      <p class="text-primary mb-0"><i class="ti ti-arrow-up-right"></i> 30.6%</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <div class="col-xxl-4 col-md-4">
+
+          <div class="col-xxl-6 col-md-6">
             <div class="card">
               <div class="card-body">
                 <div class="d-flex align-items-center">
                   <div class="flex-grow-1 me-3">
-                    <p class="mb-1 fw-medium text-muted">Proteinas</p>
-                    <h4 class="mb-1"><?= ($proteinas) ?></h4> <!-- varible prote -->
-                    <p class="mb-0 text-sm">En Calorias</p>
-                  </div>
-                  <div class="flex-shrink-0">
-                    <div class="avtar avtar-l bg-light-warning rounded-circle">
-                      <i class="ph-duotone ph-hand-fist f-28"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xxl-4 col-md-4">
-            <div class="card">
-              <div class="card-body">
-                <div class="d-flex align-items-center">
-                  <div class="flex-grow-1 me-3">
-                    <p class="mb-1 fw-medium text-muted">Grasas</p>
-                    <h4 class="mb-1"><?= ($grasas) ?></h4> <!-- varible grasas -->
-                    <p class="mb-0 text-sm">En Calorias</p>
-                  </div>
-                  <div class="flex-shrink-0">
-                    <div class="avtar avtar-l bg-light-success rounded-circle">
-                      <i class="ph-duotone ph-voicemail f-28"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-xxl-4 col-md-4">
-            <div class="card">
-              <div class="card-body">
-                <div class="d-flex align-items-center">
-                  <div class="flex-grow-1 me-3">
-                    <p class="mb-1 fw-medium text-muted">Carbohidratos</p>
-                    <h4 class="mb-1"><?= ($carbohidratos) ?></h4> <!-- varible carbo -->
-                    <p class="mb-0 text-sm">En Calorias</p>
+                    <p class="mb-1 fw-medium text-muted">Dias de Entrenamiento</p>
+                    <h4 class="mb-1"><?= ($dias_disponible) ?>: Dias</h4> <!-- varible grasas -->
                   </div>
                   <div class="flex-shrink-0">
                     <div class="avtar avtar-l bg-light-info rounded-circle">
-                      <i class="ph-duotone ph-wave-sine f-28"></i>
+                      <i class="fa fa-calendar-o" aria-hidden="true"></i>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          <div class="col-xxl-6 col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex align-items-center">
+                  <div class="flex-grow-1 me-3">
+                    <p class="mb-1 fw-medium text-muted">Tiempo de Entrenamiento</p>
+                    <h4 class="mb-1"><?= ($tiempo_disponible) ?> Minutos</h4> <!-- varible prote -->
+                  </div>
+                  <div class="flex-shrink-0">
+                    <div class="avtar avtar-l bg-light-warning rounded-circle">
+                      <i class="fa fa-clock-o" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-6 col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex align-items-center">
+                  <div class="flex-grow-1 me-3">
+                    <p class="mb-1 fw-medium text-muted">Series</p>
+                    <h4 class="mb-1"><?= ($series) ?>: Por Ejercicio</h4> <!-- varible grasas -->
+                  </div>
+                  <div class="flex-shrink-0">
+                    <div class="avtar avtar-l bg-light-success rounded-circle">
+                      <i class="fa fa-hashtag" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xxl-6 col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex align-items-center">
+                  <div class="flex-grow-1 me-3">
+                    <p class="mb-1 fw-medium text-muted">Repeticiones</p>
+                    <h4 class="mb-1"><?= ($repeticiones) ?>: Por Serie</h4> <!-- varible grasas -->
+                  </div>
+                  <div class="flex-shrink-0">
+                    <div class="avtar avtar-l bg-light-info rounded-circle">
+                      <i class="fa fa-repeat" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
 
           <div class="col-md-12">
             <div class="card">
               <div class="card-header">
-                <h5>Lista de Ingredientes</h5>
-                <span class="d-block m-t-5">Debajo encontraras los ingredientes que tendras que incluir en tu dieta para una mayor efectividad del plan según tus objetivos.</span>
+                <h5>Lista de Ejercicios</h5>
+                <span class="d-block m-t-5">Debajo encontraras los ejercicios de tu plan de entrenamiento, segun los datos que proporcionaste</span>
               </div>
-              <?php
-if (!empty($alimentos)) {
-    // 1. Definir orden personalizado de comidas
-    $orden_comidas = ['desayuno', 'almuerzo', 'merienda', 'cena', 'snack'];
-    
-    // 2. Obtener tiempos de comida desde planes_nutricionales
-    $sql_tiempos = "SELECT DISTINCT tiempo_comida 
-                   FROM planes_nutricionales 
-                   WHERE solicitud_id = ?
-                   ORDER BY FIELD(tiempo_comida, 'desayuno', 'almuerzo', 'merienda', 'cena', 'snack')";
-    $stmt = $conexion->prepare($sql_tiempos);
-    $stmt->bind_param("i", $solicitud_id);
-    $stmt->execute();
-    $result_tiempos = $stmt->get_result();
-    $comidas_usuario = $result_tiempos->fetch_all(MYSQLI_ASSOC);
-    $comidas_usuario = array_column($comidas_usuario, 'tiempo_comida');
+            <?php
 
-    // 3. Obtener requerimientos nutricionales
-    $sql_requerimientos = "SELECT proteinas, grasas, carbohidratos 
-                          FROM resumen_planes 
-                          WHERE solicitud_id = ?";
-    $stmt = $conexion->prepare($sql_requerimientos);
-    $stmt->bind_param("i", $solicitud_id);
-    $stmt->execute();
-    $requerimientos = $stmt->get_result()->fetch_assoc();
-
-    // 4. Consulta optimizada con ordenamiento personalizado
-    $sql_alimentos = "
-        SELECT 
-            pn.tiempo_comida,
-            pn.idIngrediente,
-            i.Nombre AS NombreIngrediente,
-            i.IdCategoria,
-            i.Gramos_Proteina,
-            i.Gramos_Carbohidratos,
-            i.Gramos_Grasas,
-            i.Calorias,
-            c.Nombre AS Categoria
-        FROM planes_nutricionales pn
-        INNER JOIN ingredientes i ON pn.idIngrediente = i.IdIngrediente
-        INNER JOIN categorias c ON i.IdCategoria = c.IdCategoria
-        WHERE pn.solicitud_id = ?
-        ORDER BY 
-            FIELD(pn.tiempo_comida, 'desayuno', 'almuerzo', 'merienda', 'cena', 'snack'),
-            i.IdCategoria";
-
-    $stmt_alimentos = $conexion->prepare($sql_alimentos);
-    $stmt_alimentos->bind_param("i", $solicitud_id);
-    $stmt_alimentos->execute();
-    $alimentos = $stmt_alimentos->get_result()->fetch_all(MYSQLI_ASSOC);
-
-    // 5. Validar y ajustar requerimientos
-    $requerimientos_validados = [
-        'proteinas' => max($requerimientos['proteinas'] ?? 0, 1), // Evitar división por cero
-        'grasas' => max($requerimientos['grasas'] ?? 0, 1),
-        'carbohidratos' => max($requerimientos['carbohidratos'] ?? 0, 1)
-    ];
-
-    // 6. Calcular distribución por comida
-    $num_comidas = max(count($comidas_usuario), 1); // Nunca dividir por cero
-    $distribucion = [
-        'proteinas' => $requerimientos_validados['proteinas'] / $num_comidas,
-        'grasas' => $requerimientos_validados['grasas'] / $num_comidas,
-        'carbohidratos' => $requerimientos_validados['carbohidratos'] / $num_comidas
-    ];
-
-    // 7. Procesar y agrupar alimentos
-    $plan_final = [];
-    foreach ($alimentos as $alimento) {
-        $tiempo = strtolower($alimento['tiempo_comida']);
-        $categoria = $alimento['IdCategoria'];
-        
-        // Calcular porción con límites
-        $nutriente = match($categoria) {
-            1 => ['tipo' => 'proteinas', 'gramos' => $alimento['Gramos_Proteina']],
-            2 => ['tipo' => 'carbohidratos', 'gramos' => $alimento['Gramos_Carbohidratos']],
-            3 => ['tipo' => 'grasas', 'gramos' => $alimento['Gramos_Grasas']],
-            default => null
-        };
-
-        if ($nutriente && $nutriente['gramos'] > 0) {
-            $porcion = ($distribucion[$nutriente['tipo']] * 100) / $nutriente['gramos'];
-            
-            // Aplicar límite máximo de 400g por ingrediente
-            $porcion = min(round($porcion, 2), 400);
-            
-            $plan_final[$tiempo][] = [
-                'nombre' => $alimento['NombreIngrediente'],
-                'categoria' => $alimento['Categoria'],
-                'porcion' => $porcion,
-                'calorias' => round(($alimento['Calorias'] * $porcion) / 100, 1)
-            ];
-        }
-    }
-
-    // 8. Ordenar final según estructura deseada
-    $plan_ordenado = [];
-    foreach ($orden_comidas as $comida) {
-        if (isset($plan_final[$comida])) {
-            $plan_ordenado[$comida] = $plan_final[$comida];
-        }
-    }
-    $plan_ordenado = [];
-    foreach ($comidas_usuario as $comida) {
-        $comida_lower = strtolower($comida);
-        $plan_ordenado[$comida_lower] = $plan_final[$comida_lower] ?? [];
-    }
-
-    // 8.1 Añadir elementos obligatorios - NUEVA SECCIÓN
-    foreach ($plan_ordenado as $tiempo => &$items) {
-        if (in_array($tiempo, ['desayuno', 'merienda'])) {
-            $items[] = [
-                'nombre' => 'Una Pieza de fruta',
-                'categoria' => 'Fruta',
-                'porcion' => 100,
-                'calorias' => 50
-            ];
-        } elseif (in_array($tiempo, ['almuerzo', 'cena'])) {
-            $items[] = [
-                'nombre' => 'Una pieza de verdura verde',
-                'categoria' => 'Verdura',
-                'porcion' => 100,
-                'calorias' => 30
-            ];
-        }
-    }
 ?>
 
-<!-- 9. Mostrar resultados -->
-<div class="card-body">
-    <?php if (!empty($plan_ordenado)): ?>
-        <div class="accordion" id="accordionComidas">
-            <?php foreach ($plan_ordenado as $tiempo => $items): ?>
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" 
-                                data-bs-toggle="collapse" 
-                                data-bs-target="#collapse<?= htmlspecialchars($tiempo) ?>">
-                            <?= ucfirst($tiempo) ?>
-                        </button>
-                    </h2>
-                    <div id="collapse<?= htmlspecialchars($tiempo) ?>" 
-                         class="accordion-collapse collapse" 
-                         data-bs-parent="#accordionComidas">
-                        <div class="accordion-body">
-                            <table class="table table-striped">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th class="d-none d-md-table-cell">#</th>
-                                        <th>Ingrediente</th>
-                                        <th class="d-none d-md-table-cell">Tipo</th>
-                                        <th>Cantidad (g)</th>
-                                        <th class="d-none d-md-table-cell">Calorías</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $contador = 1; ?>
-                                    <?php foreach ($items as $item): ?>
-                                    <tr>
-                                        <td class="d-none d-md-table-cell"><?= $contador++ ?></td>
-                                        <td><?= htmlspecialchars($item['nombre']) ?></td>
-                                        <td class="d-none d-md-table-cell"><?= $item['categoria'] ?></td>
-                                        <td><?= number_format($item['porcion'], 1) ?></td>
-                                        <td class="d-none d-md-table-cell"><?= number_format($item['calorias'], 1) ?></td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
+<?php if (!empty($agrupado_por_dia)): ?>
+    <div class="accordion" id="accordionComidas">
+        <?php foreach ($agrupado_por_dia as $dias => $videos):
+            $dia=str_replace(' ', '', $dias);
+          ?>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapse<?=htmlspecialchars($dia) ?>">
+                        <?= ucfirst($dia) ?>
+                    </button>
+                </h2>
+                <div id="collapse<?= htmlspecialchars($dia)?>" 
+                     class="accordion-collapse collapse" 
+                     data-bs-parent="#accordionComidas">
+                    <div class="accordion-body">
+                        <table class="table table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="d-none d-md-table-cell">Día</th>
+                                    <th>Orden Ejercicio</th>
+                                    <th class="d-none d-md-table-cell">Ejercicio</th>
+                                    <th>Descripción</th>
+                                    <th class="d-none d-md-table-cell">Lugar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($videos as $video): ?>
+                                <tr>
+                                    <td class="d-none d-md-table-cell"><?= $video['dia'] ?></td>
+                                    <td><?= htmlspecialchars($video['orden']) ?></td>
+                                    <td class="video-cell">
+                                        <a href="<?= htmlspecialchars($video['URL'], ENT_QUOTES) ?>" target="_blank">
+                                            <?= htmlspecialchars($video['videoNombre'], ENT_QUOTES) ?>
+                                        </a>
+                                        <?php if ($id = getYoutubeId($video['URL'])): ?>
+                                            <img
+                                            class="thumbnail"
+                                            src="https://img.youtube.com/vi/<?= $id ?>/hqdefault.jpg"
+                                            alt="Portada de <?= htmlspecialchars($video['videoNombre'], ENT_QUOTES) ?>"
+                                            />
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="d-none d-md-table-cell limit-text"><?= htmlspecialchars($video['Descripcion']) ?></td>
+                                    <td class="d-none d-md-table-cell"><?= htmlspecialchars($video['lugar_entrenamiento']) ?></td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <div class="alert alert-warning mb-0">No se encontraron alimentos en el plan.</div>
-    <?php endif; 
-    }?>
-</div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php else: ?>
+    <div class="alert alert-warning mb-0">No se encontró una rutina.</div>
+<?php endif; ?>
 
+
+<style>
+td.limit-text {
+  max-width: 150px;       /* o el ancho que quieras */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>
 <style>
     @media (max-width: 767.98px) {
         .accordion-body {
@@ -964,14 +926,13 @@ document.getElementById('helpForm').addEventListener('submit', function(e) {
     <!-- [Page Specific JS] start -->
     <!-- Apex Chart -->
     <script src="../assets/js/plugins/apexcharts.min.js"></script>
-    <script src="../assets/js/pages/w-chart.js"></script>
+    <!--<script src="../assets/js/pages/w-chart.js"></script> -->
     <!-- [Page Specific JS] end -->
     
 
   </body>
   <!-- [Body] end -->
 </html>
-
 
 <?php
 

@@ -210,7 +210,7 @@ function getYoutubeId(string $url): ?string {
           </a>
         </li>
         <li class="pc-item">
-          <a href="#" class="pc-link">
+          <a href="panelrutina.php" class="pc-link">
             <span class="pc-micon">
               <svg class="pc-icon">
                 <use xlink:href="#custom-fatrows"></use>
@@ -506,8 +506,6 @@ $query = "SELECT
   v.URL,
   v.IdGrupoEnfoque,
   ge.Grupo,        
-  v.IdGrupoMuscular,
-  gm.Grupo_Muscular,
   v.IdDireccion,
   d.Direccion,
   v.IdDificultad,
@@ -520,7 +518,6 @@ $query = "SELECT
   GROUP_CONCAT(e.IdEquipamiento ORDER BY e.IdEquipamiento SEPARATOR ',') AS EquipamientoIds
 FROM videos v
   JOIN Sexo s ON v.idSexo = s.idSexo
-  JOIN grupo_muscular gm ON v.IdGrupoMuscular = gm.IdGrupoMuscular
   JOIN grupo_enfoque ge ON v.IdGrupoEnfoque = ge.IdGrupo
   JOIN direccion d ON v.IdDireccion = d.IdDireccion
   JOIN dificultad dif ON v.IdDificultad = dif.IdDificultad
@@ -530,7 +527,6 @@ FROM videos v
 GROUP BY
   v.IdVideo, v.Nombre, v.Descripcion, v.URL,
   v.IdGrupoEnfoque, ge.Grupo,
-  v.IdGrupoMuscular, gm.Grupo_Muscular,
   v.IdDireccion, d.Direccion,
   v.IdDificultad, dif.Dificultad,
   v.idLugar, l.Lugar,
@@ -586,7 +582,7 @@ if ($result && $result->num_rows > 0) {
                             <th>Nombre</th>
                             <th class="d-none d-md-table-cell">Descripcion</th>
                             <th>Enfoque</th>
-                            <th class="d-none d-md-table-cell">Grupo Muscular</th>
+                            <!--<th class="d-none d-md-table-cell">Grupo Muscular</th>-->
                             <th>Equipamiento</th> <!-- NUEVA COLUMNA -->
                             <th>Acciones</th>
                         </tr>
@@ -609,7 +605,7 @@ if ($result && $result->num_rows > 0) {
                             </td>
                             <td class="d-none d-md-table-cell limit-text"><?= $video['Descripcion'] ?></td>
                             <td><?= $video['Grupo'] ?></td>
-                            <td class="d-none d-md-table-cell"><?= $video['Grupo_Muscular'] ?></td>
+                            <!--<td class="d-none d-md-table-cell"><?= $video['Grupo_Muscular'] ?></td>-->
                             <td><?= $video['Equipamientos'] ?></td> <!-- Mostrar texto -->
                             <td>
                                 <div class="d-flex flex-column flex-md-row justify-content-center gap-1">
@@ -620,7 +616,6 @@ if ($result && $result->num_rows > 0) {
                                         data-nombre="<?= htmlspecialchars($video['Nombre']) ?>"
                                         data-descripcion="<?= htmlspecialchars($video['Descripcion']) ?>"
                                         data-grupoenfoque="<?= $video['IdGrupoEnfoque'] ?>"
-                                        data-grupomuscular="<?= $video['IdGrupoMuscular'] ?>"
                                         data-sexo="<?= $video['idSexo'] ?>"
                                         data-url="<?= $video['URL'] ?>"
                                         data-equipamiento="<?= $video['EquipamientoIds'] ?>" 
@@ -2075,8 +2070,8 @@ window.onclick = function(event) {
     </div>
 </form>
 
+    </div>
 </div>
-
         <!-- ******** ACCIONES FINALES ******** -->
         <div class="modal-footer">
           <div class="acciones-container w-100">

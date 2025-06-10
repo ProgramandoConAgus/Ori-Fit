@@ -527,8 +527,8 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
                                   <select id="genero" name="genero"
                                           class="form-control" required>
                                     <option value="default" disabled selected>Seleccionar</option>
-                                    <option value="mujer">Mujer</option>
-                                    <option value="hombre">Hombre</option>
+                                    <option value="2">Mujer</option>
+                                    <option value="1">Hombre</option>
                                   </select>
                                 </div>
                                 <div class="col-sm-6 mb-3">
@@ -646,6 +646,18 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
                                     type="number" class="form-control"
                                     min="3" max="5" required />
                             </div>
+                             <div class="col-md-12 mb-3">
+                              <label class="form-label" for="tiempo_disponible">
+                                Tiempo disponible para entrenar:
+                              </label>
+                              <select id="tiempo_disponible" name="tiempo_disponible"
+                                      class="form-control" required>
+                                <option value="" disabled selected>Seleccionar</option>
+                                <option value="30">30 Minutos</option>
+                                <option value="45">45 Minutos</option>
+                                <option value="60">60 Minutos</option>
+                              </select>
+                            </div>
                             <div class="col-md-12 mb-3">
                               <label class="form-label" for="lugar_entrenamiento">
                                 La rutina de entrenamiento ¿la realizarás en un gimnasio o en tu casa?
@@ -657,18 +669,19 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
                                 <option value="casa">Casa</option>
                               </select>
                             </div>
-                                                        <!-- Campos adicionales ocultos -->
-                                                        <div id="extraField" class="row" style="display: none; gap: 20px; margin-top: 10px;">
-                                                          <div class="col-sm-6 mb-3">
-                                                            <label class="form-label" for="nivel">Experiencia en Gimnasios</label>
-                                                            <select id="nivel" name="nivel" class="form-control" required>
-                                                              <option value="default">Seleccionar</option>
-                                                              <option value="Principiante">Principiante</option>
-                                                              <option value="Avanzado">Avanzado</option>
-                                                            </select>
+                              <!-- Campos adicionales ocultos -->
+                              <div id="extraField" class="row" style="display: none; gap: 20px; margin-top: 10px;">
+                                <div class="col-sm-6 mb-3">
+                                  <label class="form-label" for="nivel">Experiencia en Gimnasios</label>
+                                  <select id="nivel" name="nivel" class="form-control" required>
+                                    <option value="default">Seleccionar</option>
+                                    <option value="1">Principiante</option>
+                                    <option value="2">Intermedio</option>
+                                    <option value="3">Avanzado</option>
+                                  </select>
 
-                                                          </div>
-                                                        </div>
+                                </div>
+                              </div>
                             <div class="col-md-12 mb-3">
                               <label class="form-label" for="preferencia_ejercicios">
                                 Te gustan los ejercicios con elementos/máquinas o sin elementos:
@@ -678,6 +691,18 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
                                 <option value="" disabled selected>Seleccionar</option>
                                 <option value="con elementos">Con elementos/máquinas</option>
                                 <option value="sin elementos">Sin elementos</option>
+                              </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                              <label class="form-label" for="grupo_enfoque">
+                                En que grupo muscular te gustaria enfocar el trabajo
+                              </label>
+                               <select class="form-select form-select-solid" id="grupo_enfoque" name="grupo_enfoque" required>
+                                <option value="">Seleccione un grupo...</option>
+                                <option value="1">Gluteos</option>
+                                <option value="2">Piernas</option>
+                                <option value="4">Tren Superior</option>
+                                <option value="5">Full body</option>
                               </select>
                             </div>
                           </div>
