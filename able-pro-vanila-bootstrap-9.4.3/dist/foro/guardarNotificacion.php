@@ -1,7 +1,7 @@
 <?php
 session_start();
 header('Content-Type: application/json; charset=utf-8');
-include('../widget/db.php');
+require_once __DIR__.'/../db.php';
 
 // Verificar que el admin esté autenticado
 if (!isset($_SESSION['IdUsuario'])) {

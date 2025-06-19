@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             // Guardar en la base de datos
-            require 'db.php';
+            require_once __DIR__.'/../db.php';
             $stmt = $conn->prepare("
                 INSERT INTO solicitudes 
                 (nombre, edad, peso, altura, genero, objetivo, comidas, alimentos_excluidos, enfermedades, 

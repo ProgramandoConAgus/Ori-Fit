@@ -1,5 +1,5 @@
 <?php
-include('widget/db.php');
+require_once __DIR__.'/db.php';
 
 // Establece la cabecera para indicar que la respuesta es JSON
 header('Content-Type: application/json');

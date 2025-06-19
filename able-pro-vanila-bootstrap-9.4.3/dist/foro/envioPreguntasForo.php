@@ -1,7 +1,7 @@
 <?php
 session_start();
 include '../../vendor/autoload.php';
-include '../widget/db.php';
+require_once __DIR__.'/../db.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 

@@ -1,5 +1,5 @@
 <?php
-include 'db.php'; // Conexión a la base de datos
+require_once __DIR__.'/../db.php'; // Conexión a la base de datos
 session_start();    
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
