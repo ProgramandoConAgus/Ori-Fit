@@ -1,5 +1,5 @@
 <?php
-include('db.php'); // Incluir archivo de conexión
+require_once __DIR__.'/../db.php'; // Incluir archivo de conexión
 
 try {
     $query = "SELECT c.Nombre AS categoria, i.Nombre AS ingrediente, i.tiempoComidas 

@@ -1,5 +1,5 @@
 <?php
-include 'db.php'; // Conexión a la base de datos
+require_once __DIR__.'/../db.php'; // Conexión a la base de datos
 
 // Consulta para obtener los ingredientes ordenados por categoría
 $sql = "SELECT ingredientes.Nombre AS Ingrediente, categorias.Nombre AS Categoria 

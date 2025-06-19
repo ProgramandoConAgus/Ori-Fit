@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+require_once __DIR__.'/../db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id = isset($_POST['IdVideo']) ? intval($_POST['IdVideo']) : 0;

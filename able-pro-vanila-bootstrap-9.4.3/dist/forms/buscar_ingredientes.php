@@ -5,7 +5,7 @@
 // Mejora la experiencia de usuario.
 
 
-include 'db.php';
+require_once __DIR__.'/../db.php';
 
 // Asegurarse de que el parámetro 'query' esté presente
 $query = $_GET['query'] ?? '';

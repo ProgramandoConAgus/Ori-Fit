@@ -1,5 +1,5 @@
   <?php
-include('db.php'); // Incluye la conexión a la base de datos
+require_once __DIR__.'/../db.php'; // Incluye la conexión a la base de datos
 session_start();
 
 // Realizamos la consulta a la base de datos
@@ -1766,7 +1766,7 @@ td.limit-text {
     </div>
 
     <?php
-    include 'db.php';
+    require_once __DIR__.'/../db.php';
     
     try {
         $sql = "SELECT id, nombre, peso, altura, genero, ejercicio, edad, email, objetivo, 

@@ -1,5 +1,5 @@
 <?php
-include 'db.php'; // Incluye la conexión a la base de datos
+require_once __DIR__.'/../db.php'; // Incluye la conexión a la base de datos
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verificar que se haya recibido el ID de la solicitud
