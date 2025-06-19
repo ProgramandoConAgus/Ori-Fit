@@ -142,17 +142,17 @@ foreach ($comidas as $comida) {
 }
 
 // Insertar en la base de datos
+$sql_insert = "INSERT INTO planes_nutricionales
+              (solicitud_id, idIngrediente, porcion, tiempo_comida,
+               calorias, proteinas, grasas, carbohidratos, estado_id)
+              VALUES (?, ?, 100, ?, ?, ?, ?, ?, 1)";
+$stmt_insert = $conexion->prepare($sql_insert);
+
 foreach ($plan_nutricional as $tiempo_comida => $categorias) {
     foreach ($categorias as $categoria => $ingredientes) {
         foreach ($ingredientes as $ingrediente) {
-            $sql_insert = "INSERT INTO planes_nutricionales 
-                          (solicitud_id, idIngrediente, porcion, tiempo_comida, 
-                           calorias, proteinas, grasas, carbohidratos, estado_id)
-                          VALUES (?, ?, 100, ?, ?, ?, ?, ?, 1)";
-            
-            $stmt_insert = $conexion->prepare($sql_insert);
             $stmt_insert->bind_param(
-                "iisdddd", 
+                "iisdddd",
                 $solicitud_id,
                 $ingrediente['IdIngrediente'],
                 $tiempo_comida,
@@ -165,6 +165,8 @@ foreach ($plan_nutricional as $tiempo_comida => $categorias) {
         }
     }
 }
+
+$stmt_insert->close();
 
 $stmt_alimentos->close();
 $conexion->close();
