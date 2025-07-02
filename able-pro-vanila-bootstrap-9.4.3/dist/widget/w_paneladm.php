@@ -1476,6 +1476,17 @@ td.limit-text {
         margin-left: 200px;
         
         }
+        #buscador-solis-ej {
+        width: 350px;
+        font-size: 14px;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s ease;
+        margin-left: 200px;
+        
+        }
        .contenedor-filtrado {
         display: flex; /* Usa flexbox para alinear los elementos */
         gap: 10px; /* Espaciado entre los elementos */
@@ -1751,7 +1762,7 @@ td.limit-text {
     color: white;
 }
 </style>
-<h2 style="text-align: center;">Gestión de Solicitudes</h2>
+<h2 style="text-align: center;">Gestión de Solicitudes Alimentos</h2>
     <br>
     
     <div class="contenedor-filtrado">
@@ -2127,7 +2138,9 @@ window.onclick = function(event) {
 </div>
 
 <div class="tab-pane fade" id="solicitudes-ej" role="tabpanel"><br>
-    <div class="contenedor-filtrado">
+    <h2 style="text-align: center;">Gestión de Solicitudes Entrenamiento</h2>
+    <br>
+    <div class="contenedor-filtrado" >
         <label for="buscador-solis-ej" class="labelb">Buscador</label>
         <input type="text" class="form-control form-control-sm" id="buscador-solis-ej"
                onkeyup="buscarSolicitudesEjercicios()" placeholder="Buscar por nombre, email..."
@@ -2285,7 +2298,6 @@ window.onclick = function(event) {
                                     } else {
                                         echo '<div class="alert alert-info">No hay ejercicios asociados</div>';
                                     }
-                                <?php
                                 else:
                                     echo '<div class="alert alert-info">No hay plan registrado</div>';
                                 endif;
