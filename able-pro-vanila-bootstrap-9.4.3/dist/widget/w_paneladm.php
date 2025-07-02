@@ -1284,7 +1284,7 @@ td.limit-text {
         justify-content: flex-start; /* Alinea el contenido a la izquierda */
         height: 120px;
         width: 907px; /* Aseguramos que el ancho se mantenga constante */
-        margin-left: 110px;
+        margin: 0 auto 10px;
     }
 
     .solicitud-card:hover {
@@ -1306,7 +1306,7 @@ td.limit-text {
         background: linear-gradient(to right, rgb(255, 255, 255),rgb(250, 247, 247));
         border-left: 5px solid red;
         width: 907px;
-        margin-left: 110px;
+        margin: 0 auto 10px;
         padding: 10px;
     }
 
@@ -1571,6 +1571,8 @@ td.limit-text {
 .solicitud-card {
     max-width: 907px;
     width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .modal-solicitudes-content {
