@@ -2880,11 +2880,3 @@ window.onload = function () {
   <!-- [Body] end -->
 </html>
 
-
-<?php
-
-
-?>
-
-
-                  
