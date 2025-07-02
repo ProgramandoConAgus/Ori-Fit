@@ -6,7 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre = trim($_POST['nombre'] ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
     $url = trim($_POST['url'] ?? '');
-    $grupoMuscular = intval($_POST['grupo_muscular'] ?? 0);
+    $grupoMuscular = isset($_POST['grupo_muscular']) && is_array($_POST['grupo_muscular'])
+        ? array_map('intval', $_POST['grupo_muscular'])
+        : [];
     $direccion = intval($_POST['movimiento_direccion'] ?? 0);
     $lugar = intval($_POST['lugar'] ?? 0);
     $sexo = intval($_POST['sexo'] ?? 0);
@@ -25,13 +27,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     try {
         // Actualizar datos básicos del video
-        $query = "UPDATE videos SET Nombre = ?, Descripcion = ?, URL = ?, idGrupoMuscular = ?, idDireccion = ?, idLugar = ?, idSexo = ?, idDificultad = ?, idGrupoEnfoque = ? WHERE IdVideo = ?";
+        $query = "UPDATE videos SET Nombre = ?, Descripcion = ?, URL = ?, idDireccion = ?, idLugar = ?, idSexo = ?, idDificultad = ?, idGrupoEnfoque = ? WHERE IdVideo = ?";
         $stmt = $conexion->prepare($query);
         if (!$stmt) throw new Exception("Error preparando UPDATE: " . $conexion->error);
 
-        $stmt->bind_param("sssiiiiiii", $nombre, $descripcion, $url, $grupoMuscular, $direccion, $lugar, $sexo, $dificultad, $grupoEnfoque, $id);
+        $stmt->bind_param("sssiiiiii", $nombre, $descripcion, $url, $direccion, $lugar, $sexo, $dificultad, $grupoEnfoque, $id);
         if (!$stmt->execute()) throw new Exception("Error al actualizar video: " . $stmt->error);
         $stmt->close();
+
+        // Actualizar grupos musculares
+        $delGrupo = $conexion->prepare("DELETE FROM video_grupo_muscular WHERE idVideo = ?");
+        $delGrupo->bind_param("i", $id);
+        $delGrupo->execute();
+        $delGrupo->close();
+
+        if (!empty($grupoMuscular)) {
+            $insGrupo = $conexion->prepare("INSERT INTO video_grupo_muscular (idVideo, idGrupoMuscular) VALUES (?, ?)");
+            if (!$insGrupo) throw new Exception("Error preparando INSERT video_grupo_muscular: " . $conexion->error);
+
+            $insGrupo->bind_param("ii", $id, $gmId);
+            foreach ($grupoMuscular as $gm) {
+                $gmId = intval($gm);
+                if (!$insGrupo->execute()) {
+                    throw new Exception("Error al insertar grupo muscular: " . $insGrupo->error);
+                }
+            }
+            $insGrupo->close();
+        }
 
         // Eliminar equipamiento actual del video
         $del = $conexion->prepare("DELETE FROM video_equipamiento WHERE idVideo = ?");

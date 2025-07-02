@@ -5,7 +5,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nombre        = trim($_POST['nombre'] ?? '');
     $descripcion   = trim($_POST['descripcion'] ?? '');
     $url           = trim($_POST['url'] ?? '');
-    $grupoMuscular = intval($_POST['grupo_muscular'] ?? 0);
+    $grupoMuscular = isset($_POST['grupo_muscular']) && is_array($_POST['grupo_muscular'])
+        ? array_map('intval', $_POST['grupo_muscular'])
+        : [];
     $direccion     = intval($_POST['movimiento_direccion'] ?? 0);
     $lugar         = intval($_POST['lugar'] ?? 0);
     $sexo          = intval($_POST['sexo'] ?? 0);
@@ -24,16 +26,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     try {
-        $query = "INSERT INTO videos (Nombre, Descripcion, URL, idGrupoMuscular, idDireccion, idLugar, idSexo, idDificultad, idGrupoEnfoque)
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO videos (Nombre, Descripcion, URL, idDireccion, idLugar, idSexo, idDificultad, idGrupoEnfoque)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conexion->prepare($query);
         if (!$stmt) throw new Exception("Error al preparar INSERT: " . $conexion->error);
 
-        $stmt->bind_param("sssiiiiii", $nombre, $descripcion, $url, $grupoMuscular, $direccion, $lugar, $sexo, $dificultad, $grupoEnfoque);
+        $stmt->bind_param("sssiiiii", $nombre, $descripcion, $url, $direccion, $lugar, $sexo, $dificultad, $grupoEnfoque);
         if (!$stmt->execute()) throw new Exception("Error al ejecutar INSERT videos: " . $stmt->error);
 
         $videoId = $stmt->insert_id;
         $stmt->close();
+
+        // Insertar grupos musculares
+        if (!empty($grupoMuscular)) {
+            $qGrupo = "INSERT INTO video_grupo_muscular (idVideo, idGrupoMuscular) VALUES (?, ?)";
+            $stmtGrupo = $conexion->prepare($qGrupo);
+            if (!$stmtGrupo) throw new Exception("Error al preparar INSERT video_grupo_muscular: " . $conexion->error);
+
+            $stmtGrupo->bind_param("ii", $videoId, $gmId);
+            foreach ($grupoMuscular as $g) {
+                $gmId = intval($g);
+                if (!$stmtGrupo->execute()) {
+                    throw new Exception("Error al insertar grupo muscular: " . $stmtGrupo->error);
+                }
+            }
+            $stmtGrupo->close();
+        }
 
         // Insertar equipamientos
         if (!empty($equipamientos)) {

@@ -19,7 +19,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $delAssoc->bind_param("i", $id);
         $delAssoc->execute();
+
         $delAssoc->close();
+
+        // 1b) Eliminar asociaciones en video_grupo_muscular
+        $delGrupo = $conexion->prepare("DELETE FROM video_grupo_muscular WHERE idVideo = ?");
+        if (!$delGrupo) {
+            throw new Exception("Error al preparar DELETE de video_grupo_muscular: " . $conexion->error);
+        }
+        $delGrupo->bind_param("i", $id);
+        $delGrupo->execute();
+        $delGrupo->close();
 
         // 2) Ahora eliminar el video en sí
         $query = "DELETE FROM videos WHERE IdVideo = ?";
