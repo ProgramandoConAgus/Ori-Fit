@@ -2,6 +2,10 @@
 include('db.php'); // Incluye la conexión a la base de datos
 session_start();
 
+// Obtener listado de equipamientos para los formularios
+$equipResult = $conexion->query("SELECT IdEquipamiento, Equipamiento FROM equipamiento ORDER BY IdEquipamiento");
+$equipamientosCatalogo = $equipResult ? $equipResult->fetch_all(MYSQLI_ASSOC) : [];
+
 // Realizamos la consulta a la base de datos
 $query = "SELECT u.id, u.nombre, u.apellido, u.telefono, u.correo, u.acceso, u.idTipoPlan as plan, u.idRol as rol ,
 s.peso, s.altura, s.objetivo, s.suscripcion, s.comidas, s.enfermedades, s.estres_soluciones, 
@@ -490,6 +494,9 @@ function getYoutubeId(string $url): ?string {
             <a class="nav-link" id="solicitudes-tab" data-bs-toggle="pill" href="#solicitudes" role="tab">Gestión de Solicitudes</a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" id="solicitudes-ej-tab" data-bs-toggle="pill" href="#solicitudes-ej" role="tab">Solicitudes Ejercicio</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" id="videos-tab"data-bs-toggle="pill" href="#videos" role="tab">Videos Entrenamiento</a>
         </li>
     </ul>
@@ -504,35 +511,35 @@ $query = "SELECT
   v.Nombre,
   v.Descripcion,
   v.URL,
-  v.IdGrupoEnfoque,
-  ge.Grupo,        
-  v.IdGrupoMuscular,
-  gm.Grupo_Muscular,
-  v.IdDireccion,
+  v.idGrupoEnfoque,
+  ge.Grupo,
+  GROUP_CONCAT(DISTINCT gm.IdGrupoMuscular ORDER BY gm.IdGrupoMuscular SEPARATOR ',') AS GrupoMuscularIds,
+  GROUP_CONCAT(DISTINCT gm.Grupo_Muscular ORDER BY gm.Grupo_Muscular SEPARATOR ', ') AS GruposMusculares,
+  v.idDireccion,
   d.Direccion,
-  v.IdDificultad,
+  v.idDificultad,
   dif.Dificultad,
   v.idLugar,
   l.Lugar,
   v.idSexo,
   s.Sexo,
-  GROUP_CONCAT(e.Equipamiento ORDER BY e.Equipamiento SEPARATOR ', ') AS Equipamientos,
-  GROUP_CONCAT(e.IdEquipamiento ORDER BY e.IdEquipamiento SEPARATOR ',') AS EquipamientoIds
+  GROUP_CONCAT(DISTINCT e.Equipamiento ORDER BY e.Equipamiento SEPARATOR ', ') AS Equipamientos,
+  GROUP_CONCAT(DISTINCT e.IdEquipamiento ORDER BY e.IdEquipamiento SEPARATOR ',') AS EquipamientoIds
 FROM videos v
   JOIN Sexo s ON v.idSexo = s.idSexo
-  JOIN grupo_muscular gm ON v.IdGrupoMuscular = gm.IdGrupoMuscular
-  JOIN grupo_enfoque ge ON v.IdGrupoEnfoque = ge.IdGrupo
-  JOIN direccion d ON v.IdDireccion = d.IdDireccion
-  JOIN dificultad dif ON v.IdDificultad = dif.IdDificultad
+  LEFT JOIN video_grupo_muscular vgm ON v.IdVideo = vgm.idVideo
+  LEFT JOIN grupo_muscular gm ON vgm.idGrupoMuscular = gm.IdGrupoMuscular
+  JOIN grupo_enfoque ge ON v.idGrupoEnfoque = ge.IdGrupo
+  JOIN direccion d ON v.idDireccion = d.IdDireccion
+  JOIN dificultad dif ON v.idDificultad = dif.IdDificultad
   JOIN lugar l ON v.idLugar = l.idLugar
   LEFT JOIN video_equipamiento ve ON v.IdVideo = ve.idVideo
   LEFT JOIN equipamiento e ON ve.idEquipamiento = e.IdEquipamiento
 GROUP BY
   v.IdVideo, v.Nombre, v.Descripcion, v.URL,
-  v.IdGrupoEnfoque, ge.Grupo,
-  v.IdGrupoMuscular, gm.Grupo_Muscular,
-  v.IdDireccion, d.Direccion,
-  v.IdDificultad, dif.Dificultad,
+  v.idGrupoEnfoque, ge.Grupo,
+  v.idDireccion, d.Direccion,
+  v.idDificultad, dif.Dificultad,
   v.idLugar, l.Lugar,
   v.idSexo, s.Sexo
 ORDER BY v.IdVideo ASC";
@@ -609,7 +616,7 @@ if ($result && $result->num_rows > 0) {
                             </td>
                             <td class="d-none d-md-table-cell limit-text"><?= $video['Descripcion'] ?></td>
                             <td><?= $video['Grupo'] ?></td>
-                            <td class="d-none d-md-table-cell"><?= $video['Grupo_Muscular'] ?></td>
+                            <td class="d-none d-md-table-cell"><?= $video['GruposMusculares'] ?></td>
                             <td><?= $video['Equipamientos'] ?></td> <!-- Mostrar texto -->
                             <td>
                                 <div class="d-flex flex-column flex-md-row justify-content-center gap-1">
@@ -619,14 +626,14 @@ if ($result && $result->num_rows > 0) {
                                         data-idvideo="<?= $video['IdVideo'] ?>"
                                         data-nombre="<?= htmlspecialchars($video['Nombre']) ?>"
                                         data-descripcion="<?= htmlspecialchars($video['Descripcion']) ?>"
-                                        data-grupoenfoque="<?= $video['IdGrupoEnfoque'] ?>"
-                                        data-grupomuscular="<?= $video['IdGrupoMuscular'] ?>"
+                                        data-grupoenfoque="<?= $video['idGrupoEnfoque'] ?>"
+                                        data-grupomuscular="<?= $video['GrupoMuscularIds'] ?>"
                                         data-sexo="<?= $video['idSexo'] ?>"
                                         data-url="<?= $video['URL'] ?>"
                                         data-equipamiento="<?= $video['EquipamientoIds'] ?>" 
                                         data-lugar="<?= $video['idLugar'] ?>"
-                                        data-dificultad="<?= $video['IdDificultad'] ?>"
-                                        data-movimiento="<?= $video['IdDireccion'] ?>">
+                                        data-dificultad="<?= $video['idDificultad'] ?>"
+                                        data-movimiento="<?= $video['idDireccion'] ?>">
                                         <img src="../assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px;">
                                     </button>
 
@@ -770,17 +777,11 @@ td.limit-text {
                         required
                         placeholder="Elige uno o más equipos"
                         >
-                        <option value="1">Ninguno (peso corporal)</option>
-                        <option value="2">Mancuernas</option>
-                        <option value="3">Bandas mini</option>
-                        <option value="4">Pesa rusa</option>
-                        <option value="5">Barra larga</option>
-                        <option value="6">Discos</option>
-                        <option value="7">Polea</option>
-                        <option value="8">Banco</option>
-                        <option value="9">Step o caja</option>
-                        <option value="10">Colchoneta</option>
-                        <option value="11">Máquinas de Gimnasio</option>
+                        <?php foreach ($equipamientosCatalogo as $eq): ?>
+                            <option value="<?= $eq['IdEquipamiento'] ?>">
+                                <?= htmlspecialchars($eq['Equipamiento']) ?>
+                            </option>
+                        <?php endforeach; ?>
                         </select>
                     </div>
 
@@ -955,16 +956,11 @@ td.limit-text {
                     Equipamiento 
                     </label>
                     <select id="editEquipamiento" name="equipamiento[]" class="form-select form-select-solid" multiple required placeholder="Seleccione uno o más equipos">
-                    <option value="1">Mancuernas</option>
-                    <option value="2">Barra olímpica</option>
-                    <option value="3">Kettlebell</option>
-                    <option value="4">Bandas elásticas</option>
-                    <option value="5">Banco plano/inclinado</option>
-                    <option value="6">Stepper</option>
-                    <option value="7">Cuerda para saltar</option>
-                    <option value="8">Máquina de poleas</option>
-                    <option value="9">Swiss Ball</option>
-                    <option value="10">Rodillo de espuma</option>
+                    <?php foreach ($equipamientosCatalogo as $eq): ?>
+                        <option value="<?= $eq['IdEquipamiento'] ?>">
+                            <?= htmlspecialchars($eq['Equipamiento']) ?>
+                        </option>
+                    <?php endforeach; ?>
                     </select>
                 </div>
 <br>
@@ -1288,7 +1284,7 @@ td.limit-text {
         justify-content: flex-start; /* Alinea el contenido a la izquierda */
         height: 120px;
         width: 907px; /* Aseguramos que el ancho se mantenga constante */
-        margin-left: 110px;
+        margin: 0 auto 10px;
     }
 
     .solicitud-card:hover {
@@ -1310,7 +1306,7 @@ td.limit-text {
         background: linear-gradient(to right, rgb(255, 255, 255),rgb(250, 247, 247));
         border-left: 5px solid red;
         width: 907px;
-        margin-left: 110px;
+        margin: 0 auto 10px;
         padding: 10px;
     }
 
@@ -1480,6 +1476,17 @@ td.limit-text {
         margin-left: 200px;
         
         }
+        #buscador-solis-ej {
+        width: 350px;
+        font-size: 14px;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s ease;
+        margin-left: 200px;
+        
+        }
        .contenedor-filtrado {
         display: flex; /* Usa flexbox para alinear los elementos */
         gap: 10px; /* Espaciado entre los elementos */
@@ -1575,6 +1582,8 @@ td.limit-text {
 .solicitud-card {
     max-width: 907px;
     width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .modal-solicitudes-content {
@@ -1753,7 +1762,7 @@ td.limit-text {
     color: white;
 }
 </style>
-<h2 style="text-align: center;">Gestión de Solicitudes</h2>
+<h2 style="text-align: center;">Gestión de Solicitudes Alimentos</h2>
     <br>
     
     <div class="contenedor-filtrado">
@@ -2127,6 +2136,186 @@ window.onclick = function(event) {
 </div>
     </div>
 </div>
+
+<div class="tab-pane fade" id="solicitudes-ej" role="tabpanel"><br>
+    <h2 style="text-align: center;">Gestión de Solicitudes Entrenamiento</h2>
+    <br>
+    <div class="contenedor-filtrado" >
+        <label for="buscador-solis-ej" class="labelb">Buscador</label>
+        <input type="text" class="form-control form-control-sm" id="buscador-solis-ej"
+               onkeyup="buscarSolicitudesEjercicios()" placeholder="Buscar por nombre, email..."
+               style="width: 200px; margin-bottom: 0;">
+
+        <div class="botones-filtrado">
+            <button id="btn-pendientes-ej">Solicitudes Pendientes</button>
+            <button id="btn-aprobadas-ej">Solicitudes Aprobadas</button>
+            <button id="btn-denegadas-ej">Solicitudes Denegadas</button>
+            <button id="btn-todas-ej">Todas</button>
+        </div>
+    </div>
+
+    <?php
+    try {
+        $sqlEj = "SELECT id, nombre, edad, email, peso, altura, genero, objetivo, suscripcion, trabajo,
+                    ejercicio, diasEntrenamiento, intensidad, nivel, lesiones, dias_disponibles,
+                    lugar_entrenamiento, preferencias, estado, fecha_envio
+                  FROM solicitudes_ejercicios";
+        $resultEj = $conexion->query($sqlEj);
+
+        if ($resultEj->num_rows > 0) {
+            echo '<div style="font-family: Arial, sans-serif; margin: 20px;"><br>';
+            echo '<div style="display: flex; flex-direction: column; gap: 15px;">';
+
+            while ($row = $resultEj->fetch_assoc()) {
+                $estadoClass = match($row['estado']) {
+                    'aprobada' => 'aprobada',
+                    'denegada' => 'denegada',
+                    default => 'pendiente'
+                };
+
+                $avatarImg = match(strtolower($row['genero'])) {
+                  'hombre' => '../assets/images/user/avatar-1.jpg',
+                  'mujer'  => '../assets/images/user/avatar-10.jpg',
+                  default   => (function() use ($row) {
+                      $nombreParts = explode(' ', $row['nombre']);
+                      $initials = strtoupper(($nombreParts[0][0] ?? '') . ($nombreParts[1][0] ?? ''));
+                      return 'data:image/svg+xml;base64,' . base64_encode(
+                          '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">'
+                          .'<circle cx="60" cy="60" r="55" fill="#4CAF50"/>'
+                          .'<text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" font-size="40" fill="white">'.$initials.'</text>'
+                          .'</svg>'
+                      );
+                  })(),
+                };
+                ?>
+                <div class="solicitud-card <?= $estadoClass ?>" onclick="abrirModal('ej-<?= $row['id'] ?>')">
+                    <div class="avatar" style="background-image: url('<?= $avatarImg ?>')"></div>
+                    <div class="solicitud-info">
+                        <p class="soli"><strong>Solicitud de entrenamiento</strong></p>
+                        <?php if (!empty($row['fecha_envio'])) :
+                            $fecha = new DateTime($row['fecha_envio']); ?>
+                            <p class="fecha"><strong>Fecha:</strong> <?= $fecha->format('d/m/Y h:i A') ?></p>
+                        <?php else : ?>
+                            <p class="fecha"><strong>Fecha de Envío:</strong> No disponible</p>
+                        <?php endif; ?>
+                        <p><strong>Nombre</strong> <?= htmlspecialchars($row['nombre']) ?></p>
+                        <p><strong>Email</strong> <?= htmlspecialchars($row['email']) ?></p>
+                        <p><strong>Género</strong> <?= htmlspecialchars($row['genero']) ?></p>
+                        <p><strong>Solicitud</strong> <?= htmlspecialchars($row['estado']) ?></p>
+                        <hr>
+                        <p class="soli2">Ver detalles</p>
+                    </div>
+                </div>
+
+                <div class="modal-solicitudes" id="modal-ej-<?= $row['id'] ?>">
+                    <div class="modal-solicitudes-content">
+                        <span class="close" onclick="cerrarModal('ej-<?= $row['id'] ?>')">&times;</span>
+                        <ul class="nav nav-pills modal-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="detalles-ej-tab-<?= $row['id'] ?>" data-bs-toggle="pill" href="#detalles-ej-<?= $row['id'] ?>" role="tab">Detalles</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="plan-ej-tab-<?= $row['id'] ?>" data-bs-toggle="pill" href="#plan-ej-<?= $row['id'] ?>" role="tab">Plan de Entrenamiento</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="detalles-ej-<?= $row['id'] ?>" role="tabpanel" aria-labelledby="detalles-ej-tab-<?= $row['id'] ?>">
+                                <?php
+                                $modalFields = [
+                                    'Nombre completo' => $row['nombre'],
+                                    'Edad' => $row['edad'],
+                                    'Correo Electrónico' => $row['email'],
+                                    'Peso (kg)' => $row['peso'].' kg',
+                                    'Altura (cm)' => $row['altura'].' cm',
+                                    'Objetivo' => $row['objetivo'],
+                                    'Suscripción' => $row['suscripcion'],
+                                    'Trabajo' => $row['trabajo'],
+                                    'Ejercicio actual' => $row['ejercicio'],
+                                    'Días de entrenamiento' => $row['diasEntrenamiento'],
+                                    'Intensidad' => $row['intensidad'],
+                                    'Nivel' => $row['nivel'],
+                                    'Lesiones' => $row['lesiones'],
+                                    'Días disponibles' => $row['dias_disponibles'],
+                                    'Lugar de entrenamiento' => $row['lugar_entrenamiento'],
+                                    'Preferencias' => $row['preferencias']
+                                ];
+                                foreach ($modalFields as $label => $value) : ?>
+                                    <div class="modal-row">
+                                        <strong><?= $label ?></strong>
+                                        <span><?= htmlspecialchars($value) ?></span>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <div class="tab-pane fade" id="plan-ej-<?= $row['id'] ?>" role="tabpanel" aria-labelledby="plan-ej-tab-<?= $row['id'] ?>">
+                                <?php
+                                $planQuery = "SELECT rr.*, ge.Grupo AS Enfoque, r.tiempo_disponible, r.dias_disponible "
+                                    . "FROM resumen_rutinas rr "
+                                    . "JOIN grupo_enfoque ge ON rr.idEnfoque = ge.IdGrupo "
+                                    . "JOIN rutina r ON rr.idRutina = r.IdRutina "
+                                    . "WHERE rr.idSolicitud = " . $row['id'] . " "
+                                    . "ORDER BY rr.fecha_calculo DESC LIMIT 1";
+                                $planResult = $conexion->query($planQuery);
+                                if ($planResult && $planResult->num_rows > 0):
+                                    $plan = $planResult->fetch_assoc();
+                                    ?>
+                                    <div class="modal-row">
+                                        <strong>Fecha de cálculo</strong>
+                                        <span><?= (new DateTime($plan['fecha_calculo']))->format('d/m/Y') ?></span>
+                                    </div>
+                                    <div class="modal-row">
+                                        <strong>Enfoque</strong>
+                                        <span><?= htmlspecialchars($plan['Enfoque']) ?></span>
+                                    </div>
+                                    <div class="modal-row">
+                                        <strong>Días disponibles</strong>
+                                        <span><?= $plan['dias_disponible'] ?></span>
+                                    </div>
+                                    <div class="modal-row">
+                                        <strong>Tiempo disponible</strong>
+                                        <span><?= $plan['tiempo_disponible'] ?> min</span>
+                                    </div>
+                                    <hr>
+                                    <?php
+                                    $ejerciciosQuery = "SELECT re.dia, v.Nombre "
+                                        . "FROM rutina_ejercicio re "
+                                        . "JOIN videos v ON re.idVideo = v.IdVideo "
+                                        . "WHERE re.idRutina = " . $plan['idRutina'] . " "
+                                        . "ORDER BY re.dia, re.orden";
+                                    $ejResult = $conexion->query($ejerciciosQuery);
+                                    $dias = [];
+                                    if ($ejResult) {
+                                        while ($ej = $ejResult->fetch_assoc()) {
+                                            $dias[$ej['dia']][] = $ej['Nombre'];
+                                        }
+                                    }
+                                    if (!empty($dias)) {
+                                        foreach ($dias as $dia => $lista): ?>
+                                            <div class="modal-row">
+                                                <strong>Día <?= $dia ?></strong>
+                                                <span><?= implode(', ', $lista) ?></span>
+                                            </div>
+                                        <?php endforeach;
+                                    } else {
+                                        echo '<div class="alert alert-info">No hay ejercicios asociados</div>';
+                                    }
+                                else:
+                                    echo '<div class="alert alert-info">No hay plan registrado</div>';
+                                endif;
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php
+            }
+            echo '</div></div>';
+        }
+    } catch (Exception $e) {
+        echo "<p>Error al mostrar las solicitudes: " . $e->getMessage() . "</p>";
+    }
+    ?>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
   <script>
@@ -2419,6 +2608,52 @@ document.getElementById('helpForm').addEventListener('submit', function(e) {
     });
 </script>
 <script>
+function buscarSolicitudesEjercicios() {
+    let input = document.getElementById('buscador-solis-ej');
+    let filtro = input.value.toLowerCase();
+    let solicitudes = document.querySelectorAll('#solicitudes-ej .solicitud-card');
+
+    solicitudes.forEach(function(solicitud) {
+        let texto = solicitud.textContent.toLowerCase();
+        solicitud.style.display = texto.includes(filtro) ? 'flex' : 'none';
+    });
+}
+
+function toggleCardsEjercicios(state) {
+    const cards = document.querySelectorAll('#solicitudes-ej .solicitud-card');
+
+    cards.forEach(card => {
+        if (state === 'todas') {
+            card.style.display = 'flex';
+        } else if (state === 'pendiente' && card.classList.contains('pendiente')) {
+            card.style.display = 'flex';
+        } else if (state === 'aprobada' && card.classList.contains('aprobada')) {
+            card.style.display = 'flex';
+        } else if (state === 'denegada' && card.classList.contains('denegada')) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+document.getElementById('btn-pendientes-ej').addEventListener('click', function() {
+    toggleCardsEjercicios('pendiente');
+});
+
+document.getElementById('btn-aprobadas-ej').addEventListener('click', function() {
+    toggleCardsEjercicios('aprobada');
+});
+
+document.getElementById('btn-denegadas-ej').addEventListener('click', function() {
+    toggleCardsEjercicios('denegada');
+});
+
+document.getElementById('btn-todas-ej').addEventListener('click', function() {
+    toggleCardsEjercicios('todas');
+});
+</script>
+<script>
 
 // Función para cambiar pestañas dentro de cada modal
 function cambiarPestana(evt, tabName, modalId) {
@@ -2659,11 +2894,3 @@ window.onload = function () {
   <!-- [Body] end -->
 </html>
 
-
-<?php
-
-
-?>
-
-
-                  
