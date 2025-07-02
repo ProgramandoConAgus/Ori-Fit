@@ -2293,7 +2293,7 @@ window.onclick = function(event) {
                                         <?php for ($d = 1; $d <= $plan['dias_disponible']; $d++): ?>
                                             <div class="modal-row">
                                                 <strong>Día <?= $d ?></strong>
-                                                <select multiple class="form-select selectpicker" data-live-search="true" name="ejercicios[<?= $d ?>][]" id="ejercicios-<?= $row['id'] ?>-<?= $d ?>" disabled>
+                                                <select multiple class="form-select select-ejercicios" name="ejercicios[<?= $d ?>][]" id="ejercicios-<?= $row['id'] ?>-<?= $d ?>" disabled placeholder="Elige ejercicios">
                                                     <?php foreach ($catalogoVideos as $vid): ?>
                                                         <option value="<?= $vid['IdVideo'] ?>" <?= in_array($vid['IdVideo'], $videosDia[$d] ?? []) ? 'selected' : '' ?>>
                                                             <?= htmlspecialchars($vid['Nombre']) ?>
@@ -2343,6 +2343,13 @@ window.onclick = function(event) {
     new TomSelect('#nuevoEquipamiento', {
       ...cfg,
       placeholder: 'Elige uno o más equipos'
+    });
+
+    document.querySelectorAll('.select-ejercicios').forEach(el => {
+      new TomSelect(el, {
+        ...cfg,
+        placeholder: 'Elige ejercicios'
+      });
     });
   });
 </script>
@@ -2397,6 +2404,9 @@ function habilitarEdicionRutina(id) {
         if (el.hasAttribute('readonly')) el.removeAttribute('readonly');
         if (el.disabled) el.disabled = false;
         el.style.backgroundColor = '#fff';
+        if (el.classList.contains('select-ejercicios') && el.tomselect) {
+            el.tomselect.enable();
+        }
     });
     document.getElementById(`btn-editar-ej-${id}`).style.display = 'none';
     document.getElementById(`btn-guardar-ej-${id}`).style.display = 'block';
@@ -2897,14 +2907,6 @@ window.onload = function () {
 
 <!-- JS de Bootstrap 5 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- JS de Bootstrap-Select -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0/dist/js/bootstrap-select.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Activa bootstrap-select sobre tu <select>
-    $('.selectpicker').selectpicker();
-  });
-</script>
 
     <!-- [Page Specific JS] start -->
     <!-- Apex Chart -->
