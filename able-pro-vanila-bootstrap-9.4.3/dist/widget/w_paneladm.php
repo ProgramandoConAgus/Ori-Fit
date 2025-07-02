@@ -507,13 +507,13 @@ $query = "SELECT
   v.Nombre,
   v.Descripcion,
   v.URL,
-  v.IdGrupoEnfoque,
-  ge.Grupo,        
-  v.IdGrupoMuscular,
+  v.idGrupoEnfoque,
+  ge.Grupo,
+  v.idGrupoMuscular,
   gm.Grupo_Muscular,
-  v.IdDireccion,
+  v.idDireccion,
   d.Direccion,
-  v.IdDificultad,
+  v.idDificultad,
   dif.Dificultad,
   v.idLugar,
   l.Lugar,
@@ -523,19 +523,19 @@ $query = "SELECT
   GROUP_CONCAT(e.IdEquipamiento ORDER BY e.IdEquipamiento SEPARATOR ',') AS EquipamientoIds
 FROM videos v
   JOIN Sexo s ON v.idSexo = s.idSexo
-  JOIN grupo_muscular gm ON v.IdGrupoMuscular = gm.IdGrupoMuscular
-  JOIN grupo_enfoque ge ON v.IdGrupoEnfoque = ge.IdGrupo
-  JOIN direccion d ON v.IdDireccion = d.IdDireccion
-  JOIN dificultad dif ON v.IdDificultad = dif.IdDificultad
+  JOIN grupo_muscular gm ON v.idGrupoMuscular = gm.IdGrupoMuscular
+  JOIN grupo_enfoque ge ON v.idGrupoEnfoque = ge.IdGrupo
+  JOIN direccion d ON v.idDireccion = d.IdDireccion
+  JOIN dificultad dif ON v.idDificultad = dif.IdDificultad
   JOIN lugar l ON v.idLugar = l.idLugar
   LEFT JOIN video_equipamiento ve ON v.IdVideo = ve.idVideo
   LEFT JOIN equipamiento e ON ve.idEquipamiento = e.IdEquipamiento
 GROUP BY
   v.IdVideo, v.Nombre, v.Descripcion, v.URL,
-  v.IdGrupoEnfoque, ge.Grupo,
-  v.IdGrupoMuscular, gm.Grupo_Muscular,
-  v.IdDireccion, d.Direccion,
-  v.IdDificultad, dif.Dificultad,
+  v.idGrupoEnfoque, ge.Grupo,
+  v.idGrupoMuscular, gm.Grupo_Muscular,
+  v.idDireccion, d.Direccion,
+  v.idDificultad, dif.Dificultad,
   v.idLugar, l.Lugar,
   v.idSexo, s.Sexo
 ORDER BY v.IdVideo ASC";
@@ -622,14 +622,14 @@ if ($result && $result->num_rows > 0) {
                                         data-idvideo="<?= $video['IdVideo'] ?>"
                                         data-nombre="<?= htmlspecialchars($video['Nombre']) ?>"
                                         data-descripcion="<?= htmlspecialchars($video['Descripcion']) ?>"
-                                        data-grupoenfoque="<?= $video['IdGrupoEnfoque'] ?>"
-                                        data-grupomuscular="<?= $video['IdGrupoMuscular'] ?>"
+                                        data-grupoenfoque="<?= $video['idGrupoEnfoque'] ?>"
+                                        data-grupomuscular="<?= $video['idGrupoMuscular'] ?>"
                                         data-sexo="<?= $video['idSexo'] ?>"
                                         data-url="<?= $video['URL'] ?>"
                                         data-equipamiento="<?= $video['EquipamientoIds'] ?>" 
                                         data-lugar="<?= $video['idLugar'] ?>"
-                                        data-dificultad="<?= $video['IdDificultad'] ?>"
-                                        data-movimiento="<?= $video['IdDireccion'] ?>">
+                                        data-dificultad="<?= $video['idDificultad'] ?>"
+                                        data-movimiento="<?= $video['idDireccion'] ?>">
                                         <img src="../assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px;">
                                     </button>
 
