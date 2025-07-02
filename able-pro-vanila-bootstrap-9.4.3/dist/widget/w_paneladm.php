@@ -2240,11 +2240,57 @@ window.onclick = function(event) {
                             </div>
                             <div class="tab-pane fade" id="plan-ej-<?= $row['id'] ?>" role="tabpanel" aria-labelledby="plan-ej-tab-<?= $row['id'] ?>">
                                 <?php
-                                $planQuery = "SELECT * FROM resumen_rutinas WHERE solicitud_id = " . $row['id'] . " ORDER BY fecha_calculo DESC LIMIT 1";
+                                $planQuery = "SELECT rr.*, ge.Grupo AS Enfoque, r.tiempo_disponible, r.dias_disponible "
+                                    . "FROM resumen_rutinas rr "
+                                    . "JOIN grupo_enfoque ge ON rr.idEnfoque = ge.IdGrupo "
+                                    . "JOIN rutina r ON rr.idRutina = r.IdRutina "
+                                    . "WHERE rr.idSolicitud = " . $row['id'] . " "
+                                    . "ORDER BY rr.fecha_calculo DESC LIMIT 1";
                                 $planResult = $conexion->query($planQuery);
-                                if($planResult && $planResult->num_rows > 0):
+                                if ($planResult && $planResult->num_rows > 0):
                                     $plan = $planResult->fetch_assoc();
-                                    echo '<pre>'.print_r($plan, true).'</pre>';
+                                    ?>
+                                    <div class="modal-row">
+                                        <strong>Fecha de cálculo</strong>
+                                        <span><?= (new DateTime($plan['fecha_calculo']))->format('d/m/Y') ?></span>
+                                    </div>
+                                    <div class="modal-row">
+                                        <strong>Enfoque</strong>
+                                        <span><?= htmlspecialchars($plan['Enfoque']) ?></span>
+                                    </div>
+                                    <div class="modal-row">
+                                        <strong>Días disponibles</strong>
+                                        <span><?= $plan['dias_disponible'] ?></span>
+                                    </div>
+                                    <div class="modal-row">
+                                        <strong>Tiempo disponible</strong>
+                                        <span><?= $plan['tiempo_disponible'] ?> min</span>
+                                    </div>
+                                    <hr>
+                                    <?php
+                                    $ejerciciosQuery = "SELECT re.dia, v.Nombre "
+                                        . "FROM rutina_ejercicio re "
+                                        . "JOIN videos v ON re.idVideo = v.IdVideo "
+                                        . "WHERE re.idRutina = " . $plan['idRutina'] . " "
+                                        . "ORDER BY re.dia, re.orden";
+                                    $ejResult = $conexion->query($ejerciciosQuery);
+                                    $dias = [];
+                                    if ($ejResult) {
+                                        while ($ej = $ejResult->fetch_assoc()) {
+                                            $dias[$ej['dia']][] = $ej['Nombre'];
+                                        }
+                                    }
+                                    if (!empty($dias)) {
+                                        foreach ($dias as $dia => $lista): ?>
+                                            <div class="modal-row">
+                                                <strong>Día <?= $dia ?></strong>
+                                                <span><?= implode(', ', $lista) ?></span>
+                                            </div>
+                                        <?php endforeach;
+                                    } else {
+                                        echo '<div class="alert alert-info">No hay ejercicios asociados</div>';
+                                    }
+                                <?php
                                 else:
                                     echo '<div class="alert alert-info">No hay plan registrado</div>';
                                 endif;
