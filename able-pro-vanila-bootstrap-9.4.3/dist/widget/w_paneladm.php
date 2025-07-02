@@ -509,8 +509,8 @@ $query = "SELECT
   v.URL,
   v.idGrupoEnfoque,
   ge.Grupo,
-  v.idGrupoMuscular,
-  gm.Grupo_Muscular,
+  GROUP_CONCAT(DISTINCT gm.IdGrupoMuscular ORDER BY gm.IdGrupoMuscular SEPARATOR ',') AS GrupoMuscularIds,
+  GROUP_CONCAT(DISTINCT gm.Grupo_Muscular ORDER BY gm.Grupo_Muscular SEPARATOR ', ') AS GruposMusculares,
   v.idDireccion,
   d.Direccion,
   v.idDificultad,
@@ -523,7 +523,8 @@ $query = "SELECT
   GROUP_CONCAT(e.IdEquipamiento ORDER BY e.IdEquipamiento SEPARATOR ',') AS EquipamientoIds
 FROM videos v
   JOIN Sexo s ON v.idSexo = s.idSexo
-  JOIN grupo_muscular gm ON v.idGrupoMuscular = gm.IdGrupoMuscular
+  LEFT JOIN video_grupo_muscular vgm ON v.IdVideo = vgm.idVideo
+  LEFT JOIN grupo_muscular gm ON vgm.idGrupoMuscular = gm.IdGrupoMuscular
   JOIN grupo_enfoque ge ON v.idGrupoEnfoque = ge.IdGrupo
   JOIN direccion d ON v.idDireccion = d.IdDireccion
   JOIN dificultad dif ON v.idDificultad = dif.IdDificultad
@@ -533,7 +534,6 @@ FROM videos v
 GROUP BY
   v.IdVideo, v.Nombre, v.Descripcion, v.URL,
   v.idGrupoEnfoque, ge.Grupo,
-  v.idGrupoMuscular, gm.Grupo_Muscular,
   v.idDireccion, d.Direccion,
   v.idDificultad, dif.Dificultad,
   v.idLugar, l.Lugar,
@@ -612,7 +612,7 @@ if ($result && $result->num_rows > 0) {
                             </td>
                             <td class="d-none d-md-table-cell limit-text"><?= $video['Descripcion'] ?></td>
                             <td><?= $video['Grupo'] ?></td>
-                            <td class="d-none d-md-table-cell"><?= $video['Grupo_Muscular'] ?></td>
+                            <td class="d-none d-md-table-cell"><?= $video['GruposMusculares'] ?></td>
                             <td><?= $video['Equipamientos'] ?></td> <!-- Mostrar texto -->
                             <td>
                                 <div class="d-flex flex-column flex-md-row justify-content-center gap-1">
@@ -623,7 +623,7 @@ if ($result && $result->num_rows > 0) {
                                         data-nombre="<?= htmlspecialchars($video['Nombre']) ?>"
                                         data-descripcion="<?= htmlspecialchars($video['Descripcion']) ?>"
                                         data-grupoenfoque="<?= $video['idGrupoEnfoque'] ?>"
-                                        data-grupomuscular="<?= $video['idGrupoMuscular'] ?>"
+                                        data-grupomuscular="<?= $video['GrupoMuscularIds'] ?>"
                                         data-sexo="<?= $video['idSexo'] ?>"
                                         data-url="<?= $video['URL'] ?>"
                                         data-equipamiento="<?= $video['EquipamientoIds'] ?>" 
