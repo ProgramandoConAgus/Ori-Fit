@@ -519,8 +519,8 @@ $query = "SELECT
   l.Lugar,
   v.idSexo,
   s.Sexo,
-  GROUP_CONCAT(e.Equipamiento ORDER BY e.Equipamiento SEPARATOR ', ') AS Equipamientos,
-  GROUP_CONCAT(e.IdEquipamiento ORDER BY e.IdEquipamiento SEPARATOR ',') AS EquipamientoIds
+  GROUP_CONCAT(DISTINCT e.Equipamiento ORDER BY e.Equipamiento SEPARATOR ', ') AS Equipamientos,
+  GROUP_CONCAT(DISTINCT e.IdEquipamiento ORDER BY e.IdEquipamiento SEPARATOR ',') AS EquipamientoIds
 FROM videos v
   JOIN Sexo s ON v.idSexo = s.idSexo
   LEFT JOIN video_grupo_muscular vgm ON v.IdVideo = vgm.idVideo
@@ -958,16 +958,17 @@ td.limit-text {
                     Equipamiento 
                     </label>
                     <select id="editEquipamiento" name="equipamiento[]" class="form-select form-select-solid" multiple required placeholder="Seleccione uno o más equipos">
-                    <option value="1">Mancuernas</option>
-                    <option value="2">Barra olímpica</option>
-                    <option value="3">Kettlebell</option>
-                    <option value="4">Bandas elásticas</option>
-                    <option value="5">Banco plano/inclinado</option>
-                    <option value="6">Stepper</option>
-                    <option value="7">Cuerda para saltar</option>
-                    <option value="8">Máquina de poleas</option>
-                    <option value="9">Swiss Ball</option>
-                    <option value="10">Rodillo de espuma</option>
+                    <option value="1">Ninguno (peso corporal)</option>
+                    <option value="2">Mancuernas</option>
+                    <option value="3">Bandas mini</option>
+                    <option value="4">Pesa rusa</option>
+                    <option value="5">Barra larga</option>
+                    <option value="6">Discos</option>
+                    <option value="7">Polea</option>
+                    <option value="8">Banco</option>
+                    <option value="9">Step o caja</option>
+                    <option value="10">Colchoneta</option>
+                    <option value="11">Máquinas de Gimnasio</option>
                     </select>
                 </div>
 <br>
