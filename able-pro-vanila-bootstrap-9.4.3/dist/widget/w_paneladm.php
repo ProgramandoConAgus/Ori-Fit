@@ -2,6 +2,10 @@
 include('db.php'); // Incluye la conexión a la base de datos
 session_start();
 
+// Obtener listado de equipamientos para los formularios
+$equipResult = $conexion->query("SELECT IdEquipamiento, Equipamiento FROM equipamiento ORDER BY IdEquipamiento");
+$equipamientosCatalogo = $equipResult ? $equipResult->fetch_all(MYSQLI_ASSOC) : [];
+
 // Realizamos la consulta a la base de datos
 $query = "SELECT u.id, u.nombre, u.apellido, u.telefono, u.correo, u.acceso, u.idTipoPlan as plan, u.idRol as rol ,
 s.peso, s.altura, s.objetivo, s.suscripcion, s.comidas, s.enfermedades, s.estres_soluciones, 
@@ -773,17 +777,11 @@ td.limit-text {
                         required
                         placeholder="Elige uno o más equipos"
                         >
-                        <option value="1">Ninguno (peso corporal)</option>
-                        <option value="2">Mancuernas</option>
-                        <option value="3">Bandas mini</option>
-                        <option value="4">Pesa rusa</option>
-                        <option value="5">Barra larga</option>
-                        <option value="6">Discos</option>
-                        <option value="7">Polea</option>
-                        <option value="8">Banco</option>
-                        <option value="9">Step o caja</option>
-                        <option value="10">Colchoneta</option>
-                        <option value="11">Máquinas de Gimnasio</option>
+                        <?php foreach ($equipamientosCatalogo as $eq): ?>
+                            <option value="<?= $eq['IdEquipamiento'] ?>">
+                                <?= htmlspecialchars($eq['Equipamiento']) ?>
+                            </option>
+                        <?php endforeach; ?>
                         </select>
                     </div>
 
@@ -958,17 +956,11 @@ td.limit-text {
                     Equipamiento 
                     </label>
                     <select id="editEquipamiento" name="equipamiento[]" class="form-select form-select-solid" multiple required placeholder="Seleccione uno o más equipos">
-                    <option value="1">Ninguno (peso corporal)</option>
-                    <option value="2">Mancuernas</option>
-                    <option value="3">Bandas mini</option>
-                    <option value="4">Pesa rusa</option>
-                    <option value="5">Barra larga</option>
-                    <option value="6">Discos</option>
-                    <option value="7">Polea</option>
-                    <option value="8">Banco</option>
-                    <option value="9">Step o caja</option>
-                    <option value="10">Colchoneta</option>
-                    <option value="11">Máquinas de Gimnasio</option>
+                    <?php foreach ($equipamientosCatalogo as $eq): ?>
+                        <option value="<?= $eq['IdEquipamiento'] ?>">
+                            <?= htmlspecialchars($eq['Equipamiento']) ?>
+                        </option>
+                    <?php endforeach; ?>
                     </select>
                 </div>
 <br>

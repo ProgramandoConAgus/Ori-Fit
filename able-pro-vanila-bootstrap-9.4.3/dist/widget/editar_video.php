@@ -14,7 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sexo = intval($_POST['sexo'] ?? 0);
     $dificultad = intval($_POST['dificultad'] ?? 0);
     $grupoEnfoque = intval($_POST['grupo_enfoque'] ?? 0);
-    $equipamientos = $_POST['equipamiento'] ?? [];
+    $equipamientos = isset($_POST['equipamiento']) && is_array($_POST['equipamiento'])
+        ? array_map('intval', $_POST['equipamiento'])
+        : [];
 
     if (
         empty($id) || empty($nombre) || empty($descripcion) || empty($url) ||
