@@ -48,8 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("i", $id);
 
         if ($stmt->execute()) {
-            // Redirigir con mensaje de éxito
-            header("Location: w_paneladm.php?#videos");
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true]);
+            } else {
+                header("Location: w_paneladm.php?#videos");
+            }
             exit();
         } else {
             throw new Exception("Error al eliminar el video: " . $stmt->error);
@@ -57,7 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $stmt->close();
     } catch (Exception $e) {
-        echo "Error: " . $e->getMessage();
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        } else {
+            echo "Error: " . $e->getMessage();
+        }
     } finally {
         $conexion->close();
     }

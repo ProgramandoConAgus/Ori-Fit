@@ -637,12 +637,13 @@ if ($result && $result->num_rows > 0) {
                                         <img src="../assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px;">
                                     </button>
 
-                                    <form method="POST" action="borrar_video.php" style="display: inline;">
-                                        <input type="hidden" name="IdVideo" value="<?= $video['IdVideo'] ?>">
-                                        <button type="submit" class="btn btn-danger btn-sm w-100 w-md-auto" title="Eliminar Video">
-                                            <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar" style="width: 16px; height: 16px;">
-                                        </button>
-                                    </form>
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger btn-sm w-100 w-md-auto btn-delete-video"
+                                        data-idvideo="<?= $video['IdVideo'] ?>"
+                                        title="Eliminar Video">
+                                        <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar" style="width: 16px; height: 16px;">
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -2846,6 +2847,7 @@ window.onload = function () {
 <script src="../assets/js/fonts/custom-font.js"></script>
 <script src="../assets/js/pcoded.js"></script>
 <script src="../assets/js/plugins/feather.min.js"></script>
+<script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
 <div class="floting-button">
 </div>
 
@@ -2903,6 +2905,44 @@ window.onload = function () {
         console.error('Error de red:', error);
     }
 }
+</script>
+<script>
+// Eliminación de videos con confirmación SweetAlert
+document.querySelectorAll('.btn-delete-video').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const id = btn.dataset.idvideo;
+        Swal.fire({
+            title: '¿Eliminar video?',
+            text: 'Esta acción no se puede deshacer',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then(result => {
+            if (result.isConfirmed) {
+                const fd = new FormData();
+                fd.append('IdVideo', id);
+                fetch('borrar_video.php', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: fd
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Eliminado', 'El video ha sido borrado', 'success')
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', data.message || 'No se pudo eliminar', 'error');
+                    }
+                })
+                .catch(() => {
+                    Swal.fire('Error', 'No se pudo eliminar', 'error');
+                });
+            }
+        });
+    });
+});
 </script>
 
 <!-- JS de Bootstrap 5 -->
