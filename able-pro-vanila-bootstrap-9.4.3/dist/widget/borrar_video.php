@@ -12,17 +12,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     try {
-        // 1) Eliminar primero las asociaciones en video_equipamiento
+        // 1) Eliminar las rutinas que referencian este video
+        $delRutina = $conexion->prepare("DELETE FROM rutina_ejercicio WHERE idVideo = ?");
+        if (!$delRutina) {
+            throw new Exception("Error al preparar DELETE de rutina_ejercicio: " . $conexion->error);
+        }
+        $delRutina->bind_param("i", $id);
+        $delRutina->execute();
+        $delRutina->close();
+
+        // 2) Eliminar primero las asociaciones en video_equipamiento
         $delAssoc = $conexion->prepare("DELETE FROM video_equipamiento WHERE idVideo = ?");
         if (!$delAssoc) {
             throw new Exception("Error al preparar DELETE de video_equipamiento: " . $conexion->error);
         }
         $delAssoc->bind_param("i", $id);
         $delAssoc->execute();
-
         $delAssoc->close();
 
-        // 1b) Eliminar asociaciones en video_grupo_muscular
+        // 3) Eliminar asociaciones en video_grupo_muscular
         $delGrupo = $conexion->prepare("DELETE FROM video_grupo_muscular WHERE idVideo = ?");
         if (!$delGrupo) {
             throw new Exception("Error al preparar DELETE de video_grupo_muscular: " . $conexion->error);
@@ -30,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $delGrupo->bind_param("i", $id);
         $delGrupo->execute();
         $delGrupo->close();
-
-        // 2) Ahora eliminar el video en sí
+        
+        // 4) Ahora eliminar el video en sí
         $query = "DELETE FROM videos WHERE IdVideo = ?";
         $stmt = $conexion->prepare($query);
         if (!$stmt) {
