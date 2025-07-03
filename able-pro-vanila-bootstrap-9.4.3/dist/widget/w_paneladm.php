@@ -600,7 +600,7 @@ if ($result && $result->num_rows > 0) {
                     </thead>
                     <tbody>
                     <?php foreach ($videos as $video): ?>
-                        <tr>
+                        <tr id="video-row-<?= $video['IdVideo'] ?>">
                             <td><?= $video['IdVideo'] ?></td>
                             <td class="video-cell">
                                 <a href="<?= htmlspecialchars($video['URL'], ENT_QUOTES) ?>" target="_blank">
@@ -2930,8 +2930,9 @@ document.querySelectorAll('.btn-delete-video').forEach(btn => {
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
-                        Swal.fire('Eliminado', 'El video ha sido borrado', 'success')
-                            .then(() => location.reload());
+                        Swal.fire('Eliminado', 'El video ha sido borrado', 'success');
+                        const row = document.getElementById("video-row-" + id);
+                        if (row) row.remove();
                     } else {
                         Swal.fire('Error', data.message || 'No se pudo eliminar', 'error');
                     }
