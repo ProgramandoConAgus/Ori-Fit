@@ -18,22 +18,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!is_numeric($grasas)) throw new Exception("Grasas inválidas");
         if (!is_numeric($carbohidratos)) throw new Exception("Carbohidratos inválidos");
 
-        // 1. Actualizar resumen_planes
-        $stmt = $conexion->prepare("
-            UPDATE resumen_planes 
-            SET calorias = ?, proteinas = ?, grasas = ?, carbohidratos = ?, fecha_calculo = NOW() 
-            WHERE solicitud_id = ?
-        ");
-        $stmt->bind_param("iiiii", $calorias, $proteinas, $grasas, $carbohidratos, $solicitud_id);
-        
-        if (!$stmt->execute()) throw new Exception("Error actualizando resumen: " . $stmt->error);
-        $stmt->close();
 
-        // 2. Eliminar ingredientes antiguos
+        // 1. Eliminar ingredientes antiguos
         $deleteStmt = $conexion->prepare("DELETE FROM planes_nutricionales WHERE solicitud_id = ?");
         $deleteStmt->bind_param("i", $solicitud_id);
         if (!$deleteStmt->execute()) throw new Exception("Error eliminando ingredientes: " . $deleteStmt->error);
         $deleteStmt->close();
+
+        $totalProte = 0;
+        $totalGrasa = 0;
+        $totalCarbs = 0;
 
         // 3. Insertar nuevos ingredientes
         if (!empty($ingredientes)) {
@@ -80,11 +74,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $grasas_ing,
                     $carbohidratos_ing
                 );
+                $totalProte += $proteinas_ing;
+                $totalGrasa += $grasas_ing;
+                $totalCarbs += $carbohidratos_ing;
                 
                 if (!$insertStmt->execute()) throw new Exception("Error insertando ingrediente: " . $insertStmt->error);
             }
             $insertStmt->close();
         }
+        $sumCalorias = ($totalProte * 4) + ($totalCarbs * 4) + ($totalGrasa * 9);
+        $nuevoCal = max($calorias, round($sumCalorias));
+        $nuevoProt = max($proteinas, round($totalProte));
+        $nuevoGrasa = max($grasas, round($totalGrasa));
+        $nuevoCarb = max($carbohidratos, round($totalCarbs));
+        $stmt = $conexion->prepare("UPDATE resumen_planes SET calorias = ?, proteinas = ?, grasas = ?, carbohidratos = ?, fecha_calculo = NOW() WHERE solicitud_id = ?");
+        $stmt->bind_param("iiiii", $nuevoCal, $nuevoProt, $nuevoGrasa, $nuevoCarb, $solicitud_id);
+        if (!$stmt->execute()) throw new Exception("Error actualizando resumen: " . $stmt->error);
+        $stmt->close();
 
         $conexion->commit();
         header("Location: w_paneladm.php");
