@@ -122,11 +122,10 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 3);
           </a>
         </li>
         <li class="pc-item">
-          <a href="#" class="pc-link">
+          <a href="../widget/panelrutina.php" class="pc-link">
             <span class="pc-micon">
               <svg class="pc-icon">
                 <use xlink:href="#custom-fatrows"></use>
-              </svg>
             </span>
             <span class="pc-mtext">Mi Entrenamiento</span>
           </a>
@@ -767,35 +766,53 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 3);
 <script src="../assets/js/pcoded.js"></script>
 <script src="../assets/js/plugins/feather.min.js"></script>
 <script>
-  document.getElementById("ejercicio").addEventListener("change", function() {
+  document.addEventListener("DOMContentLoaded", () => {
+    const ejercicio = document.getElementById("ejercicio");
     const extraFields = document.getElementById("extraFields");
     const diasEntrenamiento = document.getElementById("diasEntrenamiento");
     const intensidad = document.getElementById("intensidad");
 
-    if (this.value === "si") {
-      extraFields.style.display = "flex"; 
-      diasEntrenamiento.required = true; // Establece los campos como obligatorios
-      intensidad.required = true;
-    } else {
-      extraFields.style.display = "none";
-      diasEntrenamiento.required = false; // Desactiva el requisito de campos obligatorios
-      intensidad.required = false;
-      diasEntrenamiento.value = ""; // Limpia el campo
-      intensidad.value = ""; // Limpia el campo
-    }
-  });
+    const lugar = document.getElementById("lugar_entrenamiento");
+    const campoNivel = document.getElementById("extraField");
+    const nivel = document.getElementById("nivel");
 
-  document.getElementById("lugar_entrenamiento").addEventListener("change", function(){
-        const campo = document.getElementById("extraField");
-        const nivel = document.getElementById("nivel");
-        if(this.value === "gimnasio"){
-            campo.style.display = "flex";
-            nivel.required = true;
-        }else{
-            campo.style.display = "none";
-            nivel.required = false;
-        }
-    });
+    function toggleEjercicio() {
+      if (ejercicio.value === "si") {
+        extraFields.style.display = "flex";
+        diasEntrenamiento.required = true;
+        diasEntrenamiento.disabled = false;
+        intensidad.required = true;
+        intensidad.disabled = false;
+      } else {
+        extraFields.style.display = "none";
+        diasEntrenamiento.required = false;
+        diasEntrenamiento.disabled = true;
+        intensidad.required = false;
+        intensidad.disabled = true;
+        diasEntrenamiento.value = "";
+        intensidad.value = "";
+      }
+    }
+
+    function toggleNivel() {
+      if (lugar.value === "gimnasio") {
+        campoNivel.style.display = "flex";
+        nivel.required = true;
+        nivel.disabled = false;
+      } else {
+        campoNivel.style.display = "none";
+        nivel.required = false;
+        nivel.disabled = true;
+        nivel.value = "default";
+      }
+    }
+
+    ejercicio.addEventListener("change", toggleEjercicio);
+    lugar.addEventListener("change", toggleNivel);
+
+    toggleEjercicio();
+    toggleNivel();
+  });
 </script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -835,18 +852,27 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 3);
     function actualizarBotones() {
       const activoNav = getActiveNav();
       const id        = activoNav.getAttribute("href").substring(1);
-      btnAnterior.style.display = "none";
-      btnSiguiente.style.display = "none";
-      btnTerminar.style.display = "none";
 
-      if (id === "contactDetail") {
+      btnAnterior.style.display  = "none";
+      btnSiguiente.style.display = "none";
+      btnTerminar.style.display  = "none";
+
+      if (id === "finish") {
+        btnAnterior.style.display = "inline-block";
+        btnTerminar.style.display = "inline-block";
+        btnSiguiente.style.marginLeft = "";
+        btnSiguiente.style.marginRight = "";
+      } else {
         btnSiguiente.style.display = "inline-block";
-      } else if (id === "educationDetail") {
-        btnAnterior.style.display  = "inline-block";
-        btnSiguiente.style.display = "inline-block";
-      } else if (id === "finish") {
-        btnAnterior.style.display  = "inline-block";
-        btnTerminar.style.display  = "inline-block";
+        if (id === "contactDetail") {
+          btnAnterior.style.display = "none";
+          btnSiguiente.style.marginLeft = "auto";
+          btnSiguiente.style.marginRight = "0";
+        } else {
+          btnAnterior.style.display = "inline-block";
+          btnSiguiente.style.marginLeft = "";
+          btnSiguiente.style.marginRight = "";
+        }
       }
     }
 

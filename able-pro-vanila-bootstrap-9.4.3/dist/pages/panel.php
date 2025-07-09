@@ -132,11 +132,10 @@ $resultadoNotificaciones = $stmt->get_result();
           </a>
         </li>
         <li class="pc-item">
-          <a href="#" class="pc-link">
+          <a href="../widget/panelrutina.php" class="pc-link">
             <span class="pc-micon">
               <svg class="pc-icon">
                 <use xlink:href="#custom-fatrows"></use>
-              </svg>
             </span>
             <span class="pc-mtext">Mi Entrenamiento</span>
           </a>
