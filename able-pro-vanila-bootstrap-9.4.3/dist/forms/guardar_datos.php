@@ -45,12 +45,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Datos adicionales si el plan es mixto
     $lesiones = isset($_POST['lesiones']) ? trim($_POST['lesiones']) : '';
-    $dias_disponibles = isset($_POST['dias_disponibles']) ? filter_var(trim($_POST['dias_disponibles']), FILTER_VALIDATE_INT) : 0;
+    $dias_disponibles = isset($_POST['dias_disponibles']) ? filter_var(trim($_POST['dias_disponibles']), FILTER_VALIDATE_INT) : null;
     $lugar_entrenamiento = isset($_POST['lugar_entrenamiento']) ? trim($_POST['lugar_entrenamiento']) : '';
     $preferencia_ejercicios = isset($_POST['preferencia_ejercicios']) ? trim($_POST['preferencia_ejercicios']) : '';
-    $tiempo_disponible = isset($_POST['tiempo_disponible']) ? filter_var(trim($_POST['tiempo_disponible']), FILTER_VALIDATE_INT) : 30;
-    $nivel = isset($_POST['nivel']) ? filter_var(trim($_POST['nivel']), FILTER_VALIDATE_INT) : 1;
-    $grupo_enfoque = isset($_POST['grupo_enfoque']) ? trim($_POST['grupo_enfoque']) : 5;
+    $tiempo_disponible = isset($_POST['tiempo_disponible']) ? filter_var(trim($_POST['tiempo_disponible']), FILTER_VALIDATE_INT) : null;
+    $nivel = isset($_POST['nivel']) ? filter_var(trim($_POST['nivel']), FILTER_VALIDATE_INT) : null;
+    $grupo_enfoque = isset($_POST['grupo_enfoque']) ? trim($_POST['grupo_enfoque']) : '';
     $estado = "pendiente"; // Estado por defecto
     $fechaHoraActual = date('Y-m-d H:i:s'); 
     $comidas=implode("-", $comidaArray);;
@@ -73,8 +73,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Campos opcionales (asegurar que no sean NULL si no se proporcionan)
-    $dias_entrenamiento = $dias_entrenamiento ?? 0; // Si no se envía, valor por defecto
-    $intensidad = $intensidad ?? 0;
+    $dias_entrenamiento = ($dias_entrenamiento === null || $dias_entrenamiento === false) ? 0 : $dias_entrenamiento;
+    $intensidad = ($intensidad === null || $intensidad === false) ? 0 : $intensidad;
+    $nivel = ($nivel === null || $nivel === false) ? 1 : $nivel;
+    $dias_disponibles = ($dias_disponibles === null || $dias_disponibles === false) ? 0 : $dias_disponibles;
+    $tiempo_disponible = ($tiempo_disponible === null || $tiempo_disponible === false) ? 30 : $tiempo_disponible;
+    $grupo_enfoque = $grupo_enfoque === '' ? 5 : (int)$grupo_enfoque;
 
     try {
         // Verificar si ya existe una solicitud

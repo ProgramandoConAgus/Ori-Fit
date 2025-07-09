@@ -915,36 +915,54 @@ document.getElementById('helpForm').addEventListener('submit', function(e) {
 <script src="../assets/js/pcoded.js"></script>
 <script src="../assets/js/plugins/feather.min.js"></script>
 <script>
-  document.getElementById("ejercicio").addEventListener("change", function() {
+  document.addEventListener("DOMContentLoaded", () => {
+    const ejercicio = document.getElementById("ejercicio");
     const extraFields = document.getElementById("extraFields");
     const diasEntrenamiento = document.getElementById("diasEntrenamiento");
     const intensidad = document.getElementById("intensidad");
 
-    if (this.value === "si") {
-      extraFields.style.display = "flex"; 
-      diasEntrenamiento.required = true; // Establece los campos como obligatorios
-      intensidad.required = true;
-    } else {
-      extraFields.style.display = "none";
-      diasEntrenamiento.required = false; // Desactiva el requisito de campos obligatorios
-      intensidad.required = false;
-      diasEntrenamiento.value = ""; // Limpia el campo
-  intensidad.value = ""; // Limpia el campo
+    const lugar = document.getElementById("lugar_entrenamiento");
+    const nivelWrap = document.getElementById("extraField");
+    const nivel = document.getElementById("nivel");
+
+    function toggleEjercicio() {
+      if (ejercicio.value === "si") {
+        extraFields.style.display = "flex";
+        diasEntrenamiento.required = true;
+        diasEntrenamiento.disabled = false;
+        intensidad.required = true;
+        intensidad.disabled = false;
+      } else {
+        extraFields.style.display = "none";
+        diasEntrenamiento.required = false;
+        diasEntrenamiento.disabled = true;
+        intensidad.required = false;
+        intensidad.disabled = true;
+        diasEntrenamiento.value = "";
+        intensidad.value = "";
+      }
     }
+
+    function toggleNivel() {
+      if (lugar.value === "gimnasio") {
+        nivelWrap.style.display = "flex";
+        nivel.required = true;
+        nivel.disabled = false;
+      } else {
+        nivelWrap.style.display = "none";
+        nivel.required = false;
+        nivel.disabled = true;
+        nivel.value = "default";
+      }
+    }
+
+    ejercicio.addEventListener("change", toggleEjercicio);
+    lugar.addEventListener("change", toggleNivel);
+
+    // Ajustar estados al cargar la página
+    toggleEjercicio();
+    toggleNivel();
   });
-</script>
-<script>
-  document.getElementById("lugar_entrenamiento").addEventListener("change", function(){
-        const campo = document.getElementById("extraField");
-        const nivel = document.getElementById("nivel");
-        if(this.value === "gimnasio"){
-            campo.style.display = "flex";
-            nivel.required = true;
-        }else{
-            campo.style.display = "none";
-            nivel.required = false;
-        }
-    });
 </script>
 
 <script>
