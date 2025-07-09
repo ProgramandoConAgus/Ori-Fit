@@ -5,6 +5,21 @@ include 'db.php';
 // Iniciar la sesión para obtener datos de usuario
 session_start();
 
+// Obtener tipo de plan del usuario para definir la redirección posterior
+$plan = 1; // por defecto, solo nutricional
+$sqlPlan = "SELECT idTipoPlan FROM usuarios WHERE id = ?";
+$stmtPlan = $conexion->prepare($sqlPlan);
+if ($stmtPlan) {
+    $stmtPlan->bind_param("i", $_SESSION['IdUsuario']);
+    if ($stmtPlan->execute()) {
+        $resPlan = $stmtPlan->get_result();
+        if ($filaPlan = $resPlan->fetch_assoc()) {
+            $plan = (int)$filaPlan['idTipoPlan'];
+        }
+    }
+    $stmtPlan->close();
+}
+
 $usuario_id = $_SESSION['IdUsuario'];
 
 // Obtener solicitud más reciente
@@ -168,5 +183,11 @@ foreach ($plan_nutricional as $tiempo_comida => $categorias) {
 
 $stmt_alimentos->close();
 $conexion->close();
-header('Location: ../pages/panel.php');
-?>
+
+// Si el usuario cuenta con un plan mixto, continuamos con el formulario de
+// ejercicios; de lo contrario volvemos al panel principal.
+if ($plan === 3) {
+    header('Location: ../forms/ejerciciosForm.php');
+} else {
+    header('Location: ../pages/panel.php');
+}?>
