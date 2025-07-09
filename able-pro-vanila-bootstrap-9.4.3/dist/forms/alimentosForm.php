@@ -708,6 +708,40 @@ $resultadoNotificaciones = $stmt->get_result();
                     </select>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label class="form-label" for="tiempo_disponible">Tiempo disponible para entrenar:</label>
+                    <select name="tiempo_disponible" class="form-control" required>
+                        <option value="" disabled selected>Seleccionar</option>
+                        <option value="30">30 Minutos</option>
+                        <option value="45">45 Minutos</option>
+                        <option value="60">60 Minutos</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label class="form-label" for="nivel">Experiencia en Gimnasios</label>
+                    <select name="nivel" class="form-control" required>
+                        <option value="default">Seleccionar</option>
+                        <option value="1">Principiante</option>
+                        <option value="2">Intermedio</option>
+                        <option value="3">Avanzado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label class="form-label" for="grupo_enfoque">En que grupo muscular te gustaria enfocar el trabajo</label>
+                    <select name="grupo_enfoque" class="form-select form-select-solid" required>
+                        <option value="">Seleccione un grupo...</option>
+                        <option value="1">Gluteos</option>
+                        <option value="2">Piernas</option>
+                        <option value="4">Tren Superior</option>
+                        <option value="5">Full body</option>
+                    </select>
+                </div>
+            </div>
         <?php endif; ?>
     </div>
 </div>
@@ -1041,6 +1075,22 @@ document.getElementById('helpForm').addEventListener('submit', function(e) {
       new Wizard('#basicwizard', {
         validate: true,
         progress: true
+      });
+    </script>
+    <script>
+      document.getElementById('contactForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const data = new FormData(form);
+
+        try {
+          await fetch('./guardar_datos.php', { method: 'POST', body: new FormData(form) });
+          await fetch('./guardar_ejercicios.php', { method: 'POST', body: new FormData(form) });
+          window.location.href = '../pages/panel.php';
+        } catch (err) {
+          console.error('Error al enviar formularios:', err);
+          alert('Ocurri\u00f3 un error al generar los planes.');
+        }
       });
     </script>
     <div class="pct-c-btn">

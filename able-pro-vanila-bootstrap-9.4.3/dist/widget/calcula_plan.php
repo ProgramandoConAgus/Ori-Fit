@@ -169,4 +169,3 @@ foreach ($plan_nutricional as $tiempo_comida => $categorias) {
 $stmt_alimentos->close();
 $conexion->close();
 header('Location: ../pages/panel.php');
-?>
