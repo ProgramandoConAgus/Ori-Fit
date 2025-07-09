@@ -6,6 +6,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Recibir y limpiar los datos
     $usuario_id = $_SESSION['IdUsuario'];
+
+    // Consultar tipo de plan del usuario
+    $plan = 1;
+    $stmtPlan = $conexion->prepare("SELECT idTipoPlan FROM usuarios WHERE id = ?");
+    if ($stmtPlan) {
+        $stmtPlan->bind_param("i", $usuario_id);
+        if ($stmtPlan->execute()) {
+            $resPlan = $stmtPlan->get_result();
+            if ($filaPlan = $resPlan->fetch_assoc()) {
+                $plan = (int)$filaPlan['idTipoPlan'];
+            }
+        }
+        $stmtPlan->close();
+    }
+
     $nombre = trim($_POST['nombre']);
     $edad = isset($_POST['edad']) ? filter_var(trim($_POST['edad']), FILTER_VALIDATE_INT) : null;
     $genero = trim($_POST['genero']);  // Campo genero
@@ -23,6 +38,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ejercicio = trim($_POST['ejercicio']);
     $dias_entrenamiento = isset($_POST['dias_entrenamiento']) ? filter_var(trim($_POST['dias_entrenamiento']), FILTER_VALIDATE_INT) : null;
     $intensidad = isset($_POST['intensidad']) ? filter_var(trim($_POST['intensidad']), FILTER_VALIDATE_INT) : null;
+
+    // Datos adicionales si el plan es mixto
+    $lesiones = isset($_POST['lesiones']) ? trim($_POST['lesiones']) : '';
+    $dias_disponibles = isset($_POST['dias_disponibles']) ? filter_var(trim($_POST['dias_disponibles']), FILTER_VALIDATE_INT) : 0;
+    $lugar_entrenamiento = isset($_POST['lugar_entrenamiento']) ? trim($_POST['lugar_entrenamiento']) : '';
+    $preferencia_ejercicios = isset($_POST['preferencia_ejercicios']) ? trim($_POST['preferencia_ejercicios']) : '';
+
+    // Valores por defecto para campos que el formulario mixto no incluye
+    $nivel = 1;
+    $grupo_enfoque = 5;
+    $tiempo_disponible = 30;
     $estado = "pendiente"; // Estado por defecto
     $fechaHoraActual = date('Y-m-d H:i:s'); 
     $comidas=implode("-", $comidaArray);;
@@ -143,6 +169,74 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
             if ($exitoso) {
+                // Si el usuario tiene plan mixto, guardamos también la solicitud de ejercicios
+                if ($plan === 3) {
+                    $sqlSelEj = "SELECT * FROM solicitudes_ejercicios WHERE usuario_id = ?"; 
+                    $stmtSelEj = $conexion->prepare($sqlSelEj);
+                    $stmtSelEj->bind_param("i", $usuario_id);
+                    $stmtSelEj->execute();
+                    $resSelEj = $stmtSelEj->get_result();
+
+                    if ($resSelEj->num_rows == 0) {
+                        $sqlEj = "INSERT INTO solicitudes_ejercicios (usuario_id, nombre, edad, email, peso, altura, sexo, objetivo, suscripcion, trabajo, ejercicio, diasEntrenamiento, intensidad, nivel, lesiones, dias_disponibles, lugar_entrenamiento, preferencias, estado, fecha_envio, grupo_enfoque, tiempo_disponible) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        $stmtEj = $conexion->prepare($sqlEj);
+                        $stmtEj->bind_param(
+                            "isisdiissssiiisisssssi",
+                            $usuario_id,
+                            $nombre,
+                            $edad,
+                            $email,
+                            $peso,
+                            $altura,
+                            $genero,
+                            $objetivo,
+                            $suscripcion,
+                            $trabajo,
+                            $ejercicio,
+                            $dias_entrenamiento,
+                            $intensidad,
+                            $nivel,
+                            $lesiones,
+                            $dias_disponibles,
+                            $lugar_entrenamiento,
+                            $preferencia_ejercicios,
+                            $estado,
+                            $fechaHoraActual,
+                            $grupo_enfoque,
+                            $tiempo_disponible
+                        );
+                    } else {
+                        $sqlEj = "UPDATE solicitudes_ejercicios SET nombre = ?, edad = ?, email = ?, peso = ?, altura = ?, sexo = ?, objetivo = ?, suscripcion = ?, trabajo = ?, ejercicio = ?, diasEntrenamiento = ?, intensidad = ?, nivel = ?, lesiones = ?, dias_disponibles = ?, lugar_entrenamiento = ?, preferencias = ?, estado = ?, fecha_envio = ?, grupo_enfoque = ?, tiempo_disponible = ? WHERE usuario_id = ?";
+                        $stmtEj = $conexion->prepare($sqlEj);
+                        $stmtEj->bind_param(
+                            "sisdiissssiiisisssssii",
+                            $nombre,
+                            $edad,
+                            $email,
+                            $peso,
+                            $altura,
+                            $genero,
+                            $objetivo,
+                            $suscripcion,
+                            $trabajo,
+                            $ejercicio,
+                            $dias_entrenamiento,
+                            $intensidad,
+                            $nivel,
+                            $lesiones,
+                            $dias_disponibles,
+                            $lugar_entrenamiento,
+                            $preferencia_ejercicios,
+                            $estado,
+                            $fechaHoraActual,
+                            $grupo_enfoque,
+                            $tiempo_disponible,
+                            $usuario_id
+                        );
+                    }
+                    $stmtEj->execute();
+                }
+
                 echo "Datos guardados exitosamente.";
                 header("Location: ../widget/calcula_plan.php");
                 exit();
