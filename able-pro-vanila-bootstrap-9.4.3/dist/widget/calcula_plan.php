@@ -2,6 +2,11 @@
 // Conectar a la base de datos
 include 'db.php';
 
+// Permite incluir este archivo desde otros scripts sin redireccionar
+if (!defined('SKIP_REDIRECT')) {
+    define('SKIP_REDIRECT', false);
+}
+
 // Iniciar la sesión para obtener datos de usuario
 session_start();
 
@@ -168,5 +173,6 @@ foreach ($plan_nutricional as $tiempo_comida => $categorias) {
 
 $stmt_alimentos->close();
 $conexion->close();
-header('Location: ../pages/panel.php');
-?>
+if (!SKIP_REDIRECT) {
+    header('Location: ../pages/panel.php');
+}?>
