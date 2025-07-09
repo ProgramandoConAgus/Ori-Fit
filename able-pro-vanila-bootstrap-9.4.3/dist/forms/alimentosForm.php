@@ -691,7 +691,7 @@ $resultadoNotificaciones = $stmt->get_result();
             <div class="col-md-12">
                 <div class="mb-3">
                     <label class="form-label" for="lugar_entrenamiento">La rutina de entrenamiento ¿la realizarás en un gimnasio o en tu casa?</label>
-                    <select name="lugar_entrenamiento" class="form-control" required>
+                    <select id="lugar_entrenamiento" name="lugar_entrenamiento" class="form-control" required>
                         <option value="" disabled selected>Seleccionar</option>
                         <option value="gimnasio">Gimnasio</option>
                         <option value="casa">Casa</option>
@@ -700,11 +700,45 @@ $resultadoNotificaciones = $stmt->get_result();
             </div>
             <div class="col-md-12">
                 <div class="mb-3">
+                    <label class="form-label" for="tiempo_disponible">Tiempo disponible para entrenar:</label>
+                    <select id="tiempo_disponible" name="tiempo_disponible" class="form-control" required>
+                        <option value="" disabled selected>Seleccionar</option>
+                        <option value="30">30 Minutos</option>
+                        <option value="45">45 Minutos</option>
+                        <option value="60">60 Minutos</option>
+                    </select>
+                </div>
+            </div>
+            <div id="extraField" class="row" style="display: none; gap: 20px; margin-top: 10px;">
+                <div class="col-sm-6 mb-3">
+                    <label class="form-label" for="nivel">Experiencia en Gimnasios</label>
+                    <select id="nivel" name="nivel" class="form-control" required>
+                        <option value="default">Seleccionar</option>
+                        <option value="1">Principiante</option>
+                        <option value="2">Intermedio</option>
+                        <option value="3">Avanzado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="mb-3">
                     <label class="form-label" for="preferencia_ejercicios">Te gustan los ejercicios con elementos/máquinas o sin elementos:</label>
-                    <select name="preferencia_ejercicios" class="form-control" required>
+                    <select id="preferencia_ejercicios" name="preferencia_ejercicios" class="form-control" required>
                         <option value="" disabled selected>Seleccionar</option>
                         <option value="con elementos">Con elementos/máquinas</option>
                         <option value="sin elementos">Sin elementos</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label class="form-label" for="grupo_enfoque">En que grupo muscular te gustaria enfocar el trabajo</label>
+                    <select class="form-select form-select-solid" id="grupo_enfoque" name="grupo_enfoque" required>
+                        <option value="">Seleccione un grupo...</option>
+                        <option value="1">Gluteos</option>
+                        <option value="2">Piernas</option>
+                        <option value="4">Tren Superior</option>
+                        <option value="5">Full body</option>
                     </select>
                 </div>
             </div>
@@ -895,9 +929,22 @@ document.getElementById('helpForm').addEventListener('submit', function(e) {
       diasEntrenamiento.required = false; // Desactiva el requisito de campos obligatorios
       intensidad.required = false;
       diasEntrenamiento.value = ""; // Limpia el campo
-      intensidad.value = ""; // Limpia el campo
+  intensidad.value = ""; // Limpia el campo
     }
   });
+</script>
+<script>
+  document.getElementById("lugar_entrenamiento").addEventListener("change", function(){
+        const campo = document.getElementById("extraField");
+        const nivel = document.getElementById("nivel");
+        if(this.value === "gimnasio"){
+            campo.style.display = "flex";
+            nivel.required = true;
+        }else{
+            campo.style.display = "none";
+            nivel.required = false;
+        }
+    });
 </script>
 
 <script>

@@ -44,11 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $dias_disponibles = isset($_POST['dias_disponibles']) ? filter_var(trim($_POST['dias_disponibles']), FILTER_VALIDATE_INT) : 0;
     $lugar_entrenamiento = isset($_POST['lugar_entrenamiento']) ? trim($_POST['lugar_entrenamiento']) : '';
     $preferencia_ejercicios = isset($_POST['preferencia_ejercicios']) ? trim($_POST['preferencia_ejercicios']) : '';
-
-    // Valores por defecto para campos que el formulario mixto no incluye
-    $nivel = 1;
-    $grupo_enfoque = 5;
-    $tiempo_disponible = 30;
+    $tiempo_disponible = isset($_POST['tiempo_disponible']) ? filter_var(trim($_POST['tiempo_disponible']), FILTER_VALIDATE_INT) : 30;
+    $nivel = isset($_POST['nivel']) ? filter_var(trim($_POST['nivel']), FILTER_VALIDATE_INT) : 1;
+    $grupo_enfoque = isset($_POST['grupo_enfoque']) ? trim($_POST['grupo_enfoque']) : 5;
     $estado = "pendiente"; // Estado por defecto
     $fechaHoraActual = date('Y-m-d H:i:s'); 
     $comidas=implode("-", $comidaArray);;
