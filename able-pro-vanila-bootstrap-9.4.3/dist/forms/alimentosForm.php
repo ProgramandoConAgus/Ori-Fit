@@ -708,6 +708,40 @@ $resultadoNotificaciones = $stmt->get_result();
                     </select>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label class="form-label" for="tiempo_disponible">Tiempo disponible para entrenar:</label>
+                    <select name="tiempo_disponible" class="form-control" required>
+                        <option value="" disabled selected>Seleccionar</option>
+                        <option value="30">30 Minutos</option>
+                        <option value="45">45 Minutos</option>
+                        <option value="60">60 Minutos</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label class="form-label" for="nivel">Experiencia en Gimnasios</label>
+                    <select name="nivel" class="form-control" required>
+                        <option value="default">Seleccionar</option>
+                        <option value="1">Principiante</option>
+                        <option value="2">Intermedio</option>
+                        <option value="3">Avanzado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="mb-3">
+                    <label class="form-label" for="grupo_enfoque">En que grupo muscular te gustaria enfocar el trabajo</label>
+                    <select name="grupo_enfoque" class="form-select form-select-solid" required>
+                        <option value="">Seleccione un grupo...</option>
+                        <option value="1">Gluteos</option>
+                        <option value="2">Piernas</option>
+                        <option value="4">Tren Superior</option>
+                        <option value="5">Full body</option>
+                    </select>
+                </div>
+            </div>
         <?php endif; ?>
     </div>
 </div>
