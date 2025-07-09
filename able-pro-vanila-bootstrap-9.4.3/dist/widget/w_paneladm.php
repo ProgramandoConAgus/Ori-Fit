@@ -214,7 +214,7 @@ function getYoutubeId(string $url): ?string {
           </a>
         </li>
         <li class="pc-item">
-          <a href="#" class="pc-link">
+          <a href="panelrutina.php" class="pc-link">
             <span class="pc-micon">
               <svg class="pc-icon">
                 <use xlink:href="#custom-fatrows"></use>
@@ -593,7 +593,7 @@ if ($result && $result->num_rows > 0) {
                             <th>Nombre</th>
                             <th class="d-none d-md-table-cell">Descripcion</th>
                             <th>Enfoque</th>
-                            <th class="d-none d-md-table-cell">Grupo Muscular</th>
+                            <!--<th class="d-none d-md-table-cell">Grupo Muscular</th>-->
                             <th>Equipamiento</th> <!-- NUEVA COLUMNA -->
                             <th>Acciones</th>
                         </tr>

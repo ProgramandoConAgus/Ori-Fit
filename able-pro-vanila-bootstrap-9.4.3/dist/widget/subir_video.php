@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validación
     if (
         empty($nombre) || empty($descripcion) || empty($url) ||
-        empty($grupoMuscular) || empty($direccion) || empty($lugar) ||
+        empty($gruposMusculares) || empty($direccion) || empty($lugar) ||
         empty($sexo) || empty($grupoEnfoque)
     ) {
         echo "Todos los campos son obligatorios.";
@@ -61,12 +61,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $stmtEquip->bind_param("ii", $videoId, $eqId);
             foreach ($equipamientos as $eq) {
-                $eqId = intval($eq); // actualizar el valor
+                $eqId = intval($eq);
                 if (!$stmtEquip->execute()) {
                     throw new Exception("Error al insertar equipamiento: " . $stmtEquip->error);
                 }
             }
             $stmtEquip->close();
+        }
+
+        // Insertar grupos musculares
+        if (!empty($gruposMusculares)) {
+            $queryGM = "INSERT INTO video_grupo_muscular (idVideo, idGrupoMuscular) VALUES (?, ?)";
+            $stmtGM = $conexion->prepare($queryGM);
+            if (!$stmtGM) throw new Exception("Error al preparar INSERT video_grupo_muscular: " . $conexion->error);
+
+            $stmtGM->bind_param("ii", $videoId, $gmId);
+            foreach ($gruposMusculares as $gm) {
+                $gmId = intval($gm);
+                if (!$stmtGM->execute()) {
+                    throw new Exception("Error al insertar grupo muscular: " . $stmtGM->error);
+                }
+            }
+            $stmtGM->close();
         }
 
         header("Location: w_paneladm.php?#videos");
@@ -77,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } finally {
         $conexion->close();
     }
+
 } else {
     echo "Método no permitido.";
 }
