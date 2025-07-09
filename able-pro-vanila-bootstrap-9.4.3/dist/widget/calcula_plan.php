@@ -188,5 +188,5 @@ $conexion->close();
 // ejercicios; de lo contrario volvemos al panel principal.
 if ($plan === 3) {
     header('Location: ../widget/calcula_ejercicios.php');
-} else {
-    header('Location: ../pages/panel.php');}?>
+  } else {  }
+?>

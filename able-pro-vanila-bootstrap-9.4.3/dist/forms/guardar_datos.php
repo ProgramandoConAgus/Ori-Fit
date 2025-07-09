@@ -24,6 +24,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre = trim($_POST['nombre']);
     $edad = isset($_POST['edad']) ? filter_var(trim($_POST['edad']), FILTER_VALIDATE_INT) : null;
     $genero = trim($_POST['genero']);  // Campo genero
+    // Convertir genero a valor numérico si es necesario
+    $genero_num = is_numeric($genero)
+        ? (int)$genero
+        : ($genero === 'hombre' ? 1 : 2);
     $email = trim($_POST['email']); // Campo email
     $peso = isset($_POST['peso']) ? filter_var(trim($_POST['peso']), FILTER_VALIDATE_FLOAT) : null;
     $altura = isset($_POST['altura']) ? filter_var(trim($_POST['altura']), FILTER_VALIDATE_INT) : null;
@@ -186,7 +190,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $email,
                             $peso,
                             $altura,
-                            $genero,
+                            $genero_num,
                             $objetivo,
                             $suscripcion,
                             $trabajo,
@@ -213,7 +217,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $email,
                             $peso,
                             $altura,
-                            $genero,
+                            $genero_num,
                             $objetivo,
                             $suscripcion,
                             $trabajo,

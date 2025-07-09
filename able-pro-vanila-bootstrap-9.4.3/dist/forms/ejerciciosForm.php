@@ -6,8 +6,8 @@ session_start();
 $usuario = new Usuario($conexion);
 $datosUsuario = $usuario->obtenerPorId($_SESSION['IdUsuario']);
 
-// Determinar si se debe saltar la primera pestaña osea que tiene el plan mixto
-$saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 2);
+// Determinar si se debe saltar la primera pestaña en caso de plan mixto
+$saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 3);
 ?>
 
 <!doctype html>

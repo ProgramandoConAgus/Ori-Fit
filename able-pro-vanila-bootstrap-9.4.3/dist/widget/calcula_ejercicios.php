@@ -212,5 +212,5 @@ $insRes->bind_param("iiii",
 );
 $insRes->execute();
 
-header('Location: ../widget/panelrutina.php');
-$conexion->close();
+header('Location: ../widget/panelrutina.php');$conexion->close();
+?>
