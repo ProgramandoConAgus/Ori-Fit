@@ -184,10 +184,13 @@ foreach ($plan_nutricional as $tiempo_comida => $categorias) {
 $stmt_alimentos->close();
 $conexion->close();
 
-// Si el usuario cuenta con un plan mixto, continuamos con el formulario de
-// ejercicios; de lo contrario volvemos al panel principal.
+// Si el usuario cuenta con un plan mixto, generamos también la rutina
+// de ejercicios de forma automática utilizando fetch para no requerir un
+// segundo formulario.
 if ($plan === 3) {
-    header('Location: ../forms/ejerciciosForm.php');
+    echo "<script>
+        fetch('../widget/calcula_ejercicios.php')
+            .then(() => window.location.href = '../pages/panel.php');
+    </script>";
 } else {
-    header('Location: ../pages/panel.php');
-}?>
+    header('Location: ../pages/panel.php');}?>
