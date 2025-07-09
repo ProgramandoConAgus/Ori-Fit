@@ -187,7 +187,6 @@ $conexion->close();
 // Si el usuario cuenta con un plan mixto, continuamos con el formulario de
 // ejercicios; de lo contrario volvemos al panel principal.
 if ($plan === 3) {
-    header('Location: ../forms/guardar_ejercicios.php');
+    header('Location: ../forms/ejerciciosForm.php');
 } else {
-    header('Location: ../pages/panel.php');
-}?>
+    header('Location: ../pages/panel.php');}?>
