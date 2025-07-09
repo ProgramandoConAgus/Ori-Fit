@@ -2315,6 +2315,30 @@ window.onclick = function(event) {
                                 ?>
                             </div>
                         </div>
+                        <div class="modal-footer">
+                            <div class="acciones-container w-100">
+                                <div class="row g-2">
+                                    <div class="col-12 col-md-6">
+                                        <form method="POST" action="aprobar_o_denegar_ej.php" class="h-100">
+                                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                            <button class="boton-accion aprobar w-100 h-100" type="submit" name="accion" value="aprobar">
+                                                <img src="../assets/images/icons-tab/aprobar.png" alt="aprobar">
+                                                Aprobar
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <form method="POST" action="aprobar_o_denegar_ej.php" class="h-100">
+                                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                            <button class="boton-accion denegar w-100 h-100" type="submit" name="accion" value="denegar">
+                                                <img src="../assets/images/icons-tab/rechazado.png" alt="denegar">
+                                                Denegar
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <?php
