@@ -1043,6 +1043,22 @@ document.getElementById('helpForm').addEventListener('submit', function(e) {
         progress: true
       });
     </script>
+    <script>
+      document.getElementById('contactForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const data = new FormData(form);
+
+        try {
+          await fetch('./guardar_datos.php', { method: 'POST', body: new FormData(form) });
+          await fetch('./guardar_ejercicios.php', { method: 'POST', body: new FormData(form) });
+          window.location.href = '../pages/panel.php';
+        } catch (err) {
+          console.error('Error al enviar formularios:', err);
+          alert('Ocurri\u00f3 un error al generar los planes.');
+        }
+      });
+    </script>
     <div class="pct-c-btn">
       <a href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvas_pc_layout">
         <i class="ph-duotone ph-gear-six"></i>

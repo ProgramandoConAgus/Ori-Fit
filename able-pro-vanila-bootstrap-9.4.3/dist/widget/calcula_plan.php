@@ -5,21 +5,6 @@ include 'db.php';
 // Iniciar la sesión para obtener datos de usuario
 session_start();
 
-// Obtener tipo de plan del usuario para definir la redirección posterior
-$plan = 1; // por defecto, solo nutricional
-$sqlPlan = "SELECT idTipoPlan FROM usuarios WHERE id = ?";
-$stmtPlan = $conexion->prepare($sqlPlan);
-if ($stmtPlan) {
-    $stmtPlan->bind_param("i", $_SESSION['IdUsuario']);
-    if ($stmtPlan->execute()) {
-        $resPlan = $stmtPlan->get_result();
-        if ($filaPlan = $resPlan->fetch_assoc()) {
-            $plan = (int)$filaPlan['idTipoPlan'];
-        }
-    }
-    $stmtPlan->close();
-}
-
 $usuario_id = $_SESSION['IdUsuario'];
 
 // Obtener solicitud más reciente
@@ -183,13 +168,4 @@ foreach ($plan_nutricional as $tiempo_comida => $categorias) {
 
 $stmt_alimentos->close();
 $conexion->close();
-
-// Si el usuario cuenta con un plan mixto, generamos también la rutina de
-// ejercicios y redirigimos usando fetch para evitar recargas innecesarias.
-if ($plan === 3) {
-    echo "<script>
-        fetch('../forms/guardar_ejercicios.php')
-            .then(() => window.location.href = '../pages/panel.php');
-    </script>";
-} else {
-    echo "<script>window.location.href = '../pages/panel.php';</script>";?>
+header('Location: ../pages/panel.php');
