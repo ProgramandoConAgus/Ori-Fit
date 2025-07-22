@@ -112,6 +112,7 @@ $resultadoNotificaciones = $stmt23->get_result();
     <title>Mi plan de Alimentación - Team Ori</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
@@ -595,149 +596,128 @@ $resultadoNotificaciones = $stmt23->get_result();
               </div>
               <?php
 if (!empty($alimentos)) {
-    // 1. Definir orden personalizado de comidas
+    // 1. Orden personalizado de comidas
     $orden_comidas = ['desayuno', 'almuerzo', 'merienda', 'cena', 'snack'];
-    
-    // 2. Obtener tiempos de comida desde planes_nutricionales
-    $sql_tiempos = "SELECT DISTINCT tiempo_comida 
-                   FROM planes_nutricionales 
-                   WHERE solicitud_id = ?
-                   ORDER BY FIELD(tiempo_comida, 'desayuno', 'almuerzo', 'merienda', 'cena', 'snack')";
-    $stmt = $conexion->prepare($sql_tiempos);
-    $stmt->bind_param("i", $solicitud_id);
-    $stmt->execute();
-    $result_tiempos = $stmt->get_result();
-    $comidas_usuario = $result_tiempos->fetch_all(MYSQLI_ASSOC);
-    $comidas_usuario = array_column($comidas_usuario, 'tiempo_comida');
 
-    // 3. Obtener requerimientos nutricionales
-    $sql_requerimientos = "SELECT proteinas, grasas, carbohidratos 
-                          FROM resumen_planes 
-                          WHERE solicitud_id = ?";
-    $stmt = $conexion->prepare($sql_requerimientos);
-    $stmt->bind_param("i", $solicitud_id);
-    $stmt->execute();
-    $requerimientos = $stmt->get_result()->fetch_assoc();
+    // 2. Obtener tiempos de comida del usuario
+    $sql_tiempos = "SELECT DISTINCT tiempo_comida
+                    FROM planes_nutricionales
+                    WHERE solicitud_id = ?
+                    ORDER BY FIELD(tiempo_comida, 'desayuno', 'almuerzo', 'merienda', 'cena', 'snack')";
+    $stmtTmp = $conexion->prepare($sql_tiempos);
+    $stmtTmp->bind_param("i", $solicitud_id);
+    $stmtTmp->execute();
+    $result_tiempos = $stmtTmp->get_result();
+    $comidas_usuario = array_column($result_tiempos->fetch_all(MYSQLI_ASSOC), 'tiempo_comida');
 
-    // 4. Consulta optimizada con ordenamiento personalizado
+    // 3. Requerimientos
+    $sql_req = "SELECT proteinas, grasas, carbohidratos FROM resumen_planes WHERE solicitud_id = ?";
+    $stmtTmp = $conexion->prepare($sql_req);
+    $stmtTmp->bind_param("i", $solicitud_id);
+    $stmtTmp->execute();
+    $requerimientos = $stmtTmp->get_result()->fetch_assoc();
+
+    $req = [
+        'proteinas'     => max($requerimientos['proteinas'] ?? 0, 1),
+        'grasas'        => max($requerimientos['grasas'] ?? 0, 1),
+        'carbohidratos' => max($requerimientos['carbohidratos'] ?? 0, 1),
+    ];
+
+    $num_comidas = max(count($comidas_usuario), 1);
+    $distribucion = [
+        'proteinas'     => $req['proteinas'] / $num_comidas,
+        'grasas'        => $req['grasas'] / $num_comidas,
+        'carbohidratos' => $req['carbohidratos'] / $num_comidas,
+    ];
+
+    // 4. Sacar alimentos
     $sql_alimentos = "
-        SELECT 
-            pn.tiempo_comida,
-            pn.idIngrediente,
-            i.Nombre AS NombreIngrediente,
-            i.IdCategoria,
-            i.Gramos_Proteina,
-            i.Gramos_Carbohidratos,
-            i.Gramos_Grasas,
-            i.Calorias,
-            c.Nombre AS Categoria
+        SELECT pn.tiempo_comida,
+               pn.idIngrediente,
+               i.Nombre AS NombreIngrediente,
+               i.IdCategoria,
+               i.Gramos_Proteina,
+               i.Gramos_Carbohidratos,
+               i.Gramos_Grasas,
+               i.Calorias,
+               c.Nombre AS Categoria
         FROM planes_nutricionales pn
         INNER JOIN ingredientes i ON pn.idIngrediente = i.IdIngrediente
-        INNER JOIN categorias c ON i.IdCategoria = c.IdCategoria
+        INNER JOIN categorias   c ON i.IdCategoria = c.IdCategoria
         WHERE pn.solicitud_id = ?
-        ORDER BY 
-            FIELD(pn.tiempo_comida, 'desayuno', 'almuerzo', 'merienda', 'cena', 'snack'),
-            i.IdCategoria";
+        ORDER BY FIELD(pn.tiempo_comida, 'desayuno', 'almuerzo', 'merienda', 'cena', 'snack'),
+                 i.IdCategoria";
+    $stmtAl = $conexion->prepare($sql_alimentos);
+    $stmtAl->bind_param("i", $solicitud_id);
+    $stmtAl->execute();
+    $rows = $stmtAl->get_result()->fetch_all(MYSQLI_ASSOC);
 
-    $stmt_alimentos = $conexion->prepare($sql_alimentos);
-    $stmt_alimentos->bind_param("i", $solicitud_id);
-    $stmt_alimentos->execute();
-    $alimentos = $stmt_alimentos->get_result()->fetch_all(MYSQLI_ASSOC);
-
-    // 5. Validar y ajustar requerimientos
-    $requerimientos_validados = [
-        'proteinas' => max($requerimientos['proteinas'] ?? 0, 1), // Evitar división por cero
-        'grasas' => max($requerimientos['grasas'] ?? 0, 1),
-        'carbohidratos' => max($requerimientos['carbohidratos'] ?? 0, 1)
-    ];
-
-    // 6. Calcular distribución por comida
-    $num_comidas = max(count($comidas_usuario), 1); // Nunca dividir por cero
-    $distribucion = [
-        'proteinas' => $requerimientos_validados['proteinas'] / $num_comidas,
-        'grasas' => $requerimientos_validados['grasas'] / $num_comidas,
-        'carbohidratos' => $requerimientos_validados['carbohidratos'] / $num_comidas
-    ];
-
-    // 7. Procesar y agrupar alimentos
     $plan_final = [];
-    foreach ($alimentos as $alimento) {
-        $tiempo = strtolower($alimento['tiempo_comida']);
-        $categoria = $alimento['IdCategoria'];
-        
-        // Calcular porción con límites
-        $nutriente = match($categoria) {
-            1 => ['tipo' => 'proteinas', 'gramos' => $alimento['Gramos_Proteina']],
+    foreach ($rows as $alimento) {
+        $tiempo    = strtolower($alimento['tiempo_comida']);
+        $catId     = (int)$alimento['IdCategoria'];
+
+        $nutriente = match ($catId) {
+            1 => ['tipo' => 'proteinas',     'gramos' => $alimento['Gramos_Proteina']],
             2 => ['tipo' => 'carbohidratos', 'gramos' => $alimento['Gramos_Carbohidratos']],
-            3 => ['tipo' => 'grasas', 'gramos' => $alimento['Gramos_Grasas']],
+            3 => ['tipo' => 'grasas',        'gramos' => $alimento['Gramos_Grasas']],
             default => null
         };
 
         if ($nutriente && $nutriente['gramos'] > 0) {
             $porcion = ($distribucion[$nutriente['tipo']] * 100) / $nutriente['gramos'];
-
-            // Aplicar límite máximo de 400g por ingrediente y redondear a múltiplos de 5
             $porcion = min(round($porcion / 5) * 5, 400);
 
             $plan_final[$tiempo][] = [
-                'nombre' => $alimento['NombreIngrediente'],
-                'categoria' => $alimento['Categoria'],
-                'categoriaId' => $categoria,
-                'porcion' => $porcion,
-                'calorias' => round(($alimento['Calorias'] * $porcion) / 100, 1)
+                'nombre'      => $alimento['NombreIngrediente'],
+                'categoria'   => $alimento['Categoria'],
+                'categoriaId' => $catId,
+                'porcion'     => $porcion,
+                'calorias'    => round(($alimento['Calorias'] * $porcion) / 100, 1),
             ];
         }
     }
 
-    // 8. Ordenar final según estructura deseada
+    // 5. Ordenar según las comidas del usuario (en el orden personalizado)
     $plan_ordenado = [];
-    foreach ($orden_comidas as $comida) {
-        if (isset($plan_final[$comida])) {
-            $plan_ordenado[$comida] = $plan_final[$comida];
+    foreach ($orden_comidas as $c) {
+        if (in_array($c, $comidas_usuario, true)) {
+            $plan_ordenado[$c] = $plan_final[$c] ?? [];
         }
     }
-    $plan_ordenado = [];
-    foreach ($comidas_usuario as $comida) {
-        $comida_lower = strtolower($comida);
-        $plan_ordenado[$comida_lower] = $plan_final[$comida_lower] ?? [];
-    }
 
-    // 8.1 Añadir elementos obligatorios - NUEVA SECCIÓN
+    // 6. Añadir obligatorios
     foreach ($plan_ordenado as $tiempo => &$items) {
         if (in_array($tiempo, ['desayuno', 'merienda'])) {
             $items[] = [
-                'nombre' => 'Una Pieza de fruta',
+                'nombre'    => 'Una pieza de fruta',
                 'categoria' => 'Fruta',
-                'porcion' => 100,
-                'calorias' => 50
+                'porcion'   => 100,
+                'calorias'  => 50,
             ];
         } elseif (in_array($tiempo, ['almuerzo', 'cena'])) {
             $items[] = [
-                'nombre' => 'Una pieza de verdura verde',
+                'nombre'    => 'Una pieza de verdura verde',
                 'categoria' => 'Verdura',
-                'porcion' => 100,
-                'calorias' => 30
+                'porcion'   => 100,
+                'calorias'  => 30,
             ];
         }
     }
-?>
-
-<!-- 9. Mostrar resultados -->
-<div class="card-body">
-    <?php if (!empty($plan_ordenado)): ?>
+    unset($items);
+    ?>
+    <div class="card-body">
         <div class="accordion" id="accordionComidas">
             <?php foreach ($plan_ordenado as $tiempo => $items): ?>
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" 
-                                data-bs-toggle="collapse" 
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
                                 data-bs-target="#collapse<?= htmlspecialchars($tiempo) ?>">
                             <?= ucfirst($tiempo) ?>
                         </button>
                     </h2>
-                    <div id="collapse<?= htmlspecialchars($tiempo) ?>" 
-                         class="accordion-collapse collapse" 
-                         data-bs-parent="#accordionComidas">
+                    <div id="collapse<?= htmlspecialchars($tiempo) ?>" class="accordion-collapse collapse" data-bs-parent="#accordionComidas">
                         <div class="accordion-body">
                             <table class="table">
                                 <thead class="table-light">
@@ -752,13 +732,13 @@ if (!empty($alimentos)) {
                                 <tbody>
                                     <?php $contador = 1; ?>
                                     <?php foreach ($items as $item): ?>
-                                    <tr class="macro-<?= $item['categoriaId'] ?>">
-                                        <td class="d-none d-md-table-cell"><?= $contador++ ?></td>
-                                        <td><?= htmlspecialchars($item['nombre']) ?></td>
-                                        <td class="d-none d-md-table-cell"><?= $item['categoria'] ?></td>
-                                        <td><?= number_format($item['porcion'], 0) ?></td>
-                                        <td class="d-none d-md-table-cell"><?= number_format($item['calorias'], 1) ?></td>
-                                    </tr>
+                                        <tr class="<?= isset($item['categoriaId']) ? 'macro-'.$item['categoriaId'] : '' ?>">
+                                            <td class="d-none d-md-table-cell"><?= $contador++ ?></td>
+                                            <td><?= htmlspecialchars($item['nombre']) ?></td>
+                                            <td class="d-none d-md-table-cell"><?= $item['categoria'] ?></td>
+                                            <td><?= number_format($item['porcion'], 0) ?></td>
+                                            <td class="d-none d-md-table-cell"><?= number_format($item['calorias'], 1) ?></td>
+                                        </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
@@ -767,10 +747,13 @@ if (!empty($alimentos)) {
                 </div>
             <?php endforeach; ?>
         </div>
-    <?php else: ?>
-        <div class="alert alert-warning mb-0">No se encontraron alimentos en el plan.</div>
-    <?php endif; 
-    }?>
+    </div>
+<?php
+} else {
+    echo '<div class="alert alert-warning mb-0">No se encontraron alimentos en el plan.</div>';
+}
+?>
+
 </div>
 
 <style>
@@ -797,9 +780,9 @@ if (!empty($alimentos)) {
         }
     }
     /* Colores por macronutriente */
-    .macro-1 td { background-color: #fff3e0 !important; }
-    .macro-2 td { background-color: #e0f7fa !important; }
-    .macro-3 td { background-color: #e8f5e9 !important; }
+    .macro-1 td { background-color: #fceacc !important; }
+    .macro-2 td { background-color: #defbff !important; }
+    .macro-3 td { background-color: #d6ffda !important; }
 </style>
 
               </div>
