@@ -1,6 +1,6 @@
   <?php
 include('db.php'); // Incluye la conexión a la base de datos
-session_start();
+require_once '../auth/check_admin.php';
 
 // Obtener listado de equipamientos para los formularios
 $equipResult = $conexion->query("SELECT IdEquipamiento, Equipamiento FROM equipamiento ORDER BY IdEquipamiento");

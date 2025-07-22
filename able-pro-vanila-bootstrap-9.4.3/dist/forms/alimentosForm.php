@@ -1,7 +1,7 @@
 <?php
 include('db.php');
 include('UsuarioClass.php');
-session_start();
+require_once '../auth/check_session.php';
 
 $usuario = new Usuario($conexion);
 $datosUsuario = $usuario->obtenerPorId($_SESSION['IdUsuario']);

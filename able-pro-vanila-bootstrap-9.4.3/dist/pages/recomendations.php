@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once '../auth/check_session.php';
 $IdUsuario = $_SESSION['IdUsuario'];
 include('../widget/db.php');
 include('../forms/UsuarioClass.php');

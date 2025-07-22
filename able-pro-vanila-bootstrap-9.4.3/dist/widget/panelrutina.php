@@ -4,15 +4,11 @@
 include 'db.php';
 
 // Iniciar la sesión para obtener datos de usuario
-session_start();
+require_once '../auth/check_session.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-if (!isset($_SESSION['IdUsuario'])) {
-    echo "⚠️ ERROR: sesión no iniciada correctamente.";
-    exit;
-}
 
 // $usuario_id = $_SESSION['usuario_id']; // Captura el id de la sesión del usuario (para pruebas está hardcodeado)
 //$usuario_id = 1;  ID de usuario hardcodeado para pruebas

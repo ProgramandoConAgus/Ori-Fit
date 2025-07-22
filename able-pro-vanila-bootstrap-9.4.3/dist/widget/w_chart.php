@@ -4,7 +4,7 @@
 include 'db.php';
 
 // Iniciar la sesión para obtener datos de usuario
-session_start();
+require_once '../auth/check_session.php';
 
 // $usuario_id = $_SESSION['usuario_id']; // Captura el id de la sesión del usuario (para pruebas está hardcodeado)
 //$usuario_id = 1;  ID de usuario hardcodeado para pruebas

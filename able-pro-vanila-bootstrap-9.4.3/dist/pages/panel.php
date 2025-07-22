@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once '../auth/check_session.php';
 $IdUsuario=$_SESSION['IdUsuario'];
 include('../widget/db.php');
 include('../forms/UsuarioClass.php');
@@ -150,14 +150,16 @@ $resultadoNotificaciones = $stmt->get_result();
             <span class="pc-mtext">Mi Progreso</span>
           </a>
         </li>
+        <?php if(isset($_SESSION['IdRol']) && $_SESSION['IdRol'] == 2): ?>
         <li class="pc-item">
           <a href="../../dist/widget/w_paneladm.php" class="pc-link">
             <span class="pc-micon">
-              <img src="../assets/images/icons-tab/icons9.png" alt="Recetas">  
+              <img src="../assets/images/icons-tab/icons9.png" alt="Recetas">
             </span>
             <span class="pc-mtext">Panel de Administración</span>
           </a>
        </li>
+        <?php endif; ?>
        <li class="pc-item">
           <a href="../../dist/recetas/index.php" class="pc-link">
             <span class="pc-micon">
