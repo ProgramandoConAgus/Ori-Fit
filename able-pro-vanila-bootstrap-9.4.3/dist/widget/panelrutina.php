@@ -688,7 +688,7 @@ function getYoutubeId(string $url): ?string {
                                 <tr>
                                     <th class="d-none d-md-table-cell">Día</th>
                                     <th>Orden Ejercicio</th>
-                                    <th class="d-none d-md-table-cell">Ejercicio</th>
+                                    <th>Ejercicio</th>
                                     <th>Descripción</th>
                                     <th class="d-none d-md-table-cell">Lugar</th>
                                 </tr>
@@ -751,8 +751,6 @@ td.limit-text {
         }
         .table th:nth-child(1),
         .table td:nth-child(1),
-        .table th:nth-child(3),
-        .table td:nth-child(3),
         .table th:nth-child(5),
         .table td:nth-child(5) {
             display: none;

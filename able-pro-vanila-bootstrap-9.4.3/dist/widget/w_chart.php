@@ -739,7 +739,7 @@ if (!empty($alimentos)) {
                          class="accordion-collapse collapse" 
                          data-bs-parent="#accordionComidas">
                         <div class="accordion-body">
-                            <table class="table table-striped">
+                            <table class="table">
                                 <thead class="table-light">
                                     <tr>
                                         <th class="d-none d-md-table-cell">#</th>
@@ -797,9 +797,9 @@ if (!empty($alimentos)) {
         }
     }
     /* Colores por macronutriente */
-    .macro-1 td { background-color: #fff3e0; }
-    .macro-2 td { background-color: #e0f7fa; }
-    .macro-3 td { background-color: #e8f5e9; }
+    .macro-1 td { background-color: #fff3e0 !important; }
+    .macro-2 td { background-color: #e0f7fa !important; }
+    .macro-3 td { background-color: #e8f5e9 !important; }
 </style>
 
               </div>
