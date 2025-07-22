@@ -682,6 +682,7 @@ function getYoutubeId(string $url): ?string {
                      class="accordion-collapse collapse" 
                      data-bs-parent="#accordionComidas">
                     <div class="accordion-body">
+                        <div class="table-responsive">
                         <table class="table table-striped">
                             <thead class="table-light">
                                 <tr>
@@ -715,6 +716,7 @@ function getYoutubeId(string $url): ?string {
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -591,6 +591,7 @@ $resultadoNotificaciones = $stmt23->get_result();
               <div class="card-header">
                 <h5>Lista de Ingredientes</h5>
                 <span class="d-block m-t-5">Debajo encontraras los ingredientes que tendras que incluir en tu dieta para una mayor efectividad del plan según tus objetivos.</span>
+                <p class="mb-0 mt-2 text-muted">Elige <strong>una sola opción de cada macronutriente</strong> para armar tu plato. La pieza de fruta o verdura indicada ya está incluida en cada comida.</p>
               </div>
               <?php
 if (!empty($alimentos)) {
@@ -674,13 +675,14 @@ if (!empty($alimentos)) {
 
         if ($nutriente && $nutriente['gramos'] > 0) {
             $porcion = ($distribucion[$nutriente['tipo']] * 100) / $nutriente['gramos'];
-            
-            // Aplicar límite máximo de 400g por ingrediente
-            $porcion = min(round($porcion, 2), 400);
-            
+
+            // Aplicar límite máximo de 400g por ingrediente y redondear a múltiplos de 5
+            $porcion = min(round($porcion / 5) * 5, 400);
+
             $plan_final[$tiempo][] = [
                 'nombre' => $alimento['NombreIngrediente'],
                 'categoria' => $alimento['Categoria'],
+                'categoriaId' => $categoria,
                 'porcion' => $porcion,
                 'calorias' => round(($alimento['Calorias'] * $porcion) / 100, 1)
             ];
@@ -750,11 +752,11 @@ if (!empty($alimentos)) {
                                 <tbody>
                                     <?php $contador = 1; ?>
                                     <?php foreach ($items as $item): ?>
-                                    <tr>
+                                    <tr class="macro-<?= $item['categoriaId'] ?>">
                                         <td class="d-none d-md-table-cell"><?= $contador++ ?></td>
                                         <td><?= htmlspecialchars($item['nombre']) ?></td>
                                         <td class="d-none d-md-table-cell"><?= $item['categoria'] ?></td>
-                                        <td><?= number_format($item['porcion'], 1) ?></td>
+                                        <td><?= number_format($item['porcion'], 0) ?></td>
                                         <td class="d-none d-md-table-cell"><?= number_format($item['calorias'], 1) ?></td>
                                     </tr>
                                     <?php endforeach; ?>
@@ -794,6 +796,10 @@ if (!empty($alimentos)) {
             display: none;
         }
     }
+    /* Colores por macronutriente */
+    .macro-1 td { background-color: #fff3e0; }
+    .macro-2 td { background-color: #e0f7fa; }
+    .macro-3 td { background-color: #e8f5e9; }
 </style>
 
               </div>
