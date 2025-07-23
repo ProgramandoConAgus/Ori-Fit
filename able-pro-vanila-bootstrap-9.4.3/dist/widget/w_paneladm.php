@@ -1109,6 +1109,11 @@ td.limit-text {
                     </div>
 
                     <div class="mb-3">
+                        <label for="addPassword" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="addPassword" name="password" required>
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label">Acceso</label>
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="addAcceso" name="acceso" value="permitido">
