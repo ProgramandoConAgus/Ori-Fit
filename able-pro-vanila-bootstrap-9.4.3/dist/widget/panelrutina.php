@@ -136,14 +136,9 @@ $datosUsuario = $usuario->obtenerPorId($_SESSION['IdUsuario']);
 
 $solicitud=$usuario->ObtenerSolicitud($_SESSION['IdUsuario']);
 
-$sql56 = "SELECT n.Titulo, n.descripcion, pu.pregunta
-        FROM notificaciones n
-        JOIN preguntasusuarios pu ON n.idpregunta = pu.idpregunta
-        WHERE n.IdUsuario = ?";
-$stmt23 = $conexion->prepare($sql56);
-$stmt23->bind_param("i", $_SESSION['IdUsuario']);
-$stmt23->execute();
-$resultadoNotificaciones = $stmt23->get_result();
+require_once 'notifications.php';
+$notificaciones = get_notifications($conexion);
+$notificationCount = count($notificaciones);
 function getYoutubeId(string $url): ?string {
     // soporta youtu.be/, watch?v=, embed/
     if (preg_match(
@@ -267,7 +262,7 @@ function getYoutubeId(string $url): ?string {
                 <i class="ph-duotone ph-sneaker-move f-28"></i>
                 <span>Plan de entrenamiento</span>
               </a>
-              <a href="#!">
+              <a href="../auth/logout.php">
                 <i class="ti ti-power"></i>
                 <span>Cerrar Sesión</span>
               </a>
@@ -418,7 +413,7 @@ function getYoutubeId(string $url): ?string {
           <i class="ti ti-user"></i>
           <span>Mis Planes</span>
         </a>
-        <a href="#!" class="dropdown-item">
+        <a href="../auth/logout.php" class="dropdown-item">
           <i class="ti ti-power"></i>
           <span>Cerrar Sesión</span>
         </a>
@@ -437,43 +432,9 @@ function getYoutubeId(string $url): ?string {
         <svg class="pc-icon">
           <use xlink:href="#custom-notification"></use>
         </svg>
-        <span class="badge bg-success pc-h-badge">3</span>
+        <span class="badge bg-success pc-h-badge"><?=$notificationCount?></span>
       </a>
-      <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
-      <div class="dropdown-header d-flex align-items-center justify-content-between">
-    <h5 class="m-0">Notificaciones</h5>
-    <a href="#!" class="btn btn-link btn-sm">Marcar como leidas</a>
-  </div>
-  <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
-    <?php if($resultadoNotificaciones->num_rows > 0): ?>
-      <?php while($notificacion = $resultadoNotificaciones->fetch_assoc()): ?>
-        <div class="card mb-2">
-          <div class="card-body">
-            <div class="d-flex">
-              <div class="flex-shrink-0">
-                <svg class="pc-icon text-primary">
-                  <use xlink:href="#custom-layer"></use>
-                </svg>
-              </div>
-              <div class="flex-grow-1 ms-3">
-                <span class="float-end text-sm text-muted">
-                </span>
-                <h4 class="text-body mb-2"><?= htmlspecialchars($notificacion['Titulo']); ?></h4>
-                <p>Pregunta:<?=$notificacion['pregunta']?></p>
-                <h5 class="mb-0"><?= htmlspecialchars($notificacion['descripcion']); ?></h5>
-              </div>
-            </div>
-          </div>
-        </div>
-      <?php endwhile; ?>
-    <?php else: ?>
-      <p class="text-center">No hay notificaciones</p>
-    <?php endif; ?>
-  </div>
-  <div class="text-center py-2">
-    <a href="#!" class="link-danger">Borrar todas las Notificaciones</a>
-  </div>
-</div>
+      <?php render_notifications_dropdown($notificaciones); ?>
 
     </li>
     <li class="dropdown pc-h-item header-user-profile">

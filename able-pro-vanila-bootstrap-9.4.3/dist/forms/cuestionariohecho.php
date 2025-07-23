@@ -99,7 +99,7 @@
                 <i class="ph-duotone ph-sneaker-move f-28"></i>
                 <span>Plan de entrenamiento</span>
               </a>
-              <a href="#!">
+              <a href="../auth/logout.php">
                 <i class="ti ti-power"></i>
                 <span>Cerrar Sesión</span>
               </a>
@@ -240,7 +240,7 @@
           <i class="ti ti-user"></i>
           <span>Mis Planes</span>
         </a>
-        <a href="#!" class="dropdown-item">
+        <a href="../auth/logout.php" class="dropdown-item">
           <i class="ti ti-power"></i>
           <span>Cerrar Sesión</span>
         </a>
