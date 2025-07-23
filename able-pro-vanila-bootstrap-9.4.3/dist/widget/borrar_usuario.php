@@ -1,5 +1,6 @@
 <?php
 include 'db.php';
+require_once '../auth/check_admin.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Recibir el ID del usuario a borrar

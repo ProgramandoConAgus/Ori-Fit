@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once '../auth/check_session.php';
 header('Content-Type: application/json; charset=utf-8');
 include('../widget/db.php');
 

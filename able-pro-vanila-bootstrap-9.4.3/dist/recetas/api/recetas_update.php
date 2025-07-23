@@ -1,4 +1,5 @@
 <?php
+require_once '../../auth/check_admin.php';
   if (!empty($_SERVER['HTTPS']) && ('on' == $_SERVER['HTTPS'])) {
     $uri = 'https://';
 } else {

@@ -73,8 +73,10 @@
                     <div class="col-md-3 mb-3">
                         <div class="" style="position: relative; top: 40%;">
                             <button type="button" class="btn btn-primary" onclick="fetchRecetas(1)">Aplicar Filtros</button>
-                            <a href="./nueva-receta.php" type="button" class="btn btn-secondary"> + Nuevo</a>
-                        </div> 
+                            <?php if(isset($_SESSION['IdRol']) && $_SESSION['IdRol'] == 2): ?>
+                                <a href="./nueva-receta.php" type="button" class="btn btn-secondary"> + Nuevo</a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
                 
@@ -94,6 +96,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    var isAdmin = <?php echo (isset($_SESSION['IdRol']) && $_SESSION['IdRol'] == 2) ? 'true' : 'false'; ?>;
     function fetchRecetas(page = 1) {
         const filtros = $('#filtrosForm').serialize() + `&page=${page}`; 
         $.ajax({
@@ -133,7 +136,7 @@
                                 <a href="#" class="link-ver-mas">Ver más</a>` : ''}
                             <p><strong>Tiempo:</strong> ${receta.tiempo_preparacion} mins</p>
                             <p><strong>Dificultad:</strong> ${receta.dificultad}</p>
-                            <a href="./editar-receta.php?id=${receta.id}" class="btn btn-primary">Editar</a>
+                            ${isAdmin ? `<a href="./editar-receta.php?id=${receta.id}" class="btn btn-primary">Editar</a>` : ''}
                         </div>
                     </div>
                 </div>

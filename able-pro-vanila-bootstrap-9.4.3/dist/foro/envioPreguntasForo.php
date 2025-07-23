@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once '../auth/check_session.php';
 include '../../vendor/autoload.php';
 include '../widget/db.php';
 use PHPMailer\PHPMailer\PHPMailer;

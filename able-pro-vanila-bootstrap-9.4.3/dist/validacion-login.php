@@ -36,6 +36,7 @@ if (isset($input['email']) && isset($input['password'])) {
                     // Iniciar sesión
                     session_start();
                     $_SESSION['IdUsuario'] = $user['id'];
+                    $_SESSION['IdRol'] = $user['idRol'];
                     
                     $response['success'] = true;
                     $response['message'] = 'Ingreso exitoso.';

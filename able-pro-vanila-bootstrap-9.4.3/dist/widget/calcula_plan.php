@@ -3,7 +3,7 @@
 include 'db.php';
 
 // Iniciar la sesión para obtener datos de usuario
-session_start();
+require_once '../auth/check_session.php';
 
 // Obtener tipo de plan del usuario para definir la redirección posterior
 $plan = 1; // por defecto, solo nutricional
@@ -21,6 +21,22 @@ if ($stmtPlan) {
 }
 
 $usuario_id = $_SESSION['IdUsuario'];
+
+// Verificar si existe un plan reciente (últimos 30 días)
+$check = $conexion->prepare("SELECT fecha_calculo FROM resumen_planes WHERE idUsuario = ? ORDER BY fecha_calculo DESC LIMIT 1");
+$check->bind_param("i", $usuario_id);
+$check->execute();
+$resCheck = $check->get_result();
+if ($resCheck && $resCheck->num_rows > 0) {
+    $rowCheck = $resCheck->fetch_assoc();
+    $lastDate = new DateTime($rowCheck['fecha_calculo']);
+    $oneMonth = new DateTime('-30 days');
+    if ($lastDate > $oneMonth) {
+        echo "Ya existe un plan registrado recientemente.";
+        exit();
+    }
+}
+$check->close();
 
 // Obtener solicitud más reciente
 $sql = "SELECT peso, altura, edad, genero, objetivo, fecha_envio, id, trabajo, ejercicio, intensidad, comidas

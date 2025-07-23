@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once '../auth/check_session.php';
 $IdUsuario = $_SESSION['IdUsuario'];
 include('../widget/db.php');
 include('../forms/UsuarioClass.php');
@@ -7,14 +7,9 @@ include('../forms/UsuarioClass.php');
 $usuario = new Usuario($conexion);
 $datosUsuario = $usuario->obtenerPorId($_SESSION['IdUsuario']);
 
-$sql = "SELECT n.Titulo, n.descripcion, pu.pregunta
-        FROM notificaciones n
-        JOIN preguntasusuarios pu ON n.idpregunta = pu.idpregunta
-        WHERE n.IdUsuario = ?";
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("i", $_SESSION['IdUsuario']);
-$stmt->execute();
-$resultadoNotificaciones = $stmt->get_result();
+require_once '../widget/notifications.php';
+$notificaciones = get_notifications($conexion);
+$notificationCount = count($notificaciones);
 ?>
 <!doctype html>
 <html lang="es">
@@ -86,7 +81,7 @@ $resultadoNotificaciones = $stmt->get_result();
                     <i class="ph-duotone ph-sneaker-move f-28"></i>
                     <span>Plan de entrenamiento</span>
                   </a>
-                  <a href="#!">
+                  <a href="../auth/logout.php">
                     <i class="ti ti-power"></i>
                     <span>Cerrar Sesión</span>
                   </a>
@@ -234,7 +229,7 @@ $resultadoNotificaciones = $stmt->get_result();
           <i class="ti ti-user"></i>
           <span>Mis Planes</span>
         </a>
-        <a href="#!" class="dropdown-item">
+        <a href="../auth/logout.php" class="dropdown-item">
           <i class="ti ti-power"></i>
           <span>Cerrar Sesión</span>
         </a>
@@ -253,43 +248,9 @@ $resultadoNotificaciones = $stmt->get_result();
         <svg class="pc-icon">
           <use xlink:href="#custom-notification"></use>
         </svg>
-        <span class="badge bg-success pc-h-badge">3</span>
+        <span class="badge bg-success pc-h-badge"><?=$notificationCount?></span>
       </a>
-      <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
-      <div class="dropdown-header d-flex align-items-center justify-content-between">
-    <h5 class="m-0">Notificaciones</h5>
-    <a href="#!" class="btn btn-link btn-sm">Marcar como leidas</a>
-  </div>
-  <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
-    <?php if($resultadoNotificaciones->num_rows > 0): ?>
-      <?php while($notificacion = $resultadoNotificaciones->fetch_assoc()): ?>
-        <div class="card mb-2">
-          <div class="card-body">
-            <div class="d-flex">
-              <div class="flex-shrink-0">
-                <svg class="pc-icon text-primary">
-                  <use xlink:href="#custom-layer"></use>
-                </svg>
-              </div>
-              <div class="flex-grow-1 ms-3">
-                <span class="float-end text-sm text-muted">
-                </span>
-                <h4 class="text-body mb-2"><?= htmlspecialchars($notificacion['Titulo']); ?></h4>
-                <p>Pregunta:<?=$notificacion['pregunta']?></p>
-                <h5 class="mb-0"><?= htmlspecialchars($notificacion['descripcion']); ?></h5>
-              </div>
-            </div>
-          </div>
-        </div>
-      <?php endwhile; ?>
-    <?php else: ?>
-      <p class="text-center">No hay notificaciones</p>
-    <?php endif; ?>
-  </div>
-  <div class="text-center py-2">
-    <a href="#!" class="link-danger">Borrar todas las Notificaciones</a>
-  </div>
-</div>
+      <?php render_notifications_dropdown($notificaciones); ?>
 
     </li>
     <li class="dropdown pc-h-item header-user-profile">
@@ -357,10 +318,10 @@ $resultadoNotificaciones = $stmt->get_result();
             </a>
             <hr class="border-secondary border-opacity-50" />
             <div class="d-grid mb-3">
-              <button class="btn btn-primary">
-                <svg class="pc-icon me-2">  
+              <a href="../auth/logout.php" class="btn btn-primary">
+                <svg class="pc-icon me-2">
                   <use xlink:href="#custom-logout-1-outline"></use></svg>Logout
-              </button>
+              </a>
             </div>
             
           </div>

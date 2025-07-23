@@ -1,6 +1,6 @@
 <?php
 include 'db.php';      // Conexión a la base de datos
-session_start();
+require_once '../auth/check_session.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 

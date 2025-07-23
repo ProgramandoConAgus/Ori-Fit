@@ -1,13 +1,16 @@
 <?php
 include('db.php');
 include('UsuarioClass.php');
-session_start();
+require_once '../auth/check_session.php';
 
 $usuario = new Usuario($conexion);
 $datosUsuario = $usuario->obtenerPorId($_SESSION['IdUsuario']);
 
 // Determinar si se debe saltar la primera pestaña en caso de plan mixto
 $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 3);
+require_once '../widget/notifications.php';
+$notificaciones = get_notifications($conexion);
+$notificationCount = count($notificaciones);
 ?>
 
 <!doctype html>
@@ -93,7 +96,7 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 3);
                 <i class="ph-duotone ph-sneaker-move f-28"></i>
                 <span>Plan de entrenamiento</span>
               </a>
-              <a href="#!">
+              <a href="../auth/logout.php">
                 <i class="ti ti-power"></i>
                 <span>Cerrar Sesión</span>
               </a>
@@ -235,7 +238,7 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 3);
           <i class="ti ti-user"></i>
           <span>Mis Planes</span>
         </a>
-        <a href="#!" class="dropdown-item">
+        <a href="../auth/logout.php" class="dropdown-item">
           <i class="ti ti-power"></i>
           <span>Cerrar Sesión</span>
         </a>
@@ -254,109 +257,9 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 3);
         <svg class="pc-icon">
           <use xlink:href="#custom-notification"></use>
         </svg>
-        <span class="badge bg-success pc-h-badge">3</span>
+        <span class="badge bg-success pc-h-badge"><?=$notificationCount?></span>
       </a>
-      <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
-        <div class="dropdown-header d-flex align-items-center justify-content-between">
-          <h5 class="m-0">Notifications</h5>
-          <a href="#!" class="btn btn-link btn-sm">Mark all read</a>
-        </div>
-        <div class="dropdown-body text-wrap header-notification-scroll position-relative" style="max-height: calc(100vh - 215px)">
-          <p class="text-span">Today</p>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-layer"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">2 min ago</span>
-                  <h5 class="text-body mb-2">UI/UX Design</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-sms"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">1 hour ago</span>
-                  <h5 class="text-body mb-2">Message</h5>
-                  <p class="mb-0">Lorem Ipsum has been the industry's standard dummy text ever since the 1500.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p class="text-span">Yesterday</p>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-document-text"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">2 hour ago</span>
-                  <h5 class="text-body mb-2">Forms</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-user-bold"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">12 hour ago</span>
-                  <h5 class="text-body mb-2">Challenge invitation</h5>
-                  <p class="mb-2"><span class="text-dark">Jonny aber</span> invites to join the challenge</p>
-                  <button class="btn btn-sm btn-outline-secondary me-2">Decline</button>
-                  <button class="btn btn-sm btn-primary">Accept</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="d-flex">
-                <div class="flex-shrink-0">
-                  <svg class="pc-icon text-primary">
-                    <use xlink:href="#custom-security-safe"></use>
-                  </svg>
-                </div>
-                <div class="flex-grow-1 ms-3">
-                  <span class="float-end text-sm text-muted">5 hour ago</span>
-                  <h5 class="text-body mb-2">Security</h5>
-                  <p class="mb-0"
-                    >Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of
-                    type and scrambled it to make a type</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="text-center py-2">
-          <a href="#!" class="link-danger">Clear all Notifications</a>
-        </div>
-      </div>
+      <?php render_notifications_dropdown($notificaciones); ?>
     </li>
     <li class="dropdown pc-h-item header-user-profile">
       <a
@@ -423,10 +326,10 @@ $saltarDatosPersonales = ($datosUsuario["idTipoPlan"] == 3);
             </a>
             <hr class="border-secondary border-opacity-50" />
             <div class="d-grid mb-3">
-              <button class="btn btn-primary">
-                <svg class="pc-icon me-2">  
+              <a href="../auth/logout.php" class="btn btn-primary">
+                <svg class="pc-icon me-2">
                   <use xlink:href="#custom-logout-1-outline"></use></svg>Logout
-              </button>
+              </a>
             </div>
             
           </div>

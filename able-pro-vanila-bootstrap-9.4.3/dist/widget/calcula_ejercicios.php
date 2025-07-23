@@ -1,6 +1,6 @@
 <?php
 include 'db.php';
-session_start();
+require_once '../auth/check_session.php';
 
 // 1) Usuario y solicitud
 $usuario_id = $_SESSION['IdUsuario'];

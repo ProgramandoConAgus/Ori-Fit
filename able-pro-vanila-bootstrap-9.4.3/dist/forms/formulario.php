@@ -1,5 +1,5 @@
 <?php
-session_start(); // Iniciar sesión para manejar los datos
+require_once '../auth/check_session.php';
 
 // Identificar el formulario actual
 $formularioActual = isset($_POST['formularioActual']) ? $_POST['formularioActual'] : 1;
