@@ -14,8 +14,11 @@ try{
 
 require_once '../../sql_files/database.php';
 
-$database = new Database(); 
-$conn = $database->getConnection(); 
+$database = new Database();
+$conn = $database->getConnection();
+if ($conn === null) {
+    throw new Exception('DB connection failed');
+}
 
 $id = $_GET['id'] ?? '';
 
@@ -48,7 +51,7 @@ echo json_encode( $receta);
 
 $conn = null;
 
-}catch(e){
-    //echo "Ocurrió un error: " . $e->getMessage();
+}catch(Exception $e){
+    echo "Ocurrió un error: " . $e->getMessage();
 }
 ?>
