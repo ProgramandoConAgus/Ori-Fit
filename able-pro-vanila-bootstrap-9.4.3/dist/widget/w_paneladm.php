@@ -420,10 +420,10 @@ function getYoutubeId(string $url): ?string {
             </a>
             <hr class="border-secondary border-opacity-50" />
             <div class="d-grid mb-3">
-              <button class="btn btn-primary">
-                <svg class="pc-icon me-2">  
+              <a href="../auth/logout.php" class="btn btn-primary">
+                <svg class="pc-icon me-2">
                   <use xlink:href="#custom-logout-1-outline"></use></svg>Logout
-              </button>
+              </a>
             </div>
             
           </div>
