@@ -81,9 +81,8 @@
     var receta ={};
 
     $(document).ready(function () {
-       fetchIngredientes(function(){
-           fetchOneReceta();
-       });
+       fetchIngredientes(); 
+       fetchOneReceta();
 
         // Agregar un nuevo ingrediente
         $('#btnAddIngrediente').on('click', function () {
@@ -137,14 +136,13 @@
         $('#ingredientesList').append(ingredienteItem);
     }
 
-    function fetchIngredientes(callback = null) {
+    function fetchIngredientes() { 
         $.ajax({
             url: '../api/ingredientes.php',
             type: 'GET',
             data: null,
             success: function (response) { 
-                ingredientes = JSON.parse(response);
-                if (typeof callback === 'function') callback();
+                ingredientes = JSON.parse(response); 
             }
         });
     }
