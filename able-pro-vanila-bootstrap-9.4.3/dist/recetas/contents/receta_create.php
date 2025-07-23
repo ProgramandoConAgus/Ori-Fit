@@ -118,7 +118,7 @@
 
     function fetchIngredientes() {
         $.ajax({
-            url: '../api/ingredientes.php',
+            url: 'api/ingredientes.php',
             type: 'GET',
             data: null,
             success: function (response) {

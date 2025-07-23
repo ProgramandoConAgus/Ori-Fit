@@ -138,7 +138,7 @@
 
     function fetchIngredientes() { 
         $.ajax({
-            url: '../api/ingredientes.php',
+            url: 'api/ingredientes.php',
             type: 'GET',
             data: null,
             success: function (response) { 
@@ -149,7 +149,7 @@
 
     function fetchOneReceta() { 
     $.ajax({
-        url: '../api/recetas_one.php?id=<?php echo $_GET['id'] ?>',
+        url: 'api/recetas_one.php?id=<?php echo $_GET['id'] ?>',
         type: 'GET',
         data: null,
         success: function (response) { 
