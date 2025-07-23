@@ -738,22 +738,21 @@ td.limit-text {
 <style>
     @media (max-width: 767.98px) {
         .accordion-body {
-            padding: 0  ;
+            padding: 0;
             overflow-x: auto;
         }
         .table {
             font-size: 0.85rem;
-            min-width: 300px;
+            min-width: 480px;
         }
         .table td, .table th {
             padding: 0.5rem;
             white-space: nowrap;
         }
-        .table th:nth-child(1),
-        .table td:nth-child(1),
-        .table th:nth-child(5),
-        .table td:nth-child(5) {
-            display: none;
+        /* Mostrar columnas ocultas para que toda la información
+           esté disponible en pantallas pequeñas */
+        .table .d-md-table-cell {
+            display: table-cell !important;
         }
     }
 </style>
