@@ -7,10 +7,13 @@ ini_set('display_errors', 1);
 try {
     require_once '../../sql_files/database.php';
 
-    $database = new Database(); 
+    $database = new Database();
     $conn = $database->getConnection();
+    if ($conn === null) {
+        throw new Exception('DB connection failed');
+    }
 
-    $sql = "SELECT IdIngrediente, Nombre, Gramos_Proteina, Calorias, Gramos_Grasas FROM ingredientes";
+    $sql = "SELECT id AS IdIngrediente, nombre AS Nombre, proteinas AS Gramos_Proteina, calorias AS Calorias, grasas AS Gramos_Grasas FROM ingredientes";
 
     // Preparar y ejecutar la consulta
     $stmt = $conn->prepare($sql);

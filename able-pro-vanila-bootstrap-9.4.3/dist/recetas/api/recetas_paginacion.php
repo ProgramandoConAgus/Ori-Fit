@@ -9,6 +9,9 @@ try {
 
     $database = new Database();
     $conn = $database->getConnection();
+    if ($conn === null) {
+        throw new Exception('DB connection failed');
+    }
 
     // Parámetros de entrada
     $titulo = $_GET['titulo'] ?? '';
@@ -24,7 +27,7 @@ try {
         SELECT DISTINCT r.* 
         FROM recetas r
         LEFT JOIN recetas_ingredientes ri ON r.id = ri.receta_id
-        LEFT JOIN ingredientes i ON ri.ingrediente_id = i.IdIngrediente  -- Corregido aquí
+        LEFT JOIN ingredientes i ON ri.ingrediente_id = i.id
         WHERE 1=1
     ";
 
@@ -68,7 +71,7 @@ try {
         SELECT COUNT(DISTINCT r.id) as total 
         FROM recetas r
         LEFT JOIN recetas_ingredientes ri ON r.id = ri.receta_id
-        LEFT JOIN ingredientes i ON ri.ingrediente_id = i.IdIngrediente  -- Corregido aquí también
+        LEFT JOIN ingredientes i ON ri.ingrediente_id = i.id
         WHERE 1=1
     ";
     if (!empty($titulo)) {
