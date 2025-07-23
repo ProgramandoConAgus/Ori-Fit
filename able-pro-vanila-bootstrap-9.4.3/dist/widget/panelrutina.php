@@ -80,8 +80,9 @@ if ($result_solicitud && $result_solicitud->num_rows > 0) {
     $agrupado_por_dia = [];
   }
 }else {
-    echo "⚠️ No se encontró ninguna solicitud para este usuario.<br>";
-    $agrupado_por_dia = [];
+  header('Location: ../pages/Panel.php');
+  $calorias = $proteinas = $grasas = $carbohidratos = 0;
+  $alimentos = [];
 }
 
 function generarSeriesYRepeticiones($nivel, $tiempo, $dias) {
