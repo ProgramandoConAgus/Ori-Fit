@@ -1036,7 +1036,7 @@ td.limit-text {
                     </thead>
                     <tbody>
                         <?php foreach ($usuarios as $usuario): ?>
-                            <tr>
+                            <tr id="user-row-<?= $usuario['id'] ?>">
                                 <td><?php echo $usuario['id']; ?></td>
                                 <td><?php echo $usuario['nombre']; ?></td>
                                 <td class="d-none d-md-table-cell"><?php echo $usuario['apellido']; ?></td>
@@ -1061,12 +1061,13 @@ td.limit-text {
                                           <img src="../assets/images/icons-tab/editar.png" alt="Editar" style="width: 16px; height: 16px;">
                                       </button>
 
-                                        <form method="POST" action="borrar_usuario.php" style="display: inline;">
-                                            <input type="hidden" name="id" value="<?php echo $usuario['id']; ?>">
-                                            <button type="submit" class="btn btn-danger btn-sm w-100 w-md-auto" title="Eliminar Usuario">
+                                        <button
+                                            type="button"
+                                            class="btn btn-danger btn-sm w-100 w-md-auto btn-delete-user"
+                                            data-idusuario="<?= $usuario['id'] ?>"
+                                            title="Eliminar Usuario">
                                                 <img src="../assets/images/icons-tab/papelera.png" alt="Eliminar" style="width: 16px; height: 16px;">
-                                            </button>
-                                        </form>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -2890,6 +2891,45 @@ window.onload = function () {
         console.error('Error de red:', error);
     }
 }
+</script>
+<script>
+// Eliminación de usuarios con confirmación SweetAlert
+document.querySelectorAll('.btn-delete-user').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const id = btn.dataset.idusuario;
+        Swal.fire({
+            title: '¿Eliminar usuario?',
+            text: 'Esta acción no se puede deshacer',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then(result => {
+            if (result.isConfirmed) {
+                const fd = new FormData();
+                fd.append('id', id);
+                fetch('borrar_usuario.php', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: fd
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Eliminado', 'El usuario ha sido borrado', 'success');
+                        const row = document.getElementById("user-row-" + id);
+                        if (row) row.remove();
+                    } else {
+                        Swal.fire('Error', data.message || 'No se pudo eliminar', 'error');
+                    }
+                })
+                .catch(() => {
+                    Swal.fire('Error', 'No se pudo eliminar', 'error');
+                });
+            }
+        });
+    });
+});
 </script>
 <script>
 // Eliminación de videos con confirmación SweetAlert

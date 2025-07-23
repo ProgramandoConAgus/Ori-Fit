@@ -108,12 +108,22 @@ try {
     $stmt->close();
 
     $conexion->commit();
-    header("Location: w_paneladm.php?#usuarios");
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true]);
+    } else {
+        header("Location: w_paneladm.php?#usuarios");
+    }
     exit;
 } catch (Exception $e) {
     $conexion->rollback();
-    http_response_code(500);
-    echo "Error: " . $e->getMessage();
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    } else {
+        http_response_code(500);
+        echo "Error: " . $e->getMessage();
+    }
 } finally {
     $conexion->close();
 }
