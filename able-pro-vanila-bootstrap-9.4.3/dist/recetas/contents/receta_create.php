@@ -84,7 +84,7 @@
     var ingredientes = [];
 
     $(document).ready(function () {
-        fetchIngredientes();
+        fetchIngredientes(addIngrediente);
 
         $('#btnAddIngrediente').on('click', function () {
             addIngrediente();
@@ -116,13 +116,14 @@
         $('#ingredientesList').append(ingredienteItem);
     }
 
-    function fetchIngredientes() {
+    function fetchIngredientes(callback = null) {
         $.ajax({
             url: 'api/ingredientes.php',
             type: 'GET',
             data: null,
             success: function (response) {
                 ingredientes = JSON.parse(response);
+                if (typeof callback === 'function') callback();
             },
             error: function (xhr, status, error) {
                 console.error("Ocurrió un error al obtener los ingredientes: " + error);
