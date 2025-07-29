@@ -2303,6 +2303,15 @@ window.onclick = function(event) {
                                             </button>
                                         </form>
                                     </div>
+                                    <div class="col-12 mt-2">
+                                        <form method="POST" action="borrar_solicitud_ej.php" class="h-100">
+                                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                            <button class="boton-accion borrar w-100 h-100" type="submit">
+                                                <img src="../assets/images/icons-tab/papeleraa.png" alt="borrar">
+                                                Borrar
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
