@@ -487,7 +487,7 @@ $query = "SELECT
   GROUP_CONCAT(DISTINCT e.Equipamiento ORDER BY e.Equipamiento SEPARATOR ', ') AS Equipamientos,
   GROUP_CONCAT(DISTINCT e.IdEquipamiento ORDER BY e.IdEquipamiento SEPARATOR ',') AS EquipamientoIds
 FROM videos v
-  JOIN Sexo s ON v.idSexo = s.idSexo
+  JOIN sexo s ON v.idSexo = s.idSexo
   LEFT JOIN video_grupo_muscular vgm ON v.IdVideo = vgm.idVideo
   LEFT JOIN grupo_muscular gm ON vgm.idGrupoMuscular = gm.IdGrupoMuscular
   JOIN grupo_enfoque ge ON v.idGrupoEnfoque = ge.IdGrupo
@@ -1775,24 +1775,7 @@ td.limit-text {
               };
 
                 ?>
-<script>
-// Funciones para controlar modales
-// Agrega este código en el script principal de la página
-function abrirModal(id) {
-    document.getElementById(`modal-${id}`).style.display = 'block';
-}
 
-function cerrarModal(id) {
-    document.getElementById(`modal-${id}`).style.display = 'none';
-}
-
-// Cerrar al hacer clic fuera del modal
-window.onclick = function(event) {
-    if (event.target.classList.contains('modal-solicitudes')) {
-        event.target.style.display = 'none';
-    }
-};
-</script>
 
                 <!-- Tarjeta de solicitud -->
                 <div class="solicitud-card <?= $estadoClass ?>" onclick="abrirModal(<?= $row['id'] ?>)">
@@ -2303,6 +2286,15 @@ window.onclick = function(event) {
                                             </button>
                                         </form>
                                     </div>
+                                    <div class="col-12 mt-2">
+                                        <form method="POST" action="borrar_solicitud_ej.php" class="h-100">
+                                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                            <button class="boton-accion borrar w-100 h-100" type="submit">
+                                                <img src="../assets/images/icons-tab/papeleraa.png" alt="borrar">
+                                                Borrar
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2317,7 +2309,24 @@ window.onclick = function(event) {
     }
     ?>
 </div>
+<script>
+// Funciones para controlar modales
+// Agrega este código en el script principal de la página
+function abrirModal(id) {
+    document.getElementById(`modal-${id}`).style.display = 'block';
+}
 
+function cerrarModal(id) {
+    document.getElementById(`modal-${id}`).style.display = 'none';
+}
+
+// Cerrar al hacer clic fuera del modal
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal-solicitudes')) {
+        event.target.style.display = 'none';
+    }
+};
+</script>
 <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
   <script>

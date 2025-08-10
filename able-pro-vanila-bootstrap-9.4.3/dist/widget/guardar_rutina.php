@@ -1,72 +1,118 @@
 <?php
 include 'db.php';
+require_once '../auth/check_session.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $solicitud_id    = intval($_POST['solicitud_id'] ?? 0);
-    $enfoque         = intval($_POST['enfoque'] ?? 0);
-    $dias_disponible = intval($_POST['dias_disponible'] ?? 0);
-    $tiempo          = intval($_POST['tiempo_disponible'] ?? 0);
-    $ejercicios      = $_POST['ejercicios'] ?? [];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $usuario_id = $_SESSION['IdUsuario'];
+    $nombre = trim($_POST['nombre']);
+    $edad = isset($_POST['edad']) ? filter_var(trim($_POST['edad']), FILTER_VALIDATE_INT) : null;
+    $genero = isset($_POST['genero']) ? filter_var(trim($_POST['genero']), FILTER_VALIDATE_INT) : null;
+    $email = trim($_POST['email']);
+    $peso = isset($_POST['peso']) ? filter_var(trim($_POST['peso']), FILTER_VALIDATE_FLOAT) : null;
+    $altura = isset($_POST['altura']) ? filter_var(trim($_POST['altura']), FILTER_VALIDATE_INT) : null;
+    $objetivo = trim($_POST['objetivo']);
+    $suscripcion = trim($_POST['suscripcion']);
+    $trabajo = trim($_POST['trabajo']);
+    $ejercicio = trim($_POST['ejercicio']);
+    $diasEntrenamiento = isset($_POST['dias_entrenamiento']) ? filter_var(trim($_POST['dias_entrenamiento']), FILTER_VALIDATE_INT) : 0;
+    $intensidad = isset($_POST['intensidad']) ? filter_var(trim($_POST['intensidad']), FILTER_VALIDATE_INT) : 0;
+    $nivel = isset($_POST['nivel']) ? filter_var(trim($_POST['nivel']), FILTER_VALIDATE_INT) : 0;
+    $lesiones = trim($_POST['lesiones']);
+    $dias_disponibles = isset($_POST['dias_disponibles']) ? filter_var(trim($_POST['dias_disponibles']), FILTER_VALIDATE_INT) : null;
+    $lugar_entrenamiento = trim($_POST['lugar_entrenamiento']);
+    $preferencia_ejercicios = trim($_POST['preferencia_ejercicios']);
+    $grupo_enfoque = isset($_POST['grupo_enfoque']) ? filter_var(trim($_POST['grupo_enfoque']), FILTER_VALIDATE_INT) : 0;
+    $tiempo_disponible = isset($_POST['tiempo_disponible']) ? filter_var(trim($_POST['tiempo_disponible']), FILTER_VALIDATE_INT) : null;
+    $estado = "pendiente";
+    $fechaHoraActual = date('Y-m-d H:i:s');
 
-    $conexion->begin_transaction();
+    if (
+        empty($nombre) ||
+        empty($email) ||
+        empty($objetivo) ||
+        empty($suscripcion) ||
+        empty($trabajo) ||
+        empty($ejercicio) ||
+        empty($lesiones) ||
+        empty($dias_disponibles) ||
+        empty($lugar_entrenamiento) ||
+        empty($preferencia_ejercicios) ||
+        $genero === null ||
+        $nivel === null ||
+        $tiempo_disponible === null ||
+        $edad === false ||
+        $peso === false ||
+        $altura === false
+    ) {
+        echo "Por favor, completa todos los campos requeridos.";
+        exit();
+    }
 
     try {
-        if (!$solicitud_id) throw new Exception('Solicitud inválida');
+        $sql = "SELECT 1 FROM solicitudes_ejercicios WHERE usuario_id = ?";
+        $stmt = $conexion->prepare($sql);
+        if (!$stmt) throw new Exception("Error al preparar SELECT: " . $conexion->error);
 
-        // Obtener idRutina asociado
-        $stmt = $conexion->prepare("SELECT idRutina FROM resumen_rutinas WHERE idSolicitud = ? ORDER BY fecha_calculo DESC LIMIT 1");
-        $stmt->bind_param('i', $solicitud_id);
+        $stmt->bind_param("i", $usuario_id);
         $stmt->execute();
-        $stmt->bind_result($idRutina);
-        if (!$stmt->fetch()) {
-            throw new Exception('Plan no encontrado');
+        $resultado = $stmt->get_result();
+
+        if ($resultado->num_rows == 0) {
+            // INSERT
+            $sql = "INSERT INTO solicitudes_ejercicios (
+                        usuario_id, nombre, edad, email, peso, altura, sexo,
+                        objetivo, suscripcion, trabajo, ejercicio,
+                        diasEntrenamiento, intensidad, nivel, lesiones,
+                        dias_disponibles, lugar_entrenamiento, preferencias,
+                        estado, fecha_envio, grupo_enfoque, tiempo_disponible
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conexion->prepare($sql);
+            if (!$stmt) throw new Exception("Error al preparar INSERT: " . $conexion->error);
+
+            // Tipos corregidos (genero i, nivel i, grupo_enfoque i)
+            $stmt->bind_param(
+                "isisdiissssiiisissssii",
+                $usuario_id, $nombre, $edad, $email, $peso, $altura, $genero,
+                $objetivo, $suscripcion, $trabajo, $ejercicio, $diasEntrenamiento,
+                $intensidad, $nivel, $lesiones, $dias_disponibles, $lugar_entrenamiento,
+                $preferencia_ejercicios, $estado, $fechaHoraActual, $grupo_enfoque, $tiempo_disponible
+            );
+        } else {
+            // UPDATE
+            $sql = "UPDATE solicitudes_ejercicios SET
+                        nombre=?, edad=?, email=?, peso=?, altura=?, sexo=?,
+                        objetivo=?, suscripcion=?, trabajo=?, ejercicio=?,
+                        diasEntrenamiento=?, intensidad=?, nivel=?, lesiones=?,
+                        dias_disponibles=?, lugar_entrenamiento=?, preferencias=?,
+                        estado=?, fecha_envio=?, grupo_enfoque=?, tiempo_disponible=?
+                    WHERE usuario_id=?";
+            $stmt = $conexion->prepare($sql);
+            if (!$stmt) throw new Exception("Error al preparar UPDATE: " . $conexion->error);
+
+            $stmt->bind_param(
+                "sisdiissssiiisisssssii",
+                $nombre, $edad, $email, $peso, $altura, $genero, $objetivo,
+                $suscripcion, $trabajo, $ejercicio, $diasEntrenamiento, $intensidad,
+                $nivel, $lesiones, $dias_disponibles, $lugar_entrenamiento,
+                $preferencia_ejercicios, $estado, $fechaHoraActual, $grupo_enfoque,
+                $tiempo_disponible, $usuario_id
+            );
         }
-        $stmt->close();
 
-        // Actualizar resumen_rutinas
-        $stmt = $conexion->prepare("UPDATE resumen_rutinas SET idEnfoque = ?, fecha_calculo = NOW() WHERE idSolicitud = ?");
-        $stmt->bind_param('ii', $enfoque, $solicitud_id);
-        if (!$stmt->execute()) throw new Exception('Error actualizando resumen: ' . $stmt->error);
-        $stmt->close();
-
-        // Actualizar rutina
-        $stmt = $conexion->prepare("UPDATE rutina SET dias_disponible = ?, tiempo_disponible = ? WHERE IdRutina = ?");
-        $stmt->bind_param('iii', $dias_disponible, $tiempo, $idRutina);
-        if (!$stmt->execute()) throw new Exception('Error actualizando rutina: ' . $stmt->error);
-        $stmt->close();
-
-        // Limpiar ejercicios actuales
-        $del = $conexion->prepare("DELETE FROM rutina_ejercicio WHERE idRutina = ?");
-        $del->bind_param('i', $idRutina);
-        $del->execute();
-        $del->close();
-
-        // Insertar ejercicios nuevos
-        $ins = $conexion->prepare("INSERT INTO rutina_ejercicio (idRutina, dia, idVideo, orden) VALUES (?, ?, ?, ?)");
-        foreach ($ejercicios as $dia => $lista) {
-            $diaInt = intval($dia);
-            $orden = 1;
-            if (is_array($lista)) {
-                foreach ($lista as $vid) {
-                    $vidInt = intval($vid);
-                    $ordInt = $orden++;
-                    $ins->bind_param('iiii', $idRutina, $diaInt, $vidInt, $ordInt);
-                    if (!$ins->execute()) throw new Exception('Error insertando ejercicio: ' . $ins->error);
-                }
-            }
+        if ($stmt->execute()) {
+            header("Location: ../widget/calcula_ejercicios.php");
+            exit();
+        } else {
+            throw new Exception("Error al ejecutar la consulta: " . $stmt->error);
         }
-        $ins->close();
 
-        $conexion->commit();
-        header('Location: w_paneladm.php?#solicitudes-ej');
-        exit();
+        $stmt->close();
     } catch (Exception $e) {
-        $conexion->rollback();
-        echo 'Error: ' . $e->getMessage();
+        echo "Error: " . $e->getMessage();
     } finally {
         $conexion->close();
     }
 } else {
-    echo 'Método no permitido.';
+    echo "Método no permitido.";
 }
 ?>

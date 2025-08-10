@@ -12,11 +12,19 @@ $usuario_id = $_SESSION['IdUsuario']; // ID de usuario hardcodeado para pruebas
 
 // Obtener el ID de la solicitud
 //$solicitud_id = $_GET['solicitud_id'] ?? null;
-$sql = "SELECT solicitud_id FROM resumen_planes WHERE idUsuario = ?";
+$sql = "
+    SELECT r.solicitud_id
+    FROM resumen_planes r
+    INNER JOIN solicitudes s 
+        ON r.solicitud_id = s.id
+    WHERE r.idUsuario = ? 
+      AND s.estado = 'aprobada'
+";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $result = $stmt->get_result();
+
 
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc(); // Obtiene la fila como un array asociativo
@@ -745,7 +753,7 @@ if (!empty($alimentos)) {
     /* Colores por macronutriente */
     .macro-1 td { background-color: #fceacc !important; }
     .macro-2 td { background-color: #defbff !important; }
-    .macro-3 td { background-color: #d6ffda !important; }
+    .macro-3 td { background-color: #FAD5CF !important; }
 </style>
 
               </div>

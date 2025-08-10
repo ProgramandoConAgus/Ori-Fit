@@ -16,12 +16,18 @@ $usuario_id = $_SESSION['IdUsuario']; // ID de usuario hardcodeado para pruebas
 
 // Obtener el ID de la solicitud
 //$solicitud_id = $_GET['solicitud_id'] ?? null;
-$sql = "SELECT idSolicitud FROM resumen_rutinas WHERE idUsuario = ?";
+$sql = "
+  SELECT r.idSolicitud
+  FROM resumen_rutinas r
+  INNER JOIN solicitudes_ejercicios s 
+      ON r.idSolicitud = s.id
+  WHERE r.idUsuario = ? 
+    AND s.estado = 'aprobada'
+";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
 
 
 if ($result && $result->num_rows > 0) {

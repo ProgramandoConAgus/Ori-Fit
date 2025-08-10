@@ -2,18 +2,17 @@
 include 'db.php';
 require_once '../auth/check_session.php';
 
-// 1) Usuario y solicitud
 $usuario_id = $_SESSION['IdUsuario'];
 
+// 1) Traer la última solicitud pendiente
 $sql = "
   SELECT 
-    peso, altura, edad, genero, objetivo, fecha_envio,
+    peso, altura, edad, sexo, objetivo, fecha_envio,
     id AS solicitud_id, trabajo, ejercicio, diasEntrenamiento,
     intensidad, nivel, lesiones, dias_disponibles,
-    lugar_entrenamiento, grupo_enfoque, tiempo_disponible, sexo
+    lugar_entrenamiento, grupo_enfoque, tiempo_disponible
   FROM solicitudes_ejercicios
-  WHERE usuario_id = ? 
-    AND estado = 'pendiente'
+  WHERE usuario_id = ? AND estado = 'pendiente'
   ORDER BY fecha_envio DESC
   LIMIT 1
 ";
@@ -21,11 +20,9 @@ $stmt = $conexion->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $fila = $stmt->get_result()->fetch_assoc();
-if (!$fila) {
-    die("No hay solicitudes pendientes para este usuario.");
-}
+if (!$fila) die("No hay solicitudes pendientes para este usuario.");
 
-// Extraigo variables
+// 2) Extraer variables
 $peso                = $fila['peso'];
 $altura              = $fila['altura'];
 $edad                = $fila['edad'];
@@ -33,24 +30,24 @@ $objetivo            = $fila['objetivo'];
 $trabajo             = $fila['trabajo'];
 $ejercicio           = $fila['ejercicio'];
 $diasEntrenamiento   = $fila['diasEntrenamiento'];
-$intensidad_usuario  = (int)$fila['intensidad'];    // filtro de dificultad
-$nivel_usuario       = (int)$fila['nivel'];         // nivel de usuario (puede mapearse también a dificultad si lo prefieres)
+$intensidad_usuario  = (int)$fila['intensidad'];
+$nivel_usuario       = (int)$fila['nivel'];
 $lesiones            = $fila['lesiones'];
 $dias_disponibles    = (int)$fila['dias_disponibles'];
 $lugar_entrenamiento = $fila['lugar_entrenamiento'];
 $solicitud_id        = $fila['solicitud_id'];
 $grupo_enfoque       = (int)$fila['grupo_enfoque'];
 $tiempo_disponible   = (int)$fila['tiempo_disponible'];
-$sexo_usuario        = (int)$fila['sexo'];         // filtro de sexo
+$sexo_usuario        = (int)$fila['sexo'];
 
-// 2) Mapear 'lugar_entrenamiento' (string) a IdLugar (int) de la tabla lugar
+// 3) Mapear 'lugar_entrenamiento' a IdLugar
 $stmt2 = $conexion->prepare("SELECT IdLugar FROM lugar WHERE Lugar = ?");
 $stmt2->bind_param("s", $lugar_entrenamiento);
 $stmt2->execute();
 $res2 = $stmt2->get_result()->fetch_assoc();
-$idLugar = $res2 ? (int)$res2['IdLugar'] : 3; // si no existe, caer en '3' = 'cualquiera'
+$idLugar = $res2 ? (int)$res2['IdLugar'] : 3; // 3 = cualquiera
 
-// 3) Configuración de días / duración / grupos musculares según tu Excel
+// 4) Configuración de días / duración / grupos musculares (TU BLOQUE ORIGINAL)
 $config = [
   3 => [ // 3 días x semana
     30 => [
@@ -114,16 +111,21 @@ $config = [
   ],
 ];
 
-// 4) Función de extracción de ejercicios (sin equipamiento, porque tu tabla usa idEquipamiento)
+// 5) Validar config
+if (!isset($config[$dias_disponibles][$tiempo_disponible][$grupo_enfoque])) {
+    die("Configuración no encontrada para estos parámetros.");
+}
+
+// 6) Función para obtener ejercicios (con <= en dificultad)
 function obtenerEjerciciosPorGrupos($c, array $grupos, $sexo, $dif, $lugar, $limite) {
     $inList = implode(',', array_map('intval', $grupos));
     $sql = "
-      SELECT IdVideo, Nombre, URL
+      SELECT DISTINCT IdVideo, Nombre, URL
       FROM videos
       WHERE idGrupoEnfoque IN ($inList)
-        AND (idSexo = ?      OR idSexo = 3)
-        AND (idDificultad = ? OR idDificultad = 1)
-        AND (idLugar = ?     OR idLugar = 3)
+        AND (idSexo = ? OR idSexo = 3)
+        AND (idDificultad <= ?)
+        AND (idLugar = ? OR idLugar = 3)
       ORDER BY RAND()
       LIMIT ?
     ";
@@ -133,84 +135,72 @@ function obtenerEjerciciosPorGrupos($c, array $grupos, $sexo, $dif, $lugar, $lim
     return $st->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 
-// 5) Inserción de la rutina
-$insRut = $conexion->prepare(
-  "INSERT INTO rutina (idUsuario, tiempo_disponible, fecha, dias_disponible)
-   VALUES (?, ?, NOW(), ?)"
-);
-$insRut->bind_param("iii", $usuario_id, $tiempo_disponible, $dias_disponibles);
-$insRut->execute();
-$rutina_id = $insRut->insert_id;
+// 7) Generar rutina (Transacción + evitar duplicados)
+$conexion->begin_transaction();
+try {
+    $insRut = $conexion->prepare(
+        "INSERT INTO rutina (idUsuario, tiempo_disponible, fecha, dias_disponible)
+         VALUES (?, ?, NOW(), ?)"
+    );
+    $insRut->bind_param("iii", $usuario_id, $tiempo_disponible, $dias_disponibles);
+    $insRut->execute();
+    $rutina_id = $insRut->insert_id;
 
-// Preparo el INSERT de ejercicios (solo idRutina, dia, idVideo, orden)
-$stmtEj = $conexion->prepare(
-  "INSERT INTO rutina_ejercicio (idRutina, dia, idVideo, orden)
-   VALUES (?, ?, ?, ?)"
-);
+    $stmtEj = $conexion->prepare(
+        "INSERT INTO rutina_ejercicio (idRutina, dia, idVideo, orden)
+         VALUES (?, ?, ?, ?)"
+    );
 
-// Grupos completos para fallback
-$allGroups = [1,2,3,4,5];
+    $allGroups = [1,2,3,4,5];
+    $cfg = $config[$dias_disponibles][$tiempo_disponible][$grupo_enfoque];
 
-// Config obtención según días/tiempo/enfoque
-$cfg = $config[$dias_disponibles][$tiempo_disponible][$grupo_enfoque];
+    for ($dia = 1; $dia <= $dias_disponibles; $dia++) {
+        $ids = [];
+        array_walk_recursive($cfg['groups'][$dia-1], function($v) use (&$ids) {
+            $ids[] = $v;
+        });
 
-for ($dia = 1; $dia <= $dias_disponibles; $dia++) {
-    // a) Aplano los grupos de configuración
-    $raw = $cfg['groups'][$dia-1];
-    $ids = [];
-    foreach ($raw as $block) {
-        foreach ((array)$block as $g) {
-            $ids[] = $g;
+        $limit = $cfg['limits'][$dia-1];
+        $ejs = obtenerEjerciciosPorGrupos($conexion, $ids, $sexo_usuario, $intensidad_usuario, $idLugar, $limit);
+
+        if (count($ejs) < $limit) {
+            $faltan = $limit - count($ejs);
+            $extra = obtenerEjerciciosPorGrupos($conexion, $allGroups, $sexo_usuario, $intensidad_usuario, $idLugar, $faltan);
+            $ejs = array_merge($ejs, $extra);
         }
+
+        // 🔥 Quitar duplicados por IdVideo
+        $unicos = [];
+        foreach ($ejs as $ej) {
+            $unicos[$ej['IdVideo']] = $ej;
+        }
+        $ejs = array_values($unicos);
+
+        $orden = 1;
+        foreach ($ejs as $e) {
+            $stmtEj->bind_param("iiii", $rutina_id, $dia, $e['IdVideo'], $orden);
+            $stmtEj->execute();
+            $orden++;
+        }
+
+        error_log("DIA $dia → EJERCICIOS: " . print_r($ejs, true));
     }
 
-    // b) Extraigo hasta limit videos de esos grupos
-    $limit = $cfg['limits'][$dia-1];
-    $ejs   = obtenerEjerciciosPorGrupos(
-                $conexion, $ids,
-                $sexo_usuario, $intensidad_usuario,
-                $idLugar,
-                $limit
-             );
+    $insRes = $conexion->prepare(
+        "INSERT INTO resumen_rutinas
+         (idUsuario, idSolicitud, idEnfoque, fecha_calculo, idRutina)
+         VALUES (?, ?, ?, NOW(), ?)"
+    );
+    $insRes->bind_param("iiii", $usuario_id, $solicitud_id, $grupo_enfoque, $rutina_id);
+    $insRes->execute();
 
-    // c) Si quedó vacío, fallback a todos los grupos
-    if (empty($ejs)) {
-        $ejs = obtenerEjerciciosPorGrupos(
-                  $conexion, $allGroups,
-                  $sexo_usuario, $intensidad_usuario,
-                  $idLugar,
-                  $limit
-               );
-    }
-
-    // d) Inserto cada ejercicio con su orden
-    $orden = 1;
-    foreach ($ejs as $e) {
-        $orden++;
-        $stmtEj->bind_param(
-          "iiii",
-          $rutina_id,
-          $dia,
-          $e['IdVideo'],
-          $orden
-        );
-        $stmtEj->execute();
-    }
+    $conexion->commit();
+    header('Location: ../widget/panelrutina.php');
+    exit();
+} catch (Exception $e) {
+    $conexion->rollback();
+    die("Error generando rutina: " . $e->getMessage());
+} finally {
+    $conexion->close();
 }
-
-// 6) Registro el resumen y redirijo
-$insRes = $conexion->prepare(
-  "INSERT INTO resumen_rutinas
-     (idUsuario, idSolicitud, idEnfoque, fecha_calculo, idRutina)
-   VALUES (?, ?, ?, NOW(), ?)"
-);
-$insRes->bind_param("iiii",
-  $usuario_id,
-  $solicitud_id,
-  $grupo_enfoque,
-  $rutina_id
-);
-$insRes->execute();
-
-header('Location: ../widget/panelrutina.php');$conexion->close();
 ?>
