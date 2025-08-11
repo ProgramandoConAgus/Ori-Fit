@@ -69,7 +69,7 @@
             <select class="form-control select-ingrediente-unidad"  name="ingredientes[0][unidad]"  required>
                     <option value="">Seleccione una Unidad de meida</option> 
                     <option value="G">Gramos</option> 
-                    <option value="ml">Miligramos</option> 
+                    <option value="ml">Mililitros</option>
                     <option value="Pieza">Pieza(Unidad)</option> 
                 </select> 
             </div>

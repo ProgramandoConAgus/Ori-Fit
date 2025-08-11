@@ -34,13 +34,16 @@ if (!empty($id)) {
 }
 $stmt->execute();
 $receta = $stmt->fetch(PDO::FETCH_ASSOC);
- 
-//buscando los ingredientes de la recetas
-$sql = "select * from recetas_ingredientes where receta_id=".$id;
-$stmt = $conn->prepare($sql); 
+$sql = "
+  SELECT ri.cantidad, ri.unidad_medida, i.nombre AS ingrediente
+  FROM recetas_ingredientes ri
+  INNER JOIN ingredientes i ON ri.ingrediente_id = i.IdIngrediente
+  WHERE ri.receta_id = :id
+";
+$stmt = $conn->prepare($sql);
+$stmt->bindValue(':id', (int)$id, PDO::PARAM_INT);
 $stmt->execute();
-$ingredientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$receta["ingredientes"] = $ingredientes;
+$receta['ingredientes'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 // Formatear los resultados en JSON

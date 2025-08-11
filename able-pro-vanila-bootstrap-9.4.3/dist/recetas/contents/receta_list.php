@@ -151,7 +151,29 @@
     <nav>
         <ul id="pagination" class="pagination justify-content-center"></ul>
     </nav>
+    <!-- Modal Detalles Receta -->
+    <div class="modal fade" id="detalleRecetaModal" tabindex="-1" aria-labelledby="detalleRecetaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detalleRecetaModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="detalleRecetaDescripcion"></p>
+                    <p><strong>Tiempo:</strong> <span id="detalleRecetaTiempo"></span></p>
+                    <p><strong>Dificultad:</strong> <span id="detalleRecetaDificultad"></span></p>
+                    <h6>Ingredientes</h6>
+                    <ul id="detalleRecetaIngredientes"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
@@ -208,11 +230,11 @@
               <p class="card-text descripcion-completa" style="display:none;">${descripcion}</p>
               <a href="#" class="link-ver-mas mt-auto">Ver más</a>` : ''}
             <p class="mt-2 mb-0"><strong>Tiempo:</strong> ${r.tiempo_preparacion} mins</p>
-            <p class="mb-3"><strong>Dificultad:</strong> ${r.dificultad}</p>
-            ${isAdmin ? `<div class="mt-auto d-flex gap-2">
-              <a href="./editar-receta.php?id=${r.id}" class="btn btn-primary">Editar</a>
-              <button type="button" class="btn btn-danger btn-delete-receta" data-id="${r.id}">Eliminar</button>
-            </div>` : ''}
+            <div class="mt-auto d-flex gap-2">
+              <button type="button" class="btn btn-info btn-detalle-receta" data-id="${r.id}">Ver detalles</button>
+              ${isAdmin ? `<a href="./editar-receta.php?id=${r.id}" class="btn btn-primary">Editar</a>
+              <button type="button" class="btn btn-danger btn-delete-receta" data-id="${r.id}">Eliminar</button>` : ''}
+            </div>
           </div>
         </div>
       </div>
@@ -220,6 +242,35 @@
   });
 }
 
+// Mostrar detalles de receta en modal
+$(document).on('click', '.btn-detalle-receta', function() {
+    const id = $(this).data('id');
+    $.get('api/recetas_one.php', { id: id }, function(resp) {
+        let data;
+        try { data = typeof resp === 'string' ? JSON.parse(resp) : resp; } catch(e) { data = null; }
+        if (!data) return;
+        $('#detalleRecetaModalLabel').text(data.titulo || '');
+        $('#detalleRecetaDescripcion').text(data.descripcion || '');
+        $('#detalleRecetaTiempo').text(data.tiempo_preparacion ? data.tiempo_preparacion + ' mins' : '');
+        $('#detalleRecetaDificultad').text(data.dificultad || '');
+        const lista = $('#detalleRecetaIngredientes');
+        lista.empty();
+        if (Array.isArray(data.ingredientes)) {
+            data.ingredientes.forEach(ing => {
+                let unidad = ing.unidad_medida;
+                switch (unidad) {
+                    case 'ml': unidad = 'Mililitros'; break;
+                    case 'g': unidad = 'Gramos'; break;
+                    case 'pieza':
+                    case 'Pieza': unidad = 'Pieza'; break;
+                }
+                lista.append(`<li>${ing.cantidad} ${unidad} - ${ing.ingrediente}</li>`);
+            });
+        }
+        var modal = new bootstrap.Modal(document.getElementById('detalleRecetaModal'));
+        modal.show();
+    });
+});
 
 // Manejar clic en "Ver más/menos"
 $(document).on('click', '.link-ver-mas', function(e) {
