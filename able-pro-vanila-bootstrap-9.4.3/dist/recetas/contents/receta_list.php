@@ -154,15 +154,18 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="../assets/js/plugins/sweetalert2.all.min.js"></script>
 <script>
     var isAdmin = <?php echo (isset($_SESSION['IdRol']) && $_SESSION['IdRol'] == 2) ? 'true' : 'false'; ?>;
+    var currentPage = 1;
     function fetchRecetas(page = 1) {
+        currentPage = page;
         const filtros = $('#filtrosForm').serialize() + `&page=${page}`; 
         $.ajax({
             url: 'api/recetas_paginacion.php',
             type: 'GET',
             data: filtros,
-            success: function (response) { 
+            success: function (response) {
                 const data = JSON.parse(response);
                 renderRecetas(data.recetas);
                 renderPagination(data.totalPages, page);
@@ -206,7 +209,10 @@
               <a href="#" class="link-ver-mas mt-auto">Ver más</a>` : ''}
             <p class="mt-2 mb-0"><strong>Tiempo:</strong> ${r.tiempo_preparacion} mins</p>
             <p class="mb-3"><strong>Dificultad:</strong> ${r.dificultad}</p>
-            ${isAdmin ? `<a href="./editar-receta.php?id=${r.id}" class="btn btn-primary mt-auto">Editar</a>` : ''}
+            ${isAdmin ? `<div class="mt-auto d-flex gap-2">
+              <a href="./editar-receta.php?id=${r.id}" class="btn btn-primary">Editar</a>
+              <button type="button" class="btn btn-danger btn-delete-receta" data-id="${r.id}">Eliminar</button>
+            </div>` : ''}
           </div>
         </div>
       </div>
@@ -234,6 +240,40 @@ $(document).on('click', '.link-ver-mas', function(e) {
     }
 });
 
+
+// Eliminación de recetas con confirmación SweetAlert
+$(document).on('click', '.btn-delete-receta', function() {
+    const id = $(this).data('id');
+    Swal.fire({
+        title: '¿Eliminar receta?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then(result => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: 'api/recetas_delete.php',
+                type: 'POST',
+                data: { id: id },
+                success: function(resp) {
+                    let data;
+                    try { data = typeof resp === 'string' ? JSON.parse(resp) : resp; } catch(e) { data = {success:false}; }
+                    if (data.success) {
+                        Swal.fire('Eliminado', 'La receta ha sido borrada', 'success');
+                        fetchRecetas(currentPage);
+                    } else {
+                        Swal.fire('Error', data.message || 'No se pudo eliminar', 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'No se pudo eliminar', 'error');
+                }
+            });
+        }
+    });
+});
     function renderPagination(totalPages, currentPage) {
         const pagination = $('#pagination');
         pagination.empty();
