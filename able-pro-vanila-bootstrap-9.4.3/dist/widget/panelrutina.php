@@ -86,7 +86,7 @@ if ($result_solicitud && $result_solicitud->num_rows > 0) {
     $agrupado_por_dia = [];
   }
 }else {
-  header('Location: ../pages/Panel.php');
+  header('Location: ../pages/panel.php');
   $calorias = $proteinas = $grasas = $carbohidratos = 0;
   $alimentos = [];
 }
@@ -140,6 +140,13 @@ include('../forms/UsuarioClass.php');
 $usuario = new Usuario($conexion);
 $datosUsuario = $usuario->obtenerPorId($_SESSION['IdUsuario']);
 
+$roles = [
+    1 => 'Usuario',
+    2 => 'Administrador',
+    3 => 'Especialista en Entrenamiento',
+    4 => 'Especialista en Nutrición'
+];
+$rolUsuario = $roles[$datosUsuario['idRol']] ?? 'Rol Desconocido';
 
 $solicitud=$usuario->ObtenerSolicitud($_SESSION['IdUsuario']);
 
@@ -251,7 +258,7 @@ function getYoutubeId(string $url): ?string {
             </div>
             <div class="flex-grow-1 ms-3 me-2">
             <h6 class="mb-0"><?= ucwords($datosUsuario['nombre']) ?> <?= ucwords($datosUsuario['apellido']) ?></h6>
-            <small>Administrador</small>
+            <small><?= $rolUsuario ?></small>
             </div>
             <a class="btn btn-icon btn-link-secondary avtar" data-bs-toggle="collapse" href="#pc_sidebar_userlink">
               <svg class="pc-icon">
