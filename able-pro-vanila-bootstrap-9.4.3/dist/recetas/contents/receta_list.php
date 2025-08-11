@@ -39,6 +39,65 @@
     </div>
 </div> -->
 
+<style>
+  /* 1) Que la imagen no se deforme y mantenga la altura actual */
+  #recetasListado .card .card-img-top{
+    width: 100%;
+    height: 120px !important;   /* misma altura que usás */
+    object-fit: cover;           /* recorta sin estirar */
+    object-position: center;     /* centra el recorte */
+    display: block;
+    background: #f3f5f7;         /* color de fondo si tarda en cargar */
+    border-top-left-radius: .5rem;
+    border-top-right-radius: .5rem;
+  }
+
+  /* 2) Si viene “sin foto”, ocultá el <img> para que no quede roto */
+  #recetasListado img.card-img-top[src=""],
+  #recetasListado img.card-img-top:not([src]),
+  #recetasListado img.card-img-top[src$="/"],
+  #recetasListado img.card-img-top[src$="null"],
+  #recetasListado img.card-img-top[src$="undefined"]{
+    display:none !important;
+  }
+</style>
+<style>
+  /* ya lo tenés: 120px y cover */
+  #recetasListado .card .card-img-top{
+    width:100%;
+    height:120px!important;
+    object-fit:cover;
+    object-position:center;
+    display:block;
+    background:#f3f5f7;
+    border-top-left-radius:.5rem;
+    border-top-right-radius:.5rem;
+  }
+  /* si es placeholder, que entre completa y no se deforme */
+  #recetasListado .card .card-img-top.is-placeholder{
+    object-fit:contain;
+    padding:10px;
+  }
+</style>
+<style>
+  /* todas las imágenes de la card: NO deformar y altura fija */
+  #recetasListado .card .card-img-top{
+    width: 100%;
+    height: 120px !important;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
+
+  /* placeholder: que también rellene y recorte si hace falta */
+  #recetasListado .card .card-img-top.is-placeholder{
+    object-fit: cover !important;
+    object-position: center;      /* probá 50% 40% si querés subir el encuadre */
+    padding: 0 !important;
+    background: none;
+  }
+</style>
+
 
 <div class="">
     <!-- Panel de Filtros -->
@@ -112,38 +171,49 @@
     }
 
     function renderRecetas(recetas) {
-    const recetasListado = $('#recetasListado');
-    recetasListado.empty();
-    if (recetas.length === 0) {
-        recetasListado.append('<p class="text-center">No se encontraron recetas.</p>');
-    } else {
-        recetas.forEach(receta => {
-            const descripcion = receta.descripcion || '';
-            const maxCaracteres = 150;
-            const descripcionCorta = descripcion.length > maxCaracteres ? 
-                descripcion.substring(0, maxCaracteres) + '...' : 
-                descripcion;
+  const DEFAULT_IMG = '../files/recipe-placeholder.webp'; // ajustá la ruta si es otra
 
-            recetasListado.append(`
-                <div class="col-md-3 mb-3">
-                    <div class="card h-100">
-                        <img height="120" src="http://localhost/ori-fit/able-pro-vanila-bootstrap-9.4.3/dist/files/${receta.foto}" class="card-img-top" alt="${receta.titulo}">
-                        <div class="card-body">
-                            <h5 class="card-title">${receta.titulo}</h5>
-                            <p class="card-text descripcion-corta">${descripcionCorta}</p>
-                            ${descripcion.length > maxCaracteres ? 
-                                `<p class="card-text descripcion-completa" style="display: none;">${descripcion}</p>
-                                <a href="#" class="link-ver-mas">Ver más</a>` : ''}
-                            <p><strong>Tiempo:</strong> ${receta.tiempo_preparacion} mins</p>
-                            <p><strong>Dificultad:</strong> ${receta.dificultad}</p>
-                            ${isAdmin ? `<a href="./editar-receta.php?id=${receta.id}" class="btn btn-primary">Editar</a>` : ''}
-                        </div>
-                    </div>
-                </div>
-            `);
-        });
-    }
+  const recetasListado = $('#recetasListado');
+  recetasListado.empty();
+
+  if (!recetas || recetas.length === 0) {
+    recetasListado.append('<p class="text-center">No se encontraron recetas.</p>');
+    return;
+  }
+
+  recetas.forEach(r => {
+    const descripcion = r.descripcion || '';
+    const max = 150;
+    const corta = descripcion.length > max ? descripcion.substring(0, max) + '...' : descripcion;
+
+    const tieneFoto = r.foto && r.foto !== 'null' && r.foto !== 'undefined' && r.foto.trim() !== '';
+    const src = tieneFoto ? `../files/${encodeURIComponent(r.foto)}` : DEFAULT_IMG;
+    const extraClass = tieneFoto ? '' : ' is-placeholder';
+
+    recetasListado.append(`
+      <div class="col-md-3 mb-3">
+        <div class="card h-100">
+          <img loading="lazy"
+               src="${src}"
+               class="card-img-top${extraClass}"
+               alt="${r.titulo || 'Receta'}"
+               onerror="this.onerror=null; this.src='${DEFAULT_IMG}'; this.classList.add('is-placeholder');">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">${r.titulo || ''}</h5>
+            <p class="card-text descripcion-corta">${corta}</p>
+            ${descripcion.length > max ? `
+              <p class="card-text descripcion-completa" style="display:none;">${descripcion}</p>
+              <a href="#" class="link-ver-mas mt-auto">Ver más</a>` : ''}
+            <p class="mt-2 mb-0"><strong>Tiempo:</strong> ${r.tiempo_preparacion} mins</p>
+            <p class="mb-3"><strong>Dificultad:</strong> ${r.dificultad}</p>
+            ${isAdmin ? `<a href="./editar-receta.php?id=${r.id}" class="btn btn-primary mt-auto">Editar</a>` : ''}
+          </div>
+        </div>
+      </div>
+    `);
+  });
 }
+
 
 // Manejar clic en "Ver más/menos"
 $(document).on('click', '.link-ver-mas', function(e) {
